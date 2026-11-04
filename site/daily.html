@@ -1139,6 +1139,11 @@ button.gate{width:100%;border:0;font:inherit;color:inherit;cursor:pointer;-webki
 .recap .rl{font-size:12px;font-weight:700;color:var(--muted)}
 .recap .rt{margin-top:3px;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--mint)}
 #crewstrip:not(:empty) ~ .howto{display:none}
+/* group-chat pushes */
+.recap .rh span{margin-left:auto}
+.rsend{flex:0 0 auto;min-height:32px;padding:0 10px;border-radius:9px;background:var(--mint);color:var(--ink);font:700 10px var(--mono);letter-spacing:.1em}
+.rsend:active{transform:scale(.96)}
+.crew .inv.nudge{box-shadow:inset 0 0 0 2px var(--gold);color:var(--gold)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"><meta property="og:title" content="Off Campus · The Queen's Daily"><meta property="og:description" content="How well do you know Queen's? Today's five: 3 minutes, free, same five for everyone at Queen's."><meta property="og:url" content="https://offcampusontario.ca/daily.html"><meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head><body data-mode="intro">
@@ -1649,7 +1654,25 @@ function crewBoardHTML(c){
   return `<div class="crew" data-code="${c.code}"><div class="ch"><b>${esc(c.name)}</b><div class="ctabs"><button type="button" class="ct ${tab === 'today' ? 'on' : ''}" data-v="today">TODAY</button><button type="button" class="ct ${tab === 'league' ? 'on' : ''}" data-v="league">LEAGUE</button></div></div>
     <div class="cbody" data-today="1"><ol>${rows}</ol>
     <p class="cmeta">${c.size < 2 ? 'JUST YOU SO FAR · INVITE YOUR HOUSE OR FLOOR' : `${c.played} OF ${c.size} PLAYED TODAY${waiting ? ` · ${waiting} TO GO` : ' · EVERYONE IN'}`}${hidden > 0 ? ` · +${hidden} MORE` : ''}</p></div>
-    <button class="btn ghost inv" data-code="${c.code}" data-name="${esc(c.name)}">INVITE TO ${esc(c.name.toUpperCase())}</button></div>`;
+    ${crewButtonHTML(c, waiting)}</div>`;
+}
+// The one button under each crew board does whatever moves the crew forward right now.
+function crewButtonHTML(c, waiting){
+  const top = c.members.find(m => m.total !== null), N = c.name;
+  if (c.size >= 2 && waiting > 0 && c.played > 0) {
+    const msg = `${N}: ${c.played} of ${c.size} played today. ${top.you ? `I'm leading with ${fmt(top.total)}` : `${top.nick} leads with ${fmt(top.total)}`}. Your turn:`;
+    return `<button class="btn ghost inv nudge" data-code="${c.code}" data-name="${esc(N)}" data-msg="${esc(msg)}">NUDGE THE ${waiting} WHO HAVEN'T PLAYED</button>`;
+  }
+  if (c.size >= 2 && waiting === 0) {
+    const list = c.members.filter(m => m.total !== null).slice(0, 6).map((m, i) => `${i + 1}. ${m.nick} ${fmt(m.total)}`).join('\n');
+    const msg = `${N} today:\n${list}\nSame time tomorrow:`;
+    return `<button class="btn ghost inv" data-code="${c.code}" data-name="${esc(N)}" data-msg="${esc(msg)}">SEND THE RESULTS TO ${esc(N.toUpperCase())}</button>`;
+  }
+  return `<button class="btn ghost inv" data-code="${c.code}" data-name="${esc(N)}">INVITE TO ${esc(N.toUpperCase())}</button>`;
+}
+async function shareText(text, url, copied){
+  try { if (navigator.share) { await navigator.share({ text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text + ' ' + url); toast(copied || 'COPIED, PASTE IT IN THE CHAT'); } catch (e) { toast(url); }
 }
 function leagueHTML(L){
   const rows = L.members.slice(0, CREW_ROWS).map((m, i) => `<li class="${m.you ? 'me' : ''} ${m.played ? '' : 'wait'}"><span class="rk">${i + 1}</span><span class="nk">${esc(m.nick)}${m.you ? ' <em>YOU</em>' : ''}${m.streak >= 2 ? ` <i>${m.streak}-day streak</i>` : ''}</span><span class="lw">${m.wins}W</span><b>${m.avg === null ? '–' : fmt(m.avg)}</b></li>`).join('');
@@ -1676,6 +1699,7 @@ async function crewStrip(el){
   let me; try { me = await api('GET', '/api/me?recap=1&playerId=' + PLAYER_ID); } catch (e) { return; }
   const crews = (me.crews || []).slice(0, innerHeight < 760 ? 1 : 2); if (!crews.length) return;
   el.innerHTML = crews.map(recapHTML).join('');
+  el.querySelectorAll('.rsend').forEach(b => b.onclick = () => { SFX.tap(); vibe(10); track('recap-send'); shareText(b.dataset.msg, `${CREW_INVITE_BASE}?crew=${b.dataset.code}&ref=recap`); });
 }
 function recapHTML(c){
   const y = c.yesterday, top = c.members.find(m => m.total !== null);
@@ -1689,7 +1713,8 @@ function recapHTML(c){
       : y.myRank ? `${y.played} of ${y.size} played · you came ${ordinal(y.myRank)}, ${fmt(y.top.total - y.myTotal)} behind`
       : `${y.played} of ${y.size} played · you sat it out`;
   }
-  return `<div class="recap"><div class="rh"><b>${esc(c.name.toUpperCase())}</b><span>${head ? 'YESTERDAY' : 'YOUR CREW'}</span></div>
+  const msg = y && y.played ? `${c.name} yesterday: ${y.top.you ? `I took it with ${fmt(y.top.total)}` : `${y.top.nick} took it with ${fmt(y.top.total)}`} (${y.played} of ${y.size} played). New five is up:` : `${c.name}: new five is up. Who's going first?`;
+  return `<div class="recap"><div class="rh"><b>${esc(c.name.toUpperCase())}</b><span>${head ? 'YESTERDAY' : 'YOUR CREW'}</span><button class="rsend" type="button" data-code="${c.code}" data-msg="${esc(msg)}">SEND TO CHAT</button></div>
     ${head ? `<p class="rw">${head}</p><p class="rl">${line}</p>` : ''}<p class="rt">${today}</p></div>`;
 }
 const ordinal = n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th','st','nd','rd'][n % 10] || 'th');
@@ -1709,7 +1734,7 @@ async function renderCrews(el, myScore){
   let me; try { me = await api('GET', '/api/me?playerId=' + PLAYER_ID); } catch (e) { el.innerHTML = ''; return; }
   const crews = me.crews || [];
   el.innerHTML = `<div class="crews">${crews.length ? crews.map(crewBoardHTML).join('') + `<details class="more"><summary>+ START ANOTHER CREW</summary>${newCrewFormHTML(false)}</details>` : crewCtaHTML()}</div>`;
-  el.querySelectorAll('.inv').forEach(b => b.onclick = () => invite(b.dataset.code, b.dataset.name, myScore));
+  el.querySelectorAll('.inv').forEach(b => b.onclick = () => b.dataset.msg ? (SFX.tap(), track(b.classList.contains('nudge') ? 'crew-nudge' : 'crew-results'), shareText(b.dataset.msg, `${CREW_INVITE_BASE}?crew=${b.dataset.code}&ref=crew`)) : invite(b.dataset.code, b.dataset.name, myScore));
   wireCrewTabs(el, crews);
   const cta = el.querySelector('#crewcta');
   if (cta) cta.onclick = () => { SFX.tap(); vibe(15); track('crew-open'); cta.outerHTML = newCrewFormHTML(true); wireForm(); const n = el.querySelector('#cfName'); if (n) n.focus(); };
