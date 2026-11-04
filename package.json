@@ -1,0 +1,12 @@
+{
+  "name": "offcampus-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Off Campus Crews: friend groups that compare daily scores",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": { "node": ">=18" }
+}
