@@ -61,4 +61,15 @@ ok((await call('POST', '/api/answer', { playerId:A, day:day3, round:0 }, later))
 // recap: yesterday's crew results
 const rc = (await call('GET', `/api/me?playerId=${A}&recap=1`, null, later)).body.crews[0].yesterday;
 ok(rc.played === 2 && rc.top.nick === 'Maya' && rc.second.nick === 'Josh' && rc.myRank === 2 && rc.myTotal === 3450, 'recap: yesterday winner, my rank');
+// save your spot + log in elsewhere
+ok((await call('POST', '/api/pin', { playerId:A, nick:'Josh', pin:'12a4' }, later)).status === 400, 'pin: must be 4 numbers');
+ok((await call('POST', '/api/pin', { playerId:A, nick:'Josh', pin:'4821' }, later)).status === 200, 'pin: saved');
+ok((await call('POST', '/api/pin', { playerId:B, nick:'josh', pin:'1111' }, later)).status === 409, 'pin: name already taken by someone else');
+ok((await call('GET', `/api/me?playerId=${A}`, null, later)).body.saved === true, 'pin: me says saved');
+ok((await call('POST', '/api/login', { nick:'JOSH', pin:'0000' }, later)).status === 401, 'login: wrong pin');
+const li = (await call('POST', '/api/login', { nick:' josh ', pin:'4821' }, later)).body;
+ok(li.playerId === A && li.nick === 'Josh' && li.streak.days === 1 && li.streak.best === 3450 && li.today === null, 'login: right pin gives back the player and streak');
+for (let k = 0; k < 5; k++) await call('POST', '/api/login', { nick:'Josh', pin:'9999' }, later);
+ok((await call('POST', '/api/login', { nick:'Josh', pin:'4821' }, later)).status === 429, 'login: locked after 5 wrong tries');
+ok(!JSON.stringify(li).includes('pinHash') && !JSON.stringify(li).includes('salt'), 'login: never sends the pin back');
 console.log('all tests passed');
