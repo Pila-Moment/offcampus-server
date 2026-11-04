@@ -1058,6 +1058,11 @@ body.typing::after{display:none}
 .joincard span{font-size:12.5px;font-weight:700}
 .joincard.in{background:var(--night-2);color:var(--text);box-shadow:inset 0 0 0 2px var(--mint)}
 .joincard.in b{color:var(--mint);font-size:18px}
+.crewcta{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;padding:12px 14px;border-radius:16px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--mint);cursor:pointer;min-height:64px;-webkit-tap-highlight-color:transparent}
+.crewcta b{grid-column:1;font-family:var(--display);font-weight:400;font-size:19px;line-height:1.05;color:var(--mint)}
+.crewcta span{grid-column:1;font-size:11.5px;font-weight:600;line-height:1.35;color:var(--muted)}
+.crewcta i{grid-column:2;grid-row:1 / span 2;font-style:normal;font-family:var(--display);font-size:15px;padding:11px 12px;border-radius:12px;background:var(--mint);color:var(--ink);white-space:nowrap}
+.crewcta:active{transform:scale(.98)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head><body data-mode="intro">
@@ -1509,7 +1514,7 @@ function nextDropText(){
   return `${hh}h ${String(mm).padStart(2, '0')}m ${String(ss).padStart(2, '0')}s`;
 }
 /* ================= CREWS: friend groups that compare today's scores =================
-   Talks to the offcampus-server on Railway. If CREWS_API is empty, Crews stay hidden and the game works as before. */
+   Talks to the Crews API on the same site (Netlify Function). If CREWS_API is empty, Crews stay hidden and the game works as before. */
 const CREWS_API = (() => { const t = new URLSearchParams(location.search).get('api'); if (t && /^http:\/\/localhost:\d+$/.test(t)) return t; return CREWS_URL; })();
 const CREW_INVITE_BASE = 'https://offcampusontario.ca/daily.html';
 const randId = () => { const a = new Uint8Array(15); (crypto.getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.random() * 256)); return Array.from(a, b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join(''); };
@@ -1526,10 +1531,12 @@ async function api(method, p, body){
 async function postScore(rec){ try { await api('POST', '/api/score', { playerId:PLAYER_ID, nick:getNick(), day:DAY.no, total:rec.total, pts:rec.pts }); } catch (e) {} }
 
 function crewBoardHTML(c){
-  const rows = c.members.map((m, i) => `<li class="${m.you ? 'me' : ''} ${m.total === null ? 'wait' : ''}"><span class="rk">${m.total === null ? '–' : i + 1}</span><span class="nk">${esc(m.nick)}${m.you ? ' <em>YOU</em>' : ''}${m.streak >= 2 ? ` <i>${m.streak}-day streak</i>` : ''}</span><b>${m.total === null ? 'not played yet' : fmt(m.total)}</b></li>`).join('');
+  const shown = c.members.map((m, i) => ({ m, i })).filter(({ m, i }) => i < CREW_ROWS - 1 || m.you || (i === CREW_ROWS - 1 && !c.members.slice(CREW_ROWS).some(x => x.you)));
+  const rows = shown.map(({ m, i }) => `<li class="${m.you ? 'me' : ''} ${m.total === null ? 'wait' : ''}"><span class="rk">${m.total === null ? '–' : i + 1}</span><span class="nk">${esc(m.nick)}${m.you ? ' <em>YOU</em>' : ''}${m.streak >= 2 ? ` <i>${m.streak}-day streak</i>` : ''}</span><b>${m.total === null ? 'not played yet' : fmt(m.total)}</b></li>`).join('');
+  const hidden = c.size - shown.length;
   const waiting = c.size - c.played;
   return `<div class="crew" data-code="${c.code}"><div class="ch"><b>${esc(c.name)}</b><span>${c.played} / ${c.size} PLAYED TODAY</span></div>
-    <ol>${rows}</ol>
+    <ol>${rows}</ol>${hidden > 0 ? `<p class="cnote">+ ${hidden} more in the crew</p>` : ''}
     ${c.size < 2 ? `<p class="cnote">Just you so far. Send the invite to your house, floor or friends.</p>` : waiting ? `<p class="cnote">${waiting} ${waiting === 1 ? "hasn't" : "haven't"} played yet. Give them a nudge.</p>` : ''}
     <button class="btn ghost inv" data-code="${c.code}" data-name="${esc(c.name)}">INVITE TO ${esc(c.name.toUpperCase())}</button></div>`;
 }
@@ -1539,23 +1546,31 @@ function newCrewFormHTML(first){
     ${getNick() ? '' : '<input id="cfNick" maxlength="16" placeholder="Your nickname" required>'}
     <button class="btn" type="submit">START A CREW</button></form>`;
 }
+const CREW_ROWS = 5;   // rows shown per crew board before "+N more"
+function crewCtaHTML(){
+  return `<button class="crewcta" id="crewcta" type="button"><b>PLAY WITH FRIENDS</b><span>Start a crew for your house or floor. See who wins today.</span><i>START A CREW</i></button>`;
+}
 async function renderCrews(el, myScore){
   if (!CREWS_API || !el) return;
-  el.innerHTML = `<div class="crews"><div class="lbl">YOUR CREWS</div><p class="cnote">Loading…</p></div>`;
+  if (!el.innerHTML) el.innerHTML = `<div class="crews">${crewCtaHTML()}</div>`;
   let me; try { me = await api('GET', '/api/me?playerId=' + PLAYER_ID); } catch (e) { el.innerHTML = ''; return; }
   const crews = me.crews || [];
-  el.innerHTML = `<div class="crews"><div class="lbl">YOUR CREWS</div>${crews.map(crewBoardHTML).join('')}
-    ${crews.length ? `<details class="more"><summary>+ START ANOTHER CREW</summary>${newCrewFormHTML(false)}</details>` : newCrewFormHTML(true)}</div>`;
+  el.innerHTML = `<div class="crews">${crews.length ? crews.map(crewBoardHTML).join('') + `<details class="more"><summary>+ START ANOTHER CREW</summary>${newCrewFormHTML(false)}</details>` : crewCtaHTML()}</div>`;
   el.querySelectorAll('.inv').forEach(b => b.onclick = () => invite(b.dataset.code, b.dataset.name, myScore));
-  const f = el.querySelector('#crewform');
-  if (f) f.onsubmit = async e => {
-    e.preventDefault(); const name = el.querySelector('#cfName').value.trim(); const nk = el.querySelector('#cfNick'); if (nk) { const v = nk.value.trim(); if (!v) return; store.set('oc-nick', v); }
-    if (!name) return; const btn = f.querySelector('button'); btn.disabled = true; btn.textContent = 'STARTING…';
-    try { const c = await api('POST', '/api/crews', { playerId:PLAYER_ID, nick:getNick(), name }); SFX.ok(); track('crew-start');
-      const rec = store.get(PLAY_KEY); if (rec) await postScore(rec);
-      await renderCrews(el, myScore); invite(c.code, c.name, myScore); }
-    catch (err) { btn.disabled = false; btn.textContent = 'START A CREW'; toast('COULDN\'T START IT, TRY AGAIN'); }
+  const cta = el.querySelector('#crewcta');
+  if (cta) cta.onclick = () => { SFX.tap(); vibe(15); track('crew-open'); cta.outerHTML = newCrewFormHTML(true); wireForm(); const n = el.querySelector('#cfName'); if (n) n.focus(); };
+  const wireForm = () => {
+    const f = el.querySelector('#crewform'); if (!f) return;
+    f.onsubmit = async e => {
+      e.preventDefault(); const name = el.querySelector('#cfName').value.trim(); const nk = el.querySelector('#cfNick'); if (nk) { const v = nk.value.trim(); if (!v) return; store.set('oc-nick', v); }
+      if (!name) return; const btn = f.querySelector('button'); btn.disabled = true; btn.textContent = 'STARTING…';
+      try { const c = await api('POST', '/api/crews', { playerId:PLAYER_ID, nick:getNick(), name }); SFX.ok(); track('crew-start');
+        const rec = store.get(PLAY_KEY); if (rec) await postScore(rec);
+        await renderCrews(el, myScore); invite(c.code, c.name, myScore); }
+      catch (err) { btn.disabled = false; btn.textContent = 'START A CREW'; toast('COULDN\'T START IT, TRY AGAIN'); }
+    };
   };
+  wireForm();
 }
 async function invite(code, name, myScore){
   SFX.tap(); track('crew-invite');
@@ -1648,12 +1663,12 @@ async function results(){
       <div class="total" id="big">0</div><div class="of">OUT OF 5,000</div>
       <div class="squares">${S.results.map((r, k) => `<div class="sq"><i style="background:${sqColor(r.pts)};animation-delay:${600 + k * 120}ms"></i><span>${SQLAB[r.type]}</span><b>${fmt(r.pts)}</b></div>`).join('')}</div>
       <span class="rankstamp">${esc(stamp)}</span></div>
+    ${GUEST ? '' : '<div id="crewsbox"></div>'}
     ${ok
       ? (live ? `<div class="gate ok"><b>YOU UNLOCKED A PRIZE!</b><span>You needed ${fmt(UNLOCK)}. You got ${fmt(S.total)}.</span></div><button class="btn pulse dock go" id="prize">SPIN FOR YOUR PRIZE!</button>`
               : `<div class="gate ok"><b>YOU'D HAVE UNLOCKED A PRIZE!</b><span>You beat ${fmt(UNLOCK)}. The prize wheel drops soon.</span></div><button class="btn pulse dock go" id="prize">SEE WHAT'S COMING</button>`)
       : `<div class="gate"><b>${fmt(UNLOCK - S.total)} POINTS SHORT</b><span>${live ? `You needed ${fmt(UNLOCK)} to unlock the prize spin.` : `When prizes drop, ${fmt(UNLOCK)} unlocks the spin.`} New five at 4am.</span></div><a class="btn mint dock" href="party.html" style="text-decoration:none">PLAY THE PARTY GAMES</a>`}
     ${GUEST ? '' : statsRow(st)}
-    ${GUEST ? '' : '<div id="crewsbox"></div>'}
     ${tailHTML()}
     ${GUEST ? '<p class="demo-note">Brand preview: player numbers and "beat %" are samples.</p>' : ''}
   </section>`;
@@ -1675,8 +1690,8 @@ function doneScreen(rec){
       <div class="total">${fmt(rec.total)}</div><div class="of">OUT OF 5,000</div>
       <div class="squares">${rec.pts.map((p, k) => `<div class="sq"><i style="background:${sqColor(p)}"></i><span>${SQLAB[rec.types[k]]}</span><b>${fmt(p)}</b></div>`).join('')}</div>
       <span class="rankstamp" style="animation-delay:0s">${esc(stamp)}</span></div>
-    ${statsRow(st)}
     <div id="crewsbox"></div>
+    ${statsRow(st)}
     <div class="gate ok" style="box-shadow:inset 0 0 0 2px var(--gold)"><b style="color:var(--gold)">PRIZE WHEEL DROPS SOON</b><span>Score ${fmt(UNLOCK)} and you'll spin for free stuff from Kingston spots.</span></div>
     ${tailHTML()}
     <a class="btn mint dock" href="party.html" style="text-decoration:none">PLAY THE PARTY GAMES</a>
