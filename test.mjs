@@ -46,4 +46,19 @@ ok(!JSON.stringify(lg).includes(A) && !JSON.stringify(lg).includes(B), 'league h
 ok((await call('GET', '/api/crews/ZZZZZZ/league')).status === 404, 'league: unknown crew');
 const st = (await call('GET', '/api/stats', null, later)).body;
 ok(st.playersToday === 1 && st.playersYesterday === 2 && st.cameBackToday === 1 && st.last7Days.length >= 2, 'stats: came back the next day ' + JSON.stringify(st));
+// real answers: first answer per round counts, Queen's split hidden under 5, crew split hidden under 5
+const day3 = torontoDay(later); const ids = 'defgh'.split('').map(ch => ch.repeat(16));
+for (const id of ids) await call('POST', `/api/crews/${code}/join`, { playerId:id, nick:'P' + id[0] }, later);
+let ra = (await call('POST', '/api/answer', { playerId:A, day:day3, round:0, yes:true }, later)).body;
+ok(ra.queens.hidden === true && ra.queens.n === 1 && ra.crews[0].hidden === true, 'answers: hidden while there are few');
+await call('POST', '/api/answer', { playerId:A, day:day3, round:0, yes:false }, later);
+for (const [k, id] of ids.entries()) ra = (await call('POST', '/api/answer', { playerId:id, day:day3, round:0, yes:k < 2 }, later)).body;
+ok(ra.queens.n === 6 && ra.queens.yes === 3 && !ra.queens.hidden, "answers: real Queen's split once there are 5+ (and only the first answer counts)");
+ok(ra.crews[0].n === 6 && ra.crews[0].yes === 3 && ra.crews[0].name === 'Princess St Crew', 'answers: crew split once 5+ in the crew answered');
+ok((await call('POST', '/api/answer', { playerId:A, day:day3, round:1, texts:['  scroll <b>tiktok</b> ', 'nap'] }, later)).status === 200, 'answers: typed showdown answers saved');
+ok((await call('POST', '/api/answer', { playerId:A, day:day3 + 1, round:0, yes:true }, later)).status === 409, 'answers: wrong day rejected');
+ok((await call('POST', '/api/answer', { playerId:A, day:day3, round:0 }, later)).status === 400, 'answers: needs yes or no');
+// recap: yesterday's crew results
+const rc = (await call('GET', `/api/me?playerId=${A}&recap=1`, null, later)).body.crews[0].yesterday;
+ok(rc.played === 2 && rc.top.nick === 'Maya' && rc.second.nick === 'Josh' && rc.myRank === 2 && rc.myTotal === 3450, 'recap: yesterday winner, my rank');
 console.log('all tests passed');
