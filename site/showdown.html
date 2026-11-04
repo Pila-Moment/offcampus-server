@@ -1,0 +1,1277 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='./';return false;};</script>
+</head><body>
+<title>Survey Showdown</title>
+<title>Survey Showdown</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Bungee&family=Bungee+Inline&display=swap">
+<style>
+/* Layout: a late-night game-show stage in Queen's tricolour. Scoreboard strip on top,
+   bulb-lit marquee board in the middle, a chunky control deck at thumb height. */
+:root{
+  --stage:#0A1036;
+  --stage-2:#141D55;
+  --tile:#2246E6;
+  --tile-hi:#4F72FF;
+  --tile-deep:#11258C;
+  --gold:#FFC83D;
+  --gold-deep:#B97F05;
+  --red:#FF3B4A;
+  --red-deep:#A80F1D;
+  --cream:#FFF5DE;
+  --ink:#0A0E26;
+  --muted:#AEB8EC;
+  --display:"Bungee","Arial Black",Impact,sans-serif;
+  --marquee:"Bungee Inline","Bungee","Arial Black",Impact,sans-serif;
+  --body:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --ease-pop:cubic-bezier(.2,1.4,.4,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{
+  background:var(--stage);
+  background-image:
+    radial-gradient(120% 60% at 50% -10%, var(--stage-2) 0%, transparent 70%),
+    repeating-linear-gradient(90deg, transparent 0 46px, color-mix(in srgb, var(--stage-2) 55%, transparent) 46px 48px);
+  color:var(--cream);
+  font-family:var(--body);
+  font-size:18px;
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+#app{
+  min-height:100%;
+  max-width:1000px;margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:18px 14px;
+  box-sizing:border-box;
+  display:flex;flex-direction:column;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+/* ---------- chunky buttons ---------- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:60px;padding:0 22px;border-radius:14px;
+  font-family:var(--display);font-size:22px;letter-spacing:.02em;
+  background:var(--gold);color:var(--ink);
+  box-shadow:0 6px 0 var(--gold-deep);
+  transition:transform .12s var(--ease-out), box-shadow .12s var(--ease-out);
+  width:100%;
+}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--gold-deep)}
+.btn.red{background:var(--red);color:var(--cream);box-shadow:0 6px 0 var(--red-deep)}
+.btn.red:active{box-shadow:0 1px 0 var(--red-deep)}
+.btn.ghost{background:transparent;color:var(--cream);box-shadow:inset 0 0 0 3px color-mix(in srgb, var(--cream) 40%, transparent);min-height:52px;font-size:18px}
+.btn.ghost:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.row{display:flex;gap:12px}
+.row > *{flex:1;min-width:0}
+
+/* ---------- title ---------- */
+.title-screen{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;padding-block:20px}
+.topbar{display:flex;justify-content:flex-end}
+.sound{
+  display:flex;align-items:center;gap:6px;height:40px;padding:0 12px;border-radius:999px;
+  font-family:var(--display);font-size:12px;letter-spacing:.06em;
+  box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--cream) 30%, transparent);
+}
+.sound svg{width:18px;height:18px}
+.logo{position:relative;padding:26px 18px 30px;border-radius:22px;text-align:center;background:var(--gold-deep);isolation:isolate}
+.logo::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;
+  background-image:radial-gradient(circle, var(--cream) 0 3px, color-mix(in srgb, var(--gold) 70%, transparent) 4px, transparent 6px);
+  background-size:22px 22px;animation:chase 1.2s steps(2) infinite;
+}
+.logo-in{background:var(--stage);border-radius:14px;padding:22px 12px 26px;box-shadow:inset 0 0 0 3px var(--gold)}
+.logo h1{margin:0;font-family:var(--marquee);font-weight:400;line-height:.92;font-size:clamp(38px,11.2vw,96px);color:var(--gold);text-wrap:balance;
+  text-shadow:0 4px 0 var(--red-deep), 0 0 28px color-mix(in srgb, var(--gold) 45%, transparent)}
+.logo h1 span{display:block;color:var(--cream)}
+.ribbon{display:inline-block;margin-top:16px;padding:8px 16px;background:var(--red);color:var(--cream);font-family:var(--display);font-size:clamp(14px,4vw,20px);letter-spacing:.08em;transform:rotate(-2deg);box-shadow:4px 4px 0 var(--ink)}
+@keyframes chase{to{background-position:11px 0}}
+.how{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.how li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;font-size:19px;line-height:1.2;font-weight:600;color:var(--cream)}
+.how b{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--tile);color:var(--gold);font-family:var(--display);font-size:18px;box-shadow:inset 0 0 0 2px var(--gold)}
+.fine{margin:0;font-size:15px;color:var(--muted);text-align:center;font-weight:500}
+
+/* ---------- team setup ---------- */
+.setup{flex:1;display:flex;flex-direction:column;gap:18px;padding-block:8px}
+.setup h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(28px,8vw,44px);line-height:1;color:var(--gold)}
+.setup .sub{margin:-8px 0 0;color:var(--muted);font-size:18px;font-weight:600}
+.namebox{display:grid;gap:6px}
+.namebox label{font-family:var(--display);font-size:13px;letter-spacing:.08em}
+.namebox.t0 label{color:var(--red)} .namebox.t1 label{color:var(--gold)}
+.namebox input{
+  height:60px;border-radius:12px;border:0;padding:0 16px;
+  background:var(--cream);color:var(--ink);
+  font-family:var(--display);font-size:22px;text-transform:uppercase;width:100%;box-sizing:border-box;
+}
+.namebox.t0 input{box-shadow:inset 0 0 0 4px var(--red)} .namebox.t1 input{box-shadow:inset 0 0 0 4px var(--gold)}
+.vs{font-family:var(--display);color:var(--cream);text-align:center;font-size:20px;margin:-6px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;border-radius:999px;background:var(--stage-2);font-weight:700;font-size:17px;letter-spacing:.03em;box-shadow:inset 0 0 0 2px var(--tile)}
+.chip:active{background:var(--tile)}
+.spacer{flex:1}
+
+/* ---------- in-game ---------- */
+.game{flex:1;display:flex;flex-direction:column;gap:10px}
+.scores{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch}
+.team{position:relative;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:8px 10px;border-radius:12px;background:var(--stage-2);min-width:0;
+  transition:box-shadow .25s var(--ease-out), transform .25s var(--ease-out)}
+.team.t1{text-align:right}
+.tname{font-family:var(--display);font-size:clamp(11px,3.2vw,15px);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t0 .tname{color:var(--red)} .t1 .tname{color:var(--gold)}
+.tscore{font-family:var(--display);font-size:clamp(26px,7.5vw,40px);line-height:1;font-variant-numeric:tabular-nums}
+.team.on{transform:translateY(-2px)}
+.team.t0.on{box-shadow:inset 0 0 0 3px var(--red), 0 0 22px color-mix(in srgb, var(--red) 45%, transparent)}
+.team.t1.on{box-shadow:inset 0 0 0 3px var(--gold), 0 0 22px color-mix(in srgb, var(--gold) 45%, transparent)}
+.team .tag{position:absolute;top:-9px;padding:2px 7px;border-radius:5px;font-family:var(--display);font-size:10px;letter-spacing:.06em;color:var(--ink);opacity:0;transition:opacity .2s}
+.team.t0 .tag{left:8px;background:var(--red);color:var(--cream)} .team.t1 .tag{right:8px;background:var(--gold)}
+.team.on .tag{opacity:1}
+.bank{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:92px;padding:6px 12px;border-radius:12px;background:var(--gold);color:var(--ink);box-shadow:0 5px 0 var(--gold-deep);position:relative}
+.blabel{font-family:var(--display);font-size:11px;letter-spacing:.12em}
+.bnum{font-family:var(--display);font-size:clamp(28px,8vw,42px);line-height:1;font-variant-numeric:tabular-nums}
+.bnum.pop{animation:pop .45s var(--ease-pop)}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.mult{position:absolute;top:-10px;right:-8px;padding:2px 6px;border-radius:6px;background:var(--red);color:var(--cream);font-family:var(--display);font-size:12px;transform:rotate(8deg)}
+
+.roundline{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px}
+.rlabel{font-family:var(--display);font-size:13px;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+@media (max-width:400px){.game .sound .lbl{display:none}.game .sound{padding:0 10px}}
+.strikes{display:flex;gap:6px}
+.strikes i{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:var(--stage-2);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--red) 40%, transparent)}
+.strikes i.on{background:var(--red);box-shadow:none;animation:pop .4s var(--ease-pop)}
+.strikes i.on::before{content:"";width:16px;height:16px;background:
+  linear-gradient(45deg, transparent 42%, var(--cream) 42% 58%, transparent 58%),
+  linear-gradient(-45deg, transparent 42%, var(--cream) 42% 58%, transparent 58%)}
+.strikes[hidden]{display:none!important}
+
+.qcard{position:relative;padding:14px 16px;border-radius:14px;background:var(--cream);color:var(--ink);box-shadow:0 5px 0 var(--gold-deep)}
+.qcard p{margin:0;font-weight:800;font-size:clamp(20px,5.4vw,30px);line-height:1.08;text-wrap:balance}
+.qcard p .w{display:inline-block;opacity:0;transform:translateY(8px);animation:wordin .32s var(--ease-out) forwards}
+@keyframes wordin{to{opacity:1;transform:none}}
+
+.marquee{position:relative;padding:10px;border-radius:18px;background:var(--gold-deep);isolation:isolate}
+.marquee::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;
+  background-image:radial-gradient(circle, var(--cream) 0 2.5px, color-mix(in srgb, var(--gold) 70%, transparent) 3.5px, transparent 5px);
+  background-size:18px 18px;animation:chase2 1s steps(2) infinite;
+}
+@keyframes chase2{to{background-position:9px 0}}
+.board{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;gap:8px;padding:8px;border-radius:10px;background:var(--ink);box-shadow:inset 0 0 0 2px var(--gold)}
+.tile{position:relative;perspective:700px;height:clamp(56px,9.6vh,92px);min-width:0}
+.tile-in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s var(--ease-pop)}
+.tile.open .tile-in{transform:rotateX(-180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:8px;display:flex;align-items:center;overflow:hidden}
+.front{justify-content:center;background:linear-gradient(180deg, var(--tile-hi) 0%, var(--tile) 52%, var(--tile-deep) 100%);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--cream) 22%, transparent)}
+.front .num{display:grid;place-items:center;min-width:46px;height:34px;padding:0 6px;border-radius:50%;background:var(--ink);color:var(--gold);font-family:var(--display);font-size:20px;box-shadow:inset 0 0 0 2px var(--gold)}
+.back{transform:rotateX(180deg);background:var(--cream);color:var(--ink);justify-content:space-between;gap:6px;padding-left:10px}
+.back .ans{flex:1;min-width:0;font-weight:800;font-size:clamp(14px,3.9vw,24px);line-height:1;text-transform:uppercase;letter-spacing:.01em;overflow-wrap:break-word;text-wrap:balance}
+.back .pts{align-self:stretch;display:grid;place-items:center;min-width:44px;padding:0 6px;background:var(--tile-deep);color:var(--cream);font-family:var(--display);font-size:clamp(17px,4.6vw,26px);font-variant-numeric:tabular-nums}
+.tile.rest .back{background:color-mix(in srgb, var(--cream) 62%, var(--stage))}
+.tile.rest .pts{background:color-mix(in srgb, var(--tile-deep) 60%, var(--stage))}
+.tile.flash .back{animation:flash .9s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 var(--gold)}30%{box-shadow:0 0 0 6px var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
+
+.bubble{position:absolute;left:50%;top:50%;z-index:3;width:max-content;max-width:88%;padding:14px 20px;border-radius:16px;background:var(--cream);color:var(--ink);text-align:center;
+  box-shadow:6px 6px 0 var(--ink);transform:translate(-50%,-50%) rotate(-2deg);animation:bub .35s var(--ease-pop)}
+.bubble small{display:block;font-family:var(--display);font-size:12px;letter-spacing:.1em;color:var(--red)}
+.bubble b{display:block;font-weight:800;font-size:clamp(24px,7vw,40px);line-height:1;text-transform:uppercase;overflow-wrap:anywhere}
+@keyframes bub{from{transform:translate(-50%,-50%) scale(.3) rotate(-12deg);opacity:0}}
+
+/* deck */
+.deck{display:flex;flex-direction:column;gap:12px;padding-top:4px;margin-top:auto}
+.plus{position:absolute;right:8px;top:-6px;z-index:5;font-family:var(--display);font-size:clamp(24px,7vw,38px);color:var(--gold);text-shadow:0 3px 0 var(--ink);pointer-events:none;animation:plus 1.1s var(--ease-out) forwards}
+@keyframes plus{0%{opacity:0;transform:translateY(10px) scale(.6)}20%{opacity:1;transform:translateY(-8px) scale(1.15)}100%{opacity:0;transform:translateY(-54px) scale(1)}}
+.deck-head{display:flex;flex-direction:column;gap:2px}
+.deck-label{font-family:var(--display);font-size:clamp(20px,6vw,30px);line-height:1}
+.deck-label.t0{color:var(--red)} .deck-label.t1{color:var(--gold)}
+.deck-help{margin:0;font-size:18px;font-weight:600;color:var(--muted);line-height:1.2}
+.guess{display:flex;gap:8px}
+.guess input{flex:1;min-width:0;height:62px;border:0;border-radius:14px;padding:0 16px;background:var(--cream);color:var(--ink);font-family:var(--body);font-weight:800;font-size:22px;text-transform:uppercase;box-sizing:border-box}
+.guess input::placeholder{color:color-mix(in srgb, var(--ink) 45%, transparent);text-transform:none;font-weight:600}
+.guess.t0 input{box-shadow:inset 0 0 0 4px var(--red)} .guess.t1 input{box-shadow:inset 0 0 0 4px var(--gold)}
+.guess .btn{width:auto;flex:0 0 auto;min-height:62px;font-size:19px;padding:0 18px}
+.guess.shake{animation:shake .35s}
+.undo{align-self:flex-start;padding:8px 2px;font-weight:700;font-size:17px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.buzzers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.buzzer{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;aspect-ratio:1/0.82;max-height:190px;width:100%;border-radius:50% 50% 22px 22px;
+  font-family:var(--display);color:var(--ink);transition:transform .1s var(--ease-out), box-shadow .1s}
+.buzzer b{font-size:clamp(26px,8vw,40px);font-weight:400;line-height:1}
+.buzzer span{font-size:clamp(11px,3.2vw,15px);max-width:86%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.buzzer.t0{background:radial-gradient(70% 60% at 50% 30%, color-mix(in srgb, var(--cream) 40%, var(--red)) 0%, var(--red) 60%);box-shadow:0 10px 0 var(--red-deep);color:var(--cream)}
+.buzzer.t1{background:radial-gradient(70% 60% at 50% 30%, color-mix(in srgb, var(--cream) 50%, var(--gold)) 0%, var(--gold) 60%);box-shadow:0 10px 0 var(--gold-deep)}
+.buzzer:active,.buzzer.hit{transform:translateY(8px)}
+.buzzer.t0:active,.buzzer.t0.hit{box-shadow:0 2px 0 var(--red-deep)}
+.buzzer.t1:active,.buzzer.t1.hit{box-shadow:0 2px 0 var(--gold-deep)}
+.buzzer::after{content:"";position:absolute;inset:-6px;border-radius:inherit;box-shadow:0 0 0 3px currentColor;opacity:0;animation:ring 1.6s ease-out infinite}
+.buzzer.t1::after{color:var(--gold)} .buzzer.t0::after{color:var(--red)}
+@keyframes ring{0%{opacity:.7;transform:scale(.96)}100%{opacity:0;transform:scale(1.08)}}
+
+/* fx layer */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50;display:grid;place-items:center}
+.xs{display:flex;gap:2vw;animation:xslam .9s var(--ease-pop)}
+.xs svg{width:min(30vw,190px);height:min(30vw,190px);filter:drop-shadow(0 8px 0 var(--ink))}
+@keyframes xslam{0%{transform:scale(2.6);opacity:0}25%{transform:scale(.92);opacity:1}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+.fx-label{position:absolute;top:calc(50% + min(18vw,110px));font-family:var(--display);font-size:clamp(18px,5vw,28px);color:var(--cream);text-shadow:3px 3px 0 var(--red-deep);letter-spacing:.04em;animation:wordin .3s .15s var(--ease-out) both;text-align:center;padding:0 16px}
+.banner{position:relative;width:100%;padding:18px 16px 20px;text-align:center;background:var(--gold);color:var(--ink);transform:rotate(-3deg);box-shadow:0 8px 0 var(--ink);animation:band .5s var(--ease-pop)}
+.banner.red{background:var(--red);color:var(--cream)}
+.banner.blue{background:var(--tile);color:var(--cream)}
+.banner b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(36px,11vw,76px);line-height:.95;text-wrap:balance}
+.banner span{display:block;margin-top:6px;font-weight:800;font-size:clamp(16px,4.6vw,24px);letter-spacing:.04em;text-transform:uppercase}
+@keyframes band{from{transform:rotate(-3deg) scaleX(0)}to{transform:rotate(-3deg) scaleX(1)}}
+.fx-out{animation:fxout .3s ease-in forwards}
+@keyframes fxout{to{opacity:0;transform:scale(.96)}}
+.slam{text-align:center;animation:slam .6s var(--ease-pop)}
+.slam b{display:block;font-family:var(--marquee);font-weight:400;font-size:clamp(56px,18vw,140px);line-height:.9;color:var(--gold);text-shadow:0 6px 0 var(--red-deep), 0 0 40px color-mix(in srgb, var(--gold) 50%, transparent)}
+.slam span{display:inline-block;margin-top:12px;padding:6px 14px;background:var(--red);color:var(--cream);font-family:var(--display);font-size:clamp(16px,5vw,26px);transform:rotate(-2deg)}
+@keyframes slam{0%{transform:scale(3);opacity:0}60%{transform:scale(.94);opacity:1}100%{transform:scale(1)}}
+.dim{position:fixed;inset:0;background:color-mix(in srgb, var(--ink) 70%, transparent);animation:fadein .2s}
+@keyframes fadein{from{opacity:0}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+body.shake #app{animation:shake .45s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+/* final */
+.final{flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px;text-align:center;padding-block:16px}
+.final .crown{font-family:var(--display);font-size:16px;letter-spacing:.12em;color:var(--muted)}
+.final .winner{font-family:var(--marquee);font-size:clamp(48px,15vw,110px);line-height:.92;margin:0;text-wrap:balance;overflow-wrap:anywhere}
+.final .winner.t0{color:var(--red);text-shadow:0 5px 0 var(--ink)} .final .winner.t1{color:var(--gold);text-shadow:0 5px 0 var(--red-deep)}
+.final .tally{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.final .tally div{padding:14px 10px;border-radius:14px;background:var(--stage-2)}
+.final .tally .tname{display:block}
+.final .tally .tscore{display:block;font-size:clamp(34px,10vw,56px)}
+.final .tally .won{box-shadow:inset 0 0 0 3px var(--gold)}
+
+@media (min-width:760px){
+  #app{padding-block:18px 22px}
+  .game{gap:14px}
+  .board{gap:10px;padding:10px}
+  .tile{height:clamp(64px,10.5vh,112px)}
+  .qcard p{font-size:clamp(26px,3.2vw,38px)}
+  .deck{max-width:640px;width:100%;margin:0 auto}
+  .buzzers{max-width:520px;margin:0 auto;width:100%}
+  .title-screen,.setup,.final{max-width:620px;width:100%;margin:0 auto}
+}
+.marquee{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.board{flex:1}
+.tile{height:auto!important;min-height:clamp(58px,8.8vh,104px)}
+.back .ans{font-size:clamp(16px,4.7vw,30px)}
+.back .pts{font-size:clamp(21px,6vw,36px)!important;min-width:54px!important}
+.front .num{min-width:58px!important;height:42px!important;font-size:24px!important}
+.deck{margin-top:0!important}
+.rlabel .house{font-style:normal;margin-left:6px;padding:2px 6px;border-radius:5px;background:var(--stage-2);color:var(--muted);font-size:10px;letter-spacing:.1em}
+.game.stealing .marquee{filter:brightness(.55) saturate(.6);transition:filter .5s}
+.game.stealing .team.on{animation:stealpulse 1s ease-in-out infinite}
+@keyframes stealpulse{50%{transform:translateY(-2px) scale(1.06)}}
+.flyer{position:fixed;z-index:60;pointer-events:none;font-family:var(--display);font-size:clamp(34px,10vw,56px);color:var(--gold);text-shadow:0 4px 0 var(--ink), 0 0 24px color-mix(in srgb, var(--gold) 60%, transparent)}
+.flyer.t0{color:var(--red)}
+.tile.open .back{animation:tileflash .7s ease-out}
+@keyframes tileflash{0%{filter:brightness(2.2)}100%{filter:none}}
+/* ---------- glow layer ---------- */
+.bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bgfx .floor{position:absolute;left:-60%;right:-60%;bottom:-6%;height:52%;
+  background-image:linear-gradient(color-mix(in srgb, var(--tile-hi) 55%, transparent) 2px, transparent 2px),linear-gradient(90deg, color-mix(in srgb, var(--tile-hi) 55%, transparent) 2px, transparent 2px);
+  background-size:72px 72px;transform:perspective(420px) rotateX(64deg);transform-origin:50% 0;animation:floorrun 2.6s linear infinite;
+  -webkit-mask-image:linear-gradient(to top, black 15%, transparent 85%);mask-image:linear-gradient(to top, black 15%, transparent 85%);opacity:.55}
+@keyframes floorrun{to{background-position:0 72px}}
+.bgfx .beam{position:absolute;top:-30%;width:70vmax;height:160%;opacity:.5;filter:blur(8px);
+  background:conic-gradient(from 168deg at 50% 0%, transparent 0deg, color-mix(in srgb, var(--gold) 30%, transparent) 10deg, transparent 22deg)}
+.bgfx .beam.l{left:-28vmax;animation:sweepl 8s ease-in-out infinite alternate}
+.bgfx .beam.r{right:-28vmax;animation:sweepr 9s ease-in-out infinite alternate;background:conic-gradient(from 170deg at 50% 0%, transparent 0deg, color-mix(in srgb, var(--tile-hi) 38%, transparent) 10deg, transparent 22deg)}
+@keyframes sweepl{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+@keyframes sweepr{from{transform:rotate(14deg)}to{transform:rotate(-16deg)}}
+.front{box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--cream) 28%, transparent), inset 0 -10px 22px color-mix(in srgb, var(--ink) 45%, transparent), 0 0 18px color-mix(in srgb, var(--tile-hi) 45%, transparent)}
+.tile.open:not(.rest) .back{box-shadow:0 0 22px color-mix(in srgb, var(--gold) 55%, transparent)}
+.marquee{box-shadow:0 0 40px color-mix(in srgb, var(--gold) 35%, transparent)}
+.qcard{box-shadow:0 5px 0 var(--gold-deep), 0 0 34px color-mix(in srgb, var(--cream) 25%, transparent)}
+.qcard .asked{font-family:var(--display);font-size:clamp(10px,2.8vw,13px);letter-spacing:.12em;color:var(--red);margin-bottom:4px}
+.bank{box-shadow:0 5px 0 var(--gold-deep), 0 0 28px color-mix(in srgb, var(--gold) 55%, transparent)}
+.logo h1{text-shadow:0 4px 0 var(--red-deep), 0 0 34px color-mix(in srgb, var(--gold) 70%, transparent), 0 0 90px color-mix(in srgb, var(--gold) 35%, transparent)}
+/* ---------- TV / laptop mode ---------- */
+@media (min-width:1100px) and (min-aspect-ratio:5/4){
+  #app{max-width:min(96vw,178vh);padding-block:2.2vh 2.4vh}
+  .game{gap:1.6vh}
+  .scores{gap:1.2vw}
+  .team{padding:1.2vh 1.4vw;border-radius:1.4vh}
+  .tname{font-size:2.6vh}
+  .tscore{font-size:7.4vh}
+  .bank{min-width:16vh;padding:1vh 2vw;border-radius:1.4vh}
+  .blabel{font-size:1.8vh}
+  .bnum{font-size:7.4vh}
+  .mult{font-size:2vh}
+  .team .tag{font-size:1.5vh;top:-1.3vh}
+  .roundline{min-height:4vh}
+  .rlabel{font-size:2vh}
+  .rlabel .house{font-size:1.5vh}
+  .strikes i{width:4.4vh;height:4.4vh}
+  .strikes i.on::before{width:2.4vh;height:2.4vh}
+  .qcard{padding:1.8vh 2vw;border-radius:1.8vh}
+  .qcard .asked{font-size:1.8vh}
+  .qcard p{font-size:5vh}
+  .marquee{padding:1.4vh;border-radius:2.4vh}
+  .board{gap:1.2vh;padding:1.2vh}
+  .tile{min-height:13vh}
+  .front .num{min-width:9vh!important;height:6vh!important;font-size:3.6vh!important}
+  .back{padding-left:1.6vw}
+  .back .pts{font-size:5.4vh!important;min-width:10vh!important}
+  .deck{max-width:none!important;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);align-items:center;gap:1.4vh 2vw}
+  .deck-label{font-size:4vh}
+  .deck-help{font-size:2.2vh}
+  .guess input{height:8vh;font-size:3.4vh;border-radius:1.6vh}
+  .guess .btn{min-height:8vh;font-size:3vh}
+  .btn{min-height:8vh;font-size:3.2vh;border-radius:1.8vh}
+  .buzzers{grid-column:2;max-width:none!important;gap:1.4vw}
+  .buzzer{aspect-ratio:auto;height:13vh;max-height:none;border-radius:6.5vh}
+  .buzzer::after{inset:-.6vh}
+  .tile{min-height:12vh}
+  .final .crown{font-size:2.6vh}
+  .btn.ghost{min-height:7vh;font-size:2.6vh}
+  .buzzer b{font-size:6vh}
+  .buzzer span{font-size:2.2vh}
+  .row,.undo{grid-column:2}
+  .deck > .btn{grid-column:2}
+  .sound{height:4.6vh;font-size:1.6vh;padding:0 1.4vw}
+  .sound svg{width:2.2vh;height:2.2vh}
+  .title-screen,.setup,.final{max-width:min(90vw,120vh)!important}
+  .logo h1{font-size:13vh}
+  .ribbon{font-size:2.8vh}
+  .how li{font-size:2.6vh;grid-template-columns:5vh 1fr}
+  .how b{width:5vh;height:5vh;font-size:2.6vh}
+  .fine{font-size:2vh}
+  .setup h2{font-size:7vh}
+  .namebox input{height:8vh;font-size:3.4vh}
+  .chip{font-size:2.2vh;padding:1.2vh 1.6vw}
+  .final .winner{font-size:14vh}
+  .final .tally .tscore{font-size:8vh}
+  .banner b{font-size:12vh}
+  .banner span{font-size:3.2vh}
+  .slam b{font-size:20vh}
+  .xs svg{width:30vh;height:30vh}
+  .fx-label{font-size:4vh;top:calc(50% + 18vh)}
+  .bubble b{font-size:6vh}
+  .bubble small{font-size:1.8vh}
+  .flyer{font-size:8vh}
+}
+/* ---------- clock + big moments ---------- */
+html,body{overflow-x:clip}
+.deck-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.deck-top .deck-head{min-width:0}
+.clock{position:relative;flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--gold) calc(var(--p) * 360deg), var(--stage-2) 0);box-shadow:0 0 18px color-mix(in srgb, var(--gold) 40%, transparent)}
+.clock::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--stage)}
+.clock b{position:relative;font-family:var(--display);font-weight:400;font-size:26px;font-variant-numeric:tabular-nums}
+.clock.warn{background:conic-gradient(var(--red) calc(var(--p) * 360deg), var(--stage-2) 0);box-shadow:0 0 22px color-mix(in srgb, var(--red) 55%, transparent)}
+.clock.warn b{color:var(--red)}
+.clock.danger{animation:clockpulse .5s ease-in-out infinite}
+.clock.stopped{opacity:.35;animation:none}
+@keyframes clockpulse{50%{transform:scale(1.15)}}
+.marquee.urgent{box-shadow:0 0 0 3px var(--red), 0 0 60px color-mix(in srgb, var(--red) 60%, transparent);animation:urgent .5s ease-in-out infinite}
+@keyframes urgent{50%{box-shadow:0 0 0 3px var(--red), 0 0 20px color-mix(in srgb, var(--red) 30%, transparent)}}
+.marquee.hot::before{animation-duration:.18s}
+.marquee.hot .board{filter:brightness(.8)}
+.front{overflow:hidden}
+.front::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg, transparent 38%, color-mix(in srgb, var(--cream) 38%, transparent) 50%, transparent 62%);transform:translateX(-130%);animation:shimmer 5s ease-in-out infinite;animation-delay:calc(var(--i, 0) * .22s);pointer-events:none}
+@keyframes shimmer{0%,72%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+.tile .flare{position:absolute;inset:-25%;z-index:4;pointer-events:none;border-radius:50%;background:radial-gradient(circle, color-mix(in srgb, var(--cream) 95%, transparent) 0%, color-mix(in srgb, var(--gold) 60%, transparent) 30%, transparent 65%);animation:flare .8s ease-out forwards}
+@keyframes flare{from{opacity:1;transform:scale(.2)}to{opacity:0;transform:scale(1.5)}}
+.spark{position:fixed;z-index:70;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold), 0 0 20px var(--cream);pointer-events:none}
+.redflash{position:fixed;inset:0;z-index:45;pointer-events:none;background:radial-gradient(ellipse at center, transparent 30%, color-mix(in srgb, var(--red) 55%, transparent) 100%);animation:redflash .7s ease-out forwards}
+@keyframes redflash{from{opacity:1}to{opacity:0}}
+.tscore.pop{animation:pop .45s var(--ease-pop)}
+@media (min-width:1100px) and (min-aspect-ratio:5/4){
+  .clock{width:11vh;height:11vh}
+  .clock::before{inset:1vh}
+  .clock b{font-size:5vh}
+  .deck-top{grid-column:1}
+}
+@media (max-width:430px){.rlabel .house{display:none}}
+@media (max-width:380px){.strikes i{width:26px;height:26px}}
+@media (max-height:700px){
+  .tile{height:50px}
+  .qcard{padding:10px 14px}
+  .buzzer{max-height:140px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="bgfx" aria-hidden="true"><div class="beam l"></div><div class="beam r"></div><div class="floor"></div></div>
+<div id="app"></div>
+<div id="fx"></div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------------- TUNABLE SETTINGS ---------------- */
+const ROUNDS = 3;                 // rounds per game; the last one is double points
+const CLOCK_SECS = { fo1:10, fo2:10, play:20, steal:30 };   // seconds to answer in each phase
+const JUICY_PER_GAME = 2;         // how many of the 3 boards come from the spicy pile
+const SUSPENSE_GUESS = 0.85;      // seconds of drum roll before a normal guess is checked
+const SUSPENSE_STEAL = 1.9;       // seconds of drum roll before a steal is checked
+const STRIKES_TO_STEAL = 3;
+const TEAM_DEFAULTS = ['TEAM RED', 'TEAM GOLD'];
+const NAME_CHIPS = ['SCI', 'COMMERCE', 'ARTSCI', 'HEALTH SCI', 'KIN', 'NURSING', 'GUYS', 'GIRLS', 'FIRST YEARS', 'UPPER YEARS'];
+
+/* ---------------- BOARDS ----------------
+   Answers are ranked by Off Campus (not a real survey yet). p = points.
+   k = words that count as that answer (any one key phrase is enough). */
+const BOARDS = [
+ { id:'stauffer', q:"Your friend says they're going to Stauffer to be productive. What do they actually do?", a:[
+   { t:'Scroll on their phone', p:34, k:['phone','scroll','tiktok','instagram','insta','social media','doomscroll','snapchat','snap','reels','texting','text'] },
+   { t:'Chat with friends', p:22, k:['chat','talk','gossip','friends','socialize','catch up','yap','yapping'] },
+   { t:'Get coffee', p:15, k:['coffee','latte','cogro','common ground','starbucks','tims','tim hortons','drink'] },
+   { t:'Take a nap', p:12, k:['nap','sleep','sleeping','rest','passed out'] },
+   { t:'Hunt for a seat', p:9, k:['seat','desk','table','chair','spot','find a place','looking for space'] },
+   { t:'Actually study', p:5, k:['study','work','homework','assignment','productive','read','reading','notes'] } ]},
+ { id:'line', q:'Name a reason the line on Princess is taking forever.', a:[
+   { t:'Bouncer checking IDs', p:30, k:['id','ids','bouncer','carded','carding','checking','fake','license','licence'] },
+   { t:"It's at capacity", p:24, k:['capacity','full','packed','busy','crowded','too many people','fire code'] },
+   { t:'People cutting', p:18, k:['cut','cutting','skip','skipping','budge','budging','line jump','jumping the line'] },
+   { t:'Guest list and VIPs', p:12, k:['guest list','list','vip','promoter','table','bottle service','connections','knows the bouncer'] },
+   { t:'Waiting for a friend', p:9, k:['waiting for friend','waiting for someone','late friend','friend','missing'] },
+   { t:'Paying cover', p:6, k:['cover','pay','paying','cash','tap','money','card'] } ]},
+ { id:'engineers', q:"Name something engineers won't stop talking about.", a:[
+   { t:'Their workload', p:33, k:['workload','work','busy','homework','assignment','hours','labs','lab','stress','no sleep','studying','problem set'] },
+   { t:'Being purple', p:20, k:['purple','dye','dyed','grease','greasing','pole'] },
+   { t:'Clark Hall', p:14, k:['clark','clark hall','pub'] },
+   { t:'Their jacket', p:12, k:['jacket','leather','sci jacket','coveralls'] },
+   { t:'Their future salary', p:11, k:['salary','money','job','internship','co op','coop','pay','rich','income'] },
+   { t:'Exams', p:7, k:['exam','exams','midterm','test','calc','calculus','physics','math'] } ]},
+ { id:'runinto', spicy:1, q:"Name the place you're most likely to run into last night's hookup.", a:[
+   { t:'Stauffer', p:34, k:['stauffer','stauff','library','lib','douglas'] },
+   { t:'The ARC', p:20, k:['arc','gym','athletic','workout'] },
+   { t:'In the coffee line', p:14, k:['cogro','common ground','coffee','tims','starbucks','line'] },
+   { t:'Back at Stages', p:12, k:['stages','bar','club','trin','trinity','ale','ale house'] },
+   { t:'Princess Street', p:10, k:['princess','downtown','street','walking'] },
+   { t:'In your lecture', p:8, k:['class','lecture','tutorial','mac corry','maccorry','seminar','lab'] } ]},
+ { id:'latenight', q:'Name a place you get food after a night out in Kingston.', a:[
+   { t:'Pizza', p:30, k:['pizza','241','pizza pizza','slice','dominos','pizza hut'] },
+   { t:"Osmow's", p:20, k:['osmows','osmow','shawarma','wrap','chicken on the rock','rock'] },
+   { t:"Bubba's", p:16, k:['bubbas','bubba','burger'] },
+   { t:"McDonald's", p:14, k:['mcdonalds','mcds','mcdonald','maccas','mickey d','mcchicken'] },
+   { t:'Poutine', p:10, k:['poutine','fries','chips'] },
+   { t:'Nowhere, straight to bed', p:6, k:['nowhere','home','bed','sleep','nothing','none'] } ]},
+ { id:'western', q:"Name something Queen's students say about Western.", a:[
+   { t:"It's just a party school", p:30, k:['party','parties','partying','wild','drinking'] },
+   { t:"Queen's is better", p:22, k:['better','worse','best','superior','we are better','queens is better','lame'] },
+   { t:'Easier to get into', p:16, k:['easy','easier','dumb','stupid','safety','backup','lower average','smart'] },
+   { t:'London is boring', p:14, k:['london','boring','ugly','city','nothing to do'] },
+   { t:'Ivey kids', p:10, k:['ivey','business','commerce'] },
+   { t:'Purple was ours first', p:6, k:['purple','colour','color','mustang','mustangs'] } ]},
+ { id:'house', q:'Name something wrong with your house in the University District.', a:[
+   { t:'Mice', p:28, k:['mice','mouse','rats','rat','bugs','cockroach','pests','rodent','spider'] },
+   { t:'No heat', p:22, k:['heat','cold','freezing','furnace','heating','no heat','heater','drafty','draft'] },
+   { t:"Landlord won't fix anything", p:18, k:['landlord','fix','repair','maintenance','broken','rent'] },
+   { t:'Mould or leaks', p:14, k:['mold','mould','leak','leaks','water','damp','ceiling','flood'] },
+   { t:'Dishes piling up', p:10, k:['dishes','mess','messy','dirty','kitchen','roommate','trash','garbage'] },
+   { t:'Paper-thin walls', p:6, k:['walls','thin','noise','loud','hear','neighbours','neighbors'] } ]},
+ { id:'fridge', q:"Name something you'd find in a Queen's student's fridge.", a:[
+   { t:'Leftover pizza', p:28, k:['pizza','241','leftover','leftovers','slice'] },
+   { t:'White Claws or beer', p:22, k:['white claw','claw','claws','beer','beers','seltzer','truly','alcohol','booze','drinks','bud light','coors','wine','vodka'] },
+   { t:'Just condiments', p:16, k:['condiments','condiment','ketchup','mustard','sauce','hot sauce','mayo','nothing','empty'] },
+   { t:'Expired milk', p:12, k:['milk','expired','old','mold','moldy','mould','rotten','spoiled'] },
+   { t:"Their roommate's food", p:10, k:['roommate','someone else','stolen','not theirs','labeled','labelled'] },
+   { t:'Eggs', p:6, k:['eggs','egg'] } ]},
+ { id:'arc', q:'Name a reason you actually go to the ARC.', a:[
+   { t:'To work out', p:34, k:['workout','work out','gym','lift','lifting','exercise','train','training','cardio','weights','swole','pump'] },
+   { t:'To be seen', p:18, k:['seen','flex','show off','showing off','hot people','crush','check people out','mirror','people watch','pictures','gym selfie'] },
+   { t:'Food or coffee', p:14, k:['food','tims','tim hortons','lunch','snack','eat','coffee','smoothie'] },
+   { t:'To study', p:12, k:['study','studying','homework','work','assignment'] },
+   { t:'Intramurals', p:10, k:['intramural','intramurals','basketball','volleyball','soccer','game','sports','swim','pool','squash','badminton'] },
+   { t:'The bathroom', p:6, k:['bathroom','washroom','toilet','pee','shower'] } ]},
+ { id:'lose', spicy:1, q:'Name something people lose on a night out.', a:[
+   { t:'Their phone', p:32, k:['phone','phones','iphone','cell'] },
+   { t:'Wallet or ID', p:22, k:['wallet','id','ids','card','cards','license','licence','money','cash','student card'] },
+   { t:'Their friends', p:16, k:['friends','friend','group','people','squad','the group'] },
+   { t:'Keys', p:12, k:['keys','key'] },
+   { t:'Their jacket', p:10, k:['jacket','coat','sweater','hoodie','puffer','goose'] },
+   { t:'Their dignity', p:6, k:['dignity','self respect','pride','respect','memory','memories','voice','virginity','shoes','shoe'] } ]},
+ { id:'princess2am', spicy:1, q:"Name something you'd see on Princess Street at 2am.", a:[
+   { t:'A line for food', p:30, k:['pizza','food','line','241','shawarma','osmows','poutine','bubbas','mcdonalds'] },
+   { t:'People yelling', p:20, k:['yelling','screaming','fight','fighting','chaos','drunk','drunks','drunk people','loud','shouting'] },
+   { t:'Couples making out', p:15, k:['couple','couples','making out','kissing','hooking up','pda','make out'] },
+   { t:'Cops', p:12, k:['police','cops','cop','cruiser','bylaw'] },
+   { t:'Someone crying', p:10, k:['crying','cry','tears','sobbing'] },
+   { t:'Heels in hand', p:7, k:['shoes','heels','barefoot','no shoes','heels in hand'] } ]},
+ { id:'roommate', spicy:1, q:'Name the worst thing your roommate could say.', a:[
+   { t:"We're out of toilet paper", p:26, k:['toilet paper','tp','paper','out of'] },
+   { t:'My partner is staying over', p:22, k:['partner','boyfriend','girlfriend','bf','gf','staying over','sleepover','guest','coming over','sleeping over'] },
+   { t:'I ate your food', p:18, k:['ate','food','your food','leftovers','ate your','eaten'] },
+   { t:"The landlord's coming", p:13, k:['landlord','inspection','showing','viewing'] },
+   { t:"There's a mouse", p:12, k:['mouse','mice','rat','rats','bug','bugs','cockroach'] },
+   { t:"I'm throwing a party tonight", p:9, k:['party','throwing','people coming','pregame','having people over'] } ]},
+ { id:'parents', spicy:1, q:"Name a lie Queen's students tell their parents.", a:[
+   { t:"\u201cI'm at the library\u201d", p:30, k:['library','stauffer','stauff','studying','study','doing homework','douglas'] },
+   { t:"\u201cI'm eating healthy\u201d", p:20, k:['healthy','eating well','cooking','vegetables','salad','meal prep','eating'] },
+   { t:"\u201cI stayed in last night\u201d", p:16, k:['stayed in','didnt go out','not drinking','early night','in bed','went to bed early','sober'] },
+   { t:"\u201cI need money for textbooks\u201d", p:14, k:['textbook','textbooks','books','money','need money','school supplies','rent went up','tuition'] },
+   { t:"\u201cMy grades are fine\u201d", p:11, k:['grades','gpa','marks','passing','doing well','exams went well','midterm'] },
+   { t:"\u201cI go to every class\u201d", p:9, k:['class','classes','lecture','lectures','attending','going to class'] } ]},
+ { id:'stauff4', q:"Name something you'd hear on the silent 4th floor of Stauffer.", a:[
+   { t:'Someone eating chips', p:30, k:['chips','crunch','crunching','eating','chewing','snack','snacks','wrapper'] },
+   { t:'Music leaking from AirPods', p:20, k:['music','airpods','headphones','earbuds','song','leaking'] },
+   { t:'Whispered gossip', p:16, k:['whisper','whispering','gossip','drama','talking','breakup','phone call'] },
+   { t:'Someone crying', p:13, k:['crying','cry','sobbing','sniffling','tears'] },
+   { t:'Aggressive typing', p:12, k:['typing','keyboard','clacking','laptop','keys'] },
+   { t:'Snoring', p:9, k:['snore','snoring','sleeping','sleep'] } ]},
+ { id:'macorry', q:'Name a reason you were late to a class in Mac-Corry.', a:[
+   { t:'Got lost', p:36, k:['lost','maze','couldnt find','confusing','wrong way','directions'] },
+   { t:'Wrong wing or floor', p:20, k:['wrong floor','wrong wing','wrong room','wrong building','wrong side','floor'] },
+   { t:'The coffee line', p:15, k:['coffee','tims','line','starbucks','food'] },
+   { t:'Walked from West Campus', p:12, k:['west campus','west','walk','far','long walk','bus'] },
+   { t:'Slept in', p:10, k:['slept','sleep','alarm','overslept','tired'] },
+   { t:'Ran into a friend', p:7, k:['friend','friends','talking','chatting','ran into'] } ]},
+ { id:'vichall', spicy:1, q:'Name something every first-year in residence has been through.', a:[
+   { t:'A 3am fire alarm', p:34, k:['fire alarm','alarm','fire','fire drill','3am'] },
+   { t:'A bathroom horror story', p:20, k:['bathroom','washroom','shower','toilet','gross','hair','clog'] },
+   { t:'A floor crush', p:15, k:['crush','floor crush','floorcest','hooking up','dating','floor'] },
+   { t:'A talk from the don', p:12, k:['don','dons','ra','write up','written up','noise complaint','trouble'] },
+   { t:'Getting sexiled', p:11, k:['sexiled','sock','locked out','kicked out','roommate'] },
+   { t:'Caf food regret', p:8, k:['caf','cafeteria','food','leonard','ban righ','meal plan','food poisoning'] } ]},
+ { id:'backyard', q:'Name something you\'d find in a University District backyard.', a:[
+   { t:'A couch', p:30, k:['couch','sofa','loveseat','futon'] },
+   { t:'Empty cans', p:24, k:['cans','empties','beer cans','bottles','recycling','empty','beer'] },
+   { t:'A beer pong table', p:16, k:['pong','beer pong','table'] },
+   { t:'Broken lawn chairs', p:12, k:['chair','chairs','lawn chair','lawn chairs','broken'] },
+   { t:'Garbage bags', p:10, k:['garbage','trash','bags','garbage bags','raccoon'] },
+   { t:'A shopping cart', p:8, k:['cart','shopping cart','grocery cart','metro cart'] } ]},
+ { id:'commerce', q:'Name something every Commerce kid has.', a:[
+   { t:'A bank internship', p:28, k:['internship','bank','job','offer','co op','coop','bay street','investment banking','ib'] },
+   { t:'A Canada Goose', p:20, k:['canada goose','goose','parka','arcteryx','jacket','coat','puffer'] },
+   { t:'A quarter zip or vest', p:16, k:['vest','patagonia','quarter zip','fleece','zip'] },
+   { t:'Opinions about stocks', p:14, k:['stocks','stock','crypto','market','investing','trading','finance'] },
+   { t:'A very active LinkedIn', p:12, k:['linkedin','networking','network'] },
+   { t:"Their parents' credit card", p:10, k:['credit card','parents','dad','money','rich','trust fund','allowance'] } ]},
+ { id:'hoco', q:"Name something you'll see on Hoco weekend.", a:[
+   { t:'Tricolour everything', p:30, k:['tricolour','tricolor','red gold blue','jersey','jerseys','overalls','merch','colours','colors','outfits'] },
+   { t:'Alumni way too old to be there', p:22, k:['alumni','old people','grads','parents','old','dads'] },
+   { t:'Lines for everything', p:16, k:['line','lines','lineup','waiting'] },
+   { t:'Purple engineers', p:12, k:['purple','engineers','engineer','sci'] },
+   { t:'Cops', p:11, k:['cops','police','bylaw','cop'] },
+   { t:'Hangover brunch', p:9, k:['brunch','hangover','breakfast','hungover'] } ]},
+ { id:'underbed', spicy:1, q:"Name something you'd find under a Queen's student's bed.", a:[
+   { t:'Empty bottles', p:27, k:['bottles','bottle','cans','empties','beer','wine','white claw','claws','alcohol','vodka','smirnoff'] },
+   { t:'Mouldy dishes', p:20, k:['dishes','plates','bowl','mug','cups','mould','mold','mouldy','moldy','food','pizza box','leftovers'] },
+   { t:"Someone else's underwear", p:17, k:['underwear','boxers','bra','thong','panties','someone elses','clothes','sock','socks'] },
+   { t:'A vape', p:13, k:['vape','vapes','juul','elf bar','pen','weed','joint','bong'] },
+   { t:'A stolen street sign', p:12, k:['sign','street sign','stop sign','pylon','cone','traffic cone','stolen'] },
+   { t:"Their ex's hoodie", p:11, k:['ex','exs','ex hoodie','hoodie','sweater','sweatshirt'] } ]},
+ { id:'kickedout', spicy:1, q:'Name a reason you got kicked out of a house party.', a:[
+   { t:'Threw up everywhere', p:27, k:['puke','puked','throw up','threw up','vomit','vomited','sick','spew','barf','hurl'] },
+   { t:"Hooked up in the host's bed", p:20, k:['hooked up','hook up','hookup','bed','bedroom','room','sex','making out','host bed'] },
+   { t:'Started a fight', p:16, k:['fight','fighting','punch','punched','swung','beef','fought','drama'] },
+   { t:'Brought ten uninvited friends', p:14, k:['uninvited','friends','brought people','crashed','not invited','plus ones','too many people','gatecrash'] },
+   { t:'Broke something', p:12, k:['broke','break','broken','smashed','table','window','tv','door'] },
+   { t:"Drank the host's alcohol", p:11, k:['drank','stole','alcohol','booze','drinks','liquor','host drinks','handle','took'] } ]},
+ { id:'hookupspot', spicy:1, q:'Name the worst place on campus to hook up.', a:[
+   { t:'Stauffer Library', p:29, k:['stauffer','stauff','library','libraries','stacks','study room','4th floor','fourth floor','douglas'] },
+   { t:'A campus washroom', p:21, k:['washroom','bathroom','toilet','stall','mac corry bathroom','restroom'] },
+   { t:'Res, with your roommate there', p:16, k:['res','residence','dorm','roommate','vic hall','leonard','brant'] },
+   { t:'The ARC', p:13, k:['arc','gym','change room','locker room','sauna','pool','showers'] },
+   { t:'A lecture hall', p:12, k:['lecture hall','lecture','classroom','class','dunning','biosci','stirling','kingston hall'] },
+   { t:'Grant Hall', p:9, k:['grant hall','grant','clock tower','tower'] } ]},
+ { id:'firstdate', spicy:1, q:'Name a lie people tell on a first date.', a:[
+   { t:'"I never do this"', p:28, k:['never do this','dont usually','never','usually','normally','not usually'] },
+   { t:"“I'm so over my ex”", p:24, k:['ex','over my ex','over','not talking'] },
+   { t:"“I don't really go out”", p:18, k:['go out','party','partying','drink','drinking','not a partier','dont drink','stay in'] },
+   { t:'"I love hiking"', p:12, k:['hiking','hike','outdoors','gym','active','working out','run','running'] },
+   { t:"“I'm almost done my degree”", p:10, k:['degree','grad','graduating','school','almost done','final year','fourth year','gpa','grades'] },
+   { t:"“My phone died”", p:8, k:['phone died','phone','died','didnt see','didnt see your text','missed','busy'] } ]},
+ { id:'redflag', spicy:1, q:"Name a red flag in someone you're talking to.", a:[
+   { t:'Still talks about their ex', p:26, k:['ex','exs','talks about ex','still talks','not over','obsessed with ex','still follows'] },
+   { t:'Takes hours to text back', p:20, k:['text','texts','texting','text back','reply','left on read','dry','dry texter','ghost','ghosting','late reply'] },
+   { t:'Rude to servers', p:16, k:['rude','waiter','server','servers','staff','bartender','mean'] },
+   { t:'Wears a Western hoodie', p:13, k:['western','uwo','western hoodie','goes to western'] },
+   { t:'Snap score way too high', p:13, k:['snap','snapchat','snap score','score','followers','tinder','hinge','dating apps','still on apps'] },
+   { t:'No friends of the same gender', p:12, k:['no friends','friends','only girl friends','only guy friends','same gender','no guy friends','no girl friends','loner'] } ]},
+ { id:'aberdeen', spicy:1, q:"Name something you'd see on Aberdeen at 3am on Hoco.", a:[
+   { t:'Someone peeing in public', p:26, k:['peeing','pee','pissing','piss','urinating','public urination','bush'] },
+   { t:'Cops on horses', p:20, k:['cops','police','horse','horses','mounted','bylaw','cop','cruiser'] },
+   { t:'Someone on a roof', p:16, k:['roof','rooftop','on a roof','climbing','balcony','lamppost','pole','tree'] },
+   { t:'A couch on fire', p:14, k:['couch','fire','burning','burning couch','couch fire','flames'] },
+   { t:'Broken glass everywhere', p:12, k:['glass','broken glass','bottles','smashed','cans','garbage','trash','mess'] },
+   { t:'One lonely shoe', p:12, k:['shoe','shoes','lost shoe','heel','heels','sneaker','one shoe'] } ]},
+ { id:'groupchat', spicy:1, q:'Name something that gets posted in the group chat the morning after.', a:[
+   { t:'"Has anyone seen my ___?"', p:26, k:['seen','lost','where is','my phone','my jacket','my keys','who has','has anyone seen','missing'] },
+   { t:'Blurry videos', p:22, k:['video','videos','blurry','clips','snaps','pics','pictures','photos','evidence','footage'] },
+   { t:'"Who did I leave with?"', p:16, k:['who did i leave with','leave with','went home with','go home with','who did i','hookup','hook up','where did i go'] },
+   { t:'Screenshots of drunk texts', p:14, k:['screenshot','screenshots','drunk texts','texts','text','dms','messages'] },
+   { t:'"E-transfer me"', p:12, k:['etransfer','e transfer','transfer','venmo','pay me','owe','money','uber','split'] },
+   { t:'"Never drinking again"', p:10, k:['never drinking','never again','sober','hungover','hangover','dying','dead'] } ]},
+ { id:'ex2am', spicy:1, q:'Name a reason someone texts their ex at 2am.', a:[
+   { t:"They're drunk", p:34, k:['drunk','wasted','drinking','tipsy','alcohol','hammered','faded'] },
+   { t:'Lonely (or horny)', p:20, k:['lonely','alone','horny','bored','sad','miss them','miss','booty call'] },
+   { t:'Saw them out tonight', p:16, k:['saw them','saw','out','at the bar','ran into','spotted'] },
+   { t:'Want their hoodie back', p:12, k:['hoodie','stuff','things back','sweater','clothes','their stuff','give back'] },
+   { t:'Jealous of the new person', p:10, k:['jealous','new partner','new boyfriend','new girlfriend','rebound','new person','instagram','story'] },
+   { t:'Pocket text', p:8, k:['pocket','accident','accidentally','butt dial','wrong person','mistake'] } ]},
+ { id:'partysteal', spicy:1, q:'Name something people steal from a house party.', a:[
+   { t:'Drinks', p:32, k:['drinks','drink','beer','beers','alcohol','booze','claws','cans','liquor','handle','vodka'] },
+   { t:'A hoodie or jacket', p:20, k:['hoodie','jacket','coat','sweater','clothes','goose','puffer'] },
+   { t:'A phone charger', p:14, k:['charger','phone charger','cable','cord','iphone charger'] },
+   { t:'Food from the fridge', p:12, k:['food','snacks','chips','fridge','pizza','leftovers'] },
+   { t:'Decorations or signs', p:12, k:['sign','signs','decorations','decor','flag','poster','lights','string lights'] },
+   { t:'Pong balls', p:10, k:['pong','pong balls','ping pong','balls','cups','solo cups'] } ]},
+ { id:'leaveparty', spicy:1, q:'Name something that makes you leave a party immediately.', a:[
+   { t:'Your ex walks in', p:28, k:['ex','exs','ex shows up','ex walks in','ex is there'] },
+   { t:'The cops show up', p:22, k:['cops','police','bylaw','noise complaint','cop','shut down'] },
+   { t:'No drinks left', p:16, k:['no drinks','no alcohol','no beer','ran out','out of drinks','dry'] },
+   { t:'Terrible music', p:14, k:['music','bad music','dj','aux','playlist','songs'] },
+   { t:'Someone throws up', p:11, k:['puke','puked','throw up','throws up','vomit','sick'] },
+   { t:'It\'s only engineers', p:9, k:['engineers','engineer','sci','purple','all guys','sausage fest','only guys','no girls'] } ]},
+ { id:'skipclass', spicy:1, q:'Name the real reason you skipped class.', a:[
+   { t:'Hungover', p:36, k:['hungover','hangover','drunk','still drunk','went out','partied','party'] },
+   { t:'Overslept', p:22, k:['overslept','slept','sleep','alarm','tired','slept in','nap'] },
+   { t:"It's recorded anyway", p:16, k:['recorded','recording','online','onq','slides','lecture capture','posted'] },
+   { t:'Too cold to walk', p:10, k:['cold','snow','weather','rain','freezing','too far','walk'] },
+   { t:'Avoiding someone in the class', p:9, k:['avoiding','avoid','ex','hookup','someone','crush','awkward'] },
+   { t:'Brunch', p:7, k:['brunch','food','breakfast','coffee','eating'] } ]}
+];
+
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const app = $('#app'), fx = $('#fx');
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+const vibe = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+/* ---------------- answer matching ---------------- */
+const STOP = new Set('a an the to of in on at for and or my your their our his her its they them he she it we i you is are was be been being get gets getting got go going goes went do does doing did just like really some something someone with from up about that this there then than so very too into by as all im theyre were what when where who how lol ok okay um uh'.split(' '));
+function norm(s){ return String(s||'').normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/&/g,' and ').replace(/['’]/g,'').replace(/[^a-z0-9]+/g,' ').trim(); }
+function stem(w){
+  if (w.length > 4 && w.endsWith('ies')) w = w.slice(0,-3) + 'y';
+  else if (w.length > 5 && w.endsWith('ing')) w = w.slice(0,-3);
+  else if (w.length > 4 && w.endsWith('ed')) w = w.slice(0,-2);
+  else if (w.length > 4 && w.endsWith('es') && !w.endsWith('ses')) w = w.slice(0,-2);
+  else if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) w = w.slice(0,-1);
+  if (w.length > 3 && w[w.length-1] === w[w.length-2]) w = w.slice(0,-1);
+  return w;
+}
+function tokens(s){ return norm(s).split(' ').filter(w => w && !STOP.has(w)).map(stem); }
+function near(a, b){
+  if (a === b) return true;
+  if (Math.min(a.length, b.length) < 5 || Math.abs(a.length - b.length) > 1) return false;
+  let i = 0, j = 0, edits = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { i++; j++; continue; }
+    if (++edits > 1) return false;
+    if (a.length > b.length) i++; else if (b.length > a.length) j++; else { i++; j++; }
+  }
+  return edits + (a.length - i) + (b.length - j) <= 1;
+}
+function matchAnswer(guess, board){
+  const g = tokens(guess);
+  const squash = norm(guess).replace(/ /g,'');
+  if (!g.length && !squash) return -1;
+  let best = -1, bestScore = 0;
+  board.a.forEach((ans, idx) => {
+    for (const key of [ans.t, ...ans.k]) {
+      const kt = tokens(key);
+      if (!kt.length) continue;
+      const all = kt.every(k => g.some(w => near(w, k)));
+      const glued = squash.length >= 3 && squash === norm(key).replace(/ /g,'');
+      if (all || glued) {
+        const score = kt.length * 10 + norm(key).length;
+        if (score > bestScore) { bestScore = score; best = idx; }
+      }
+    }
+  });
+  return best;
+}
+
+/* ---------------- sound (all made live, nothing downloaded) ---------------- */
+const SFX = (() => {
+  let ctx = null, out = null, nbuf = null, muted = false;
+  try { muted = localStorage.getItem('ss-muted') === '1'; } catch (e) {}
+  function init(){
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+    ctx = new C();
+    const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 4;
+    out = ctx.createGain(); out.gain.value = muted ? 0 : 0.9; out.connect(comp); comp.connect(ctx.destination);
+    const len = ctx.sampleRate * 2; nbuf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = nbuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    return ctx;
+  }
+  function env(g, t, a, peak, dur){ g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); }
+  function osc(type, f, t, dur, vol, o = {}){
+    const n = ctx.createOscillator(), g = ctx.createGain(); n.type = type; n.frequency.setValueAtTime(f, t);
+    if (o.f2) n.frequency.exponentialRampToValueAtTime(o.f2, t + (o.glide || dur));
+    env(g, t, o.a || 0.005, vol, dur); n.connect(g); g.connect(out); n.start(t); n.stop(t + dur + 0.05);
+  }
+  function noise(t, dur, vol, o = {}){
+    const s = ctx.createBufferSource(); s.buffer = nbuf; s.loop = true;
+    const fl = ctx.createBiquadFilter(); fl.type = o.type || 'bandpass'; fl.frequency.setValueAtTime(o.f || 1000, t);
+    if (o.f2) fl.frequency.exponentialRampToValueAtTime(o.f2, t + dur); fl.Q.value = o.q || 1;
+    const g = ctx.createGain(); env(g, t, o.a || 0.002, vol, dur);
+    s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+  }
+  function bell(t, f, vol){
+    [[1,1,1.6],[2,.45,1.0],[2.76,.32,.7],[5.4,.14,.35],[8.9,.06,.2]].forEach(([m, a, d]) => osc('sine', f * m, t, d, vol * a, { a: 0.002 }));
+    noise(t, 0.04, vol * 0.5, { type:'highpass', f:6000 });
+  }
+  function brass(t, f, dur, vol = 0.13){
+    const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 1.5;
+    fl.frequency.setValueAtTime(500, t); fl.frequency.linearRampToValueAtTime(3400, t + 0.05); fl.frequency.exponentialRampToValueAtTime(1300, t + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.03);
+    g.gain.setValueAtTime(vol, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    fl.connect(g); g.connect(out);
+    [-8, 8].forEach(c => { const n = ctx.createOscillator(); n.type = 'sawtooth'; n.frequency.value = f; n.detune.value = c; n.connect(fl); n.start(t); n.stop(t + dur + 0.05); });
+  }
+  function crash(t){ noise(t, 1.8, 0.3, { type:'highpass', f:4200, q:.5 }); osc('sine', 95, t, 0.55, 0.45, { f2:42, glide:.45 }); }
+  function cheer(t, dur, vol){ noise(t, dur, vol, { type:'bandpass', f:1500, q:.5, a:dur * 0.25 }); }
+  function claps(t, dur){
+    for (let i = 0; i < 170; i++) { const tt = t + Math.pow(Math.random(), 1.6) * dur; noise(tt, 0.035, 0.05 + Math.random() * 0.07, { type:'bandpass', f:1100 + Math.random() * 1800, q:1.3 }); }
+    cheer(t, dur, 0.1);
+  }
+  const play = fn => { if (muted || !init()) return; try { fn(ctx.currentTime + 0.01); } catch (e) {} };
+  return {
+    unlock(){ init(); },
+    isMuted: () => muted,
+    setMuted(m){ muted = m; try { localStorage.setItem('ss-muted', m ? '1' : '0'); } catch (e) {} if (out) out.gain.value = m ? 0 : 0.9; if (!m) init(); },
+    tap(){ play(t => osc('triangle', 700, t, 0.06, 0.1)); },
+    buzz(team){ play(t => { const f = team ? 440 : 330; osc('square', f, t, 0.34, 0.16, { f2:f * 1.5, glide:.07 }); osc('sawtooth', f / 2, t, 0.34, 0.1); }); },
+    flip(){ play(t => { noise(t, 0.16, 0.14, { f:500, f2:2800, q:.8 }); osc('square', 1800, t + 0.1, 0.015, 0.04); }); },
+    ding(){ play(t => { bell(t, 1318.5, 0.32); bell(t + 0.16, 1760, 0.22); cheer(t + 0.1, 0.9, 0.06); }); },
+    top(){ play(t => {
+      bell(t, 1318.5, 0.32); bell(t + 0.14, 1760, 0.24);
+      [523.25, 659.25, 783.99].forEach((f, i) => brass(t + 0.2 + i * 0.09, f, 0.16));
+      [523.25, 659.25, 783.99, 1046.5].forEach(f => brass(t + 0.47, f, 1.0, 0.09));
+      cheer(t + 0.3, 1.8, 0.16);
+    }); },
+    strike(){ play(t => {
+      const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1700;
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.32, t + 0.01);
+      g.gain.setValueAtTime(0.32, t + 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.74);
+      fl.connect(g); g.connect(out);
+      [[110,'square'],[116.5,'sawtooth'],[164.8,'square']].forEach(([f, ty]) => { const n = ctx.createOscillator(); n.type = ty; n.frequency.value = f; n.connect(fl); n.start(t); n.stop(t + 0.8); });
+    }); },
+    bwomp(){ play(t => { osc('triangle', 240, t, 0.22, 0.2, { f2:180 }); osc('triangle', 170, t + 0.22, 0.45, 0.2, { f2:110 }); }); },
+    roll(dur, withCrash){ play(t => {
+      let x = t;
+      while (x < t + dur) { const p = (x - t) / dur; const v = 0.05 + 0.18 * p; noise(x, 0.07, v, { type:'highpass', f:900, q:.7 }); osc('triangle', 200, x, 0.05, v * 0.4, { f2:130 }); x += 0.075 - 0.037 * p; }
+      if (withCrash) crash(t + dur);
+    }); },
+    crash(){ play(t => crash(t)); },
+    whoosh(){ play(t => { noise(t, 0.5, 0.22, { type:'lowpass', f:180, f2:5000, q:.6, a:.25 }); osc('sine', 72, t + 0.4, 0.6, 0.5, { f2:38, glide:.5 }); }); },
+    steal(){ play(t => { brass(t, 146.8, 0.22, 0.16); brass(t + 0.28, 138.6, 0.22, 0.16); brass(t + 0.56, 130.8, 0.9, 0.16); osc('sine', 65, t + 0.56, 0.9, 0.3); }); },
+    tick(){ play(t => osc('square', 2300, t, 0.02, 0.035)); },
+    clock(hard){ play(t => { osc('square', hard ? 1250 : 950, t, 0.03, hard ? 0.07 : 0.035); noise(t, 0.02, hard ? 0.12 : 0.06, { type:'highpass', f:4000 }); }); },
+    beep(n){ play(t => { osc('sine', n === 1 ? 1320 : 990, t, 0.16, 0.22); osc('square', n === 1 ? 660 : 495, t, 0.16, 0.05); }); },
+    win(){ play(t => {
+      const seq = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+      seq.forEach((f, i) => brass(t + i * 0.12, f, i === seq.length - 1 ? 1.2 : 0.14, 0.12));
+      [523.25, 659.25, 783.99].forEach(f => brass(t + 0.72, f, 1.2, 0.07));
+      crash(t + 0.72); claps(t + 0.5, 3.2);
+    }); }
+  };
+})();
+
+const ICON_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const ICON_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const soundBtn = () => `<button class="sound" id="soundBtn" aria-pressed="${!SFX.isMuted()}">${SFX.isMuted() ? ICON_OFF + '<span class="lbl">SOUND OFF</span>' : ICON_ON + '<span class="lbl">SOUND ON</span>'}</button>`;
+function wireSound(){
+  const b = $('#soundBtn'); if (!b) return;
+  b.onclick = () => { SFX.setMuted(!SFX.isMuted()); b.outerHTML = soundBtn(); wireSound(); SFX.tap(); };
+}
+/* iPhone: let sound play even when the silent switch is on */
+(function(){
+  const SILENT = 'data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+  let el = null;
+  function wake(){
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    SFX.unlock();
+    try {
+      if (!el) { el = document.createElement('audio'); el.src = SILENT; el.loop = true; el.setAttribute('playsinline', ''); el.preload = 'auto'; }
+      if (el.paused && !document.hidden) { const p = el.play(); if (p && p.catch) p.catch(() => {}); }
+    } catch (e) {}
+  }
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, wake, { passive:true }));
+  document.addEventListener('visibilitychange', () => { if (document.hidden && el) el.pause(); });
+})();
+
+
+
+/* ---------------- fx layer ---------------- */
+let fxTimer = null;
+function showFx(html, ms, dim = false){
+  clearTimeout(fxTimer);
+  fx.innerHTML = (dim ? '<div class="dim"></div>' : '') + `<div class="fx-wrap" style="position:relative;width:100%;display:grid;place-items:center">${html}</div>`;
+  return new Promise(res => {
+    fxTimer = setTimeout(() => {
+      const w = fx.querySelector('.fx-wrap'); if (w) w.classList.add('fx-out');
+      setTimeout(() => { fx.innerHTML = ''; res(); }, reduced ? 0 : 280);
+    }, ms);
+  });
+}
+const X_SVG = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M22 22 78 78M78 22 22 78" stroke="var(--cream)" stroke-width="30" stroke-linecap="round"/><path d="M22 22 78 78M78 22 22 78" stroke="var(--red)" stroke-width="18" stroke-linecap="round"/></svg>';
+function strikeFx(n, label){
+  if (!reduced) { const rf = document.createElement('div'); rf.className = 'redflash'; document.body.appendChild(rf); setTimeout(() => rf.remove(), 700); }
+  SFX.strike(); vibe([80, 40, 140]);
+  document.body.classList.remove('shake'); void document.body.offsetWidth; document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 500);
+  return showFx(`<div class="xs" role="img" aria-label="${n} strike${n > 1 ? 's' : ''}">${X_SVG.repeat(n)}</div><div class="fx-label">${esc(label)}</div>`, 1150, true);
+}
+function banner(big, small, tone = '', ms = 1500){
+  return showFx(`<div class="banner ${tone}"><b>${esc(big)}</b>${small ? `<span>${esc(small)}</span>` : ''}</div>`, ms, true);
+}
+
+/* ---------------- confetti ---------------- */
+function confetti(ms = 3800){
+  const c = $('#confetti'); if (reduced) return;
+  c.hidden = false; const ctx = c.getContext('2d'); const dpr = Math.min(2, window.devicePixelRatio || 1);
+  c.width = innerWidth * dpr; c.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const css = getComputedStyle(document.documentElement);
+  const cols = ['--red','--gold','--tile-hi','--cream'].map(v => css.getPropertyValue(v).trim());
+  const P = Array.from({ length: 170 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 80, y: innerHeight * .35, vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4, w: 6 + Math.random() * 8, h: 8 + Math.random() * 10, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cols[Math.floor(Math.random() * cols.length)] }));
+  const end = performance.now() + ms;
+  (function frame(now){
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const p of P) { p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); ctx.restore(); }
+    if (now < end) requestAnimationFrame(frame); else { ctx.clearRect(0, 0, innerWidth, innerHeight); c.hidden = true; }
+  })(performance.now());
+}
+
+/* ---------------- game state ---------------- */
+let S = null;
+let teamNames = TEAM_DEFAULTS.slice();
+const usedBoards = new Set();
+
+function pickBoards(){
+  // JUICY_PER_GAME spicy boards, the juiciest saved for the last (double) round
+  let pool = BOARDS.filter(b => !usedBoards.has(b.id));
+  if (pool.filter(b => b.spicy).length < JUICY_PER_GAME || pool.length < ROUNDS) { usedBoards.clear(); pool = BOARDS.slice(); }
+  const spicy = shuffle(pool.filter(b => b.spicy)).slice(0, JUICY_PER_GAME);
+  const rest = shuffle(pool.filter(b => !spicy.includes(b))).slice(0, ROUNDS - spicy.length);
+  const picks = [...rest, ...spicy];
+  picks.forEach(b => usedBoards.add(b.id));
+  return picks;
+}
+
+/* ---------------- screens ---------------- */
+function titleScreen(){
+  app.innerHTML = `
+  <div class="topbar"><a class="sound" href="./" onclick="return __allGames(event)" style="margin-right:auto;text-decoration:none">&larr; ALL GAMES</a>${soundBtn()}</div>
+  <section class="title-screen">
+    <div class="logo"><div class="logo-in">
+      <h1>SURVEY<span>SHOWDOWN</span></h1>
+      <div class="ribbon">QUEEN'S EDITION</div>
+    </div></div>
+    <ol class="how">
+      <li><b>1</b>Two teams, one phone or the TV. Whoever holds it types what their team says.</li>
+      <li><b>2</b>Face-off: buzz first, hit the top answer, win control of the board.</li>
+      <li><b>3</b>Clear the board before 3 strikes, or the other team steals every point.</li>
+    </ol>
+    <button class="btn red" id="playBtn">PLAY</button>
+    <p class="fine">We asked 100 Queen's students. Can you guess what they said?</p>
+  </section>`;
+  wireSound();
+  $('#playBtn').onclick = () => { SFX.unlock(); SFX.whoosh(); vibe(20); setupScreen(); };
+}
+
+function setupScreen(){
+  app.innerHTML = `
+  <div class="topbar">${soundBtn()}</div>
+  <section class="setup">
+    <h2>NAME YOUR TEAMS</h2>
+    <p class="sub">Faculty vs faculty, guys vs girls, your house vs theirs.</p>
+    <div class="namebox t0"><label for="n0">TEAM 1</label><input id="n0" maxlength="16" autocomplete="off" value="${esc(teamNames[0])}"></div>
+    <div class="vs">VS</div>
+    <div class="namebox t1"><label for="n1">TEAM 2</label><input id="n1" maxlength="16" autocomplete="off" value="${esc(teamNames[1])}"></div>
+    <div class="chips" aria-label="Quick names">${NAME_CHIPS.map(c => `<button class="chip" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <div class="spacer"></div>
+    <button class="btn red" id="startBtn">START THE SHOW</button>
+  </section>`;
+  wireSound();
+  let target = 0;
+  const n0 = $('#n0'), n1 = $('#n1');
+  n0.onfocus = () => target = 0; n1.onfocus = () => target = 1;
+  app.querySelectorAll('.chip').forEach(ch => ch.onclick = () => {
+    SFX.tap(); vibe(10);
+    (target === 0 ? n0 : n1).value = ch.dataset.c; target = target === 0 ? 1 : 0;
+  });
+  $('#startBtn').onclick = () => {
+    teamNames = [n0.value.trim().toUpperCase() || TEAM_DEFAULTS[0], n1.value.trim().toUpperCase() || TEAM_DEFAULTS[1]];
+    if (teamNames[0] === teamNames[1]) teamNames[1] += ' 2';
+    vibe(20); newGame();
+  };
+}
+
+function newGame(){
+  S = { teams: teamNames.map(n => ({ name:n, score:0 })), boards: pickBoards(), round: -1 };
+  startRound();
+}
+
+async function startRound(){
+  S.round++;
+  Object.assign(S, { board: S.boards[S.round], open: new Map(), bank: 0, strikes: 0, control: null,
+    mult: S.round === ROUNDS - 1 ? 2 : 1, fo: { buzz:null, first:null, misses:0 }, phase: 'intro', canUndo: false, busy: false });
+  renderGame();
+  SFX.whoosh(); vibe(30);
+  await showFx(`<div class="slam"><b>ROUND ${S.round + 1}</b>${S.mult > 1 ? '<span>DOUBLE POINTS</span>' : ''}</div>`, 1300, true);
+  typeQuestion();
+  await wait(reduced ? 0 : 500 + S.board.q.split(' ').length * 55);
+  S.phase = 'buzz'; renderDeck();
+}
+
+function renderGame(){
+  const tiles = S.board.a.map((a, i) => `
+    <div class="tile" id="tile${i}" data-i="${i}" style="--i:${i}"><div class="tile-in">
+      <div class="face front"><span class="num">${i + 1}</span></div>
+      <div class="face back"><span class="ans" style="font-size:${ansSize(a.t)}">${esc(a.t)}</span><span class="pts">${a.p * S.mult}</span></div>
+    </div></div>`).join('');
+  app.innerHTML = `
+  <div class="game">
+    <header class="scores">
+      ${[0,1].map(t => `<div class="team t${t}" id="team${t}"><span class="tag">PLAYING</span><span class="tname">${esc(S.teams[t].name)}</span><span class="tscore" id="score${t}">${S.teams[t].score}</span></div>`).join('')}
+    </header>
+    <div class="roundline"><span class="rlabel">ROUND ${S.round + 1}/${ROUNDS} <i class="house">100 SURVEYED</i></span><span class="strikes" id="strikes" hidden><i></i><i></i><i></i></span>${soundBtn()}</div>
+    <section class="qcard"><div class="asked">WE ASKED 100 QUEEN'S STUDENTS</div><p id="qtext"></p></section>
+    <div class="marquee" id="marquee"><div class="board" id="board" style="grid-template-rows:repeat(${Math.ceil(S.board.a.length / 2)},1fr)">${tiles}</div></div>
+    <section class="deck" id="deck" aria-live="polite"></section>
+  </div>`;
+  // put the bank between the two teams
+  const bank = document.createElement('div');
+  bank.className = 'bank';
+  bank.innerHTML = `<span class="blabel">BANK</span><span class="bnum" id="bank">0</span>${S.mult > 1 ? '<span class="mult">×2</span>' : ''}`;
+  $('#team0').after(bank);
+  wireSound();
+}
+
+function ansSize(t){
+  // shrink long single words so they never break mid-word on a phone
+  const longest = Math.max(...t.replace(/[^A-Za-z0-9' ]/g, ' ').split(/\s+/).map(w => w.length));
+  const wide = window.innerWidth >= 760;
+  return wide ? `min(4.3vh, ${(26 / (longest * 0.62)).toFixed(2)}vw)` : `min(4.7vw, 30px, ${(21 / (longest * 0.64)).toFixed(2)}vw)`;
+}
+function typeQuestion(){
+  const words = S.board.q.split(' ');
+  $('#qtext').innerHTML = words.map((w, i) => `<span class="w" style="animation-delay:${i * 55}ms">${esc(w)}</span>`).join(' ');
+}
+
+function setControlGlow(){
+  const gm = document.querySelector('.game'); if (gm) gm.classList.toggle('stealing', S.phase === 'steal');
+  [0,1].forEach(t => {
+    const el = $('#team' + t); if (!el) return;
+    const on = (S.phase === 'play' && S.control === t) || (S.phase === 'steal' && S.control === 1 - t) ||
+               ((S.phase === 'fo1') && S.fo.buzz === t) || ((S.phase === 'fo2') && S.fo.buzz === 1 - t);
+    el.classList.toggle('on', on);
+    el.querySelector('.tag').textContent = S.phase === 'steal' ? 'STEALING' : (S.phase === 'fo1' || S.phase === 'fo2') ? 'ANSWERING' : 'PLAYING';
+  });
+  const st = $('#strikes');
+  if (st) { st.hidden = !(S.phase === 'play' || S.phase === 'steal' || S.phase === 'end'); st.querySelectorAll('i').forEach((x, i) => x.classList.toggle('on', i < S.strikes)); }
+}
+
+function guessForm(team, placeholder){
+  return `<form class="guess t${team}" id="gform" autocomplete="off">
+    <input id="guess" maxlength="60" enterkeyhint="go" autocapitalize="characters" spellcheck="false" placeholder="${esc(placeholder)}" aria-label="Your team's answer">
+    <button class="btn ${team ? '' : 'red'}" type="submit">LOCK IT</button>
+  </form>`;
+}
+
+function renderDeck(){
+  const d = $('#deck'); if (!d) return;
+  const T = S.teams, other = t => 1 - t;
+  let h = '';
+  if (S.phase === 'buzz') {
+    h = `<div class="deck-head"><div class="deck-label">FACE-OFF</div><p class="deck-help">One player from each team. First hand on the buzzer answers.</p></div>
+      <div class="buzzers">${[0,1].map(t => `<button class="buzzer t${t}" data-t="${t}"><b>BUZZ</b><span>${esc(T[t].name)}</span></button>`).join('')}</div>`;
+  } else if (S.phase === 'fo1') {
+    const t = S.fo.buzz;
+    h = `<div class="deck-top"><div class="deck-head"><div class="deck-label t${t}">${esc(T[t].name)} BUZZED</div><p class="deck-help">Top answer wins the board outright.</p></div>${clockHTML()}</div>${guessForm(t, 'What did they say?')}`;
+  } else if (S.phase === 'fo2') {
+    const t = other(S.fo.buzz);
+    const beat = S.fo.first >= 0 ? `Beat answer #${S.fo.first + 1} to steal the face-off.` : 'Any answer on the board wins it.';
+    h = `<div class="deck-top"><div class="deck-head"><div class="deck-label t${t}">${esc(T[t].name)}, YOUR SHOT</div><p class="deck-help">${beat}</p></div>${clockHTML()}</div>${guessForm(t, 'What did they say?')}`;
+  } else if (S.phase === 'playpass') {
+    const t = S.fo.winner;
+    h = `<div class="deck-head"><div class="deck-label t${t}">${esc(T[t].name)} WON THE FACE-OFF</div><p class="deck-help">Play the board yourselves, or pass it and make them sweat?</p></div>
+      <div class="row"><button class="btn ${t ? '' : 'red'}" id="playB">PLAY</button><button class="btn ghost" id="passB">PASS</button></div>`;
+  } else if (S.phase === 'play') {
+    const t = S.control, left = STRIKES_TO_STEAL - S.strikes;
+    h = `<div class="deck-top"><div class="deck-head"><div class="deck-label t${t}">${esc(T[t].name)} IS UP</div><p class="deck-help">Name what's left. ${left} strike${left === 1 ? '' : 's'} before ${esc(T[other(t)].name)} can steal.</p></div>${clockHTML()}</div>
+      ${guessForm(t, 'Next answer?')}${S.canUndo ? '<button class="undo" id="undoB">Typo? Undo that strike</button>' : ''}`;
+  } else if (S.phase === 'steal') {
+    const t = other(S.control);
+    h = `<div class="deck-top"><div class="deck-head"><div class="deck-label t${t}">${esc(T[t].name)}: STEAL IT</div><p class="deck-help">Huddle up. One answer takes all ${S.bank} points.</p></div>${clockHTML()}</div>
+      ${guessForm(t, 'Your one answer')}${S.canUndo ? '<button class="undo" id="undoB">Typo? Undo that strike</button>' : ''}`;
+  } else if (S.phase === 'end') {
+    h = `<div class="deck-head"><div class="deck-label">${esc(S.endLine || 'THE REST OF THE BOARD')}</div></div>`;
+  } else if (S.phase === 'next') {
+    const last = S.round === ROUNDS - 1;
+    h = `<div class="deck-head"><div class="deck-label t${S.roundWinner}">${esc(S.endLine)}</div><p class="deck-help">${esc(T[0].name)} ${T[0].score} · ${esc(T[1].name)} ${T[1].score}</p></div>
+      <button class="btn red" id="nextB">${last ? 'FINAL SCORES' : (S.round === ROUNDS - 2 ? 'FINAL ROUND ×2' : 'NEXT ROUND')}</button>`;
+  }
+  d.innerHTML = h;
+  setControlGlow();
+  if (CLOCK_SECS[S.phase]) clockStart(CLOCK_SECS[S.phase]); else clockStop();
+
+  d.querySelectorAll('.buzzer').forEach(b => b.addEventListener('pointerdown', e => {
+    e.preventDefault(); if (S.phase !== 'buzz') return;
+    const t = +b.dataset.t; b.classList.add('hit'); SFX.buzz(t); vibe(60);
+    S.fo.buzz = t; S.phase = 'fo1'; setTimeout(renderDeck, 260);
+  }));
+  const f = $('#gform');
+  if (f) {
+    f.onsubmit = e => { e.preventDefault(); const v = $('#guess').value; if (!v.trim()) { f.classList.remove('shake'); void f.offsetWidth; f.classList.add('shake'); return; } $('#guess').blur(); handleGuess(v); };
+    if (finePointer) setTimeout(() => { const g = $('#guess'); if (g) g.focus(); }, 50);
+  }
+  const pb = $('#playB'), ps = $('#passB');
+  if (pb) pb.onclick = () => choosePlay(S.fo.winner);
+  if (ps) ps.onclick = () => choosePlay(1 - S.fo.winner);
+  const ub = $('#undoB'); if (ub) ub.onclick = undoStrike;
+  const nb = $('#nextB'); if (nb) nb.onclick = () => { SFX.tap(); vibe(20); if (S.round === ROUNDS - 1) finalScreen(); else startRound(); };
+}
+
+/* ---------------- the countdown clock ---------------- */
+const CLOCK = { id:0, end:0, total:0, last:-1 };
+const clockHTML = () => `<div class="clock" id="clock" style="--p:1"><b>${CLOCK_SECS[S.phase] || ''}</b></div>`;
+function clockStop(){
+  CLOCK.id++;
+  const m = $('#marquee'); if (m) m.classList.remove('urgent');
+  const c = $('#clock'); if (c) c.classList.add('stopped');
+}
+function clockStart(secs){
+  clockStop();
+  const c0 = $('#clock'); if (c0) c0.classList.remove('stopped');
+  const id = ++CLOCK.id; CLOCK.total = secs; CLOCK.end = performance.now() + secs * 1000; CLOCK.last = -1;
+  (function f(now){
+    if (id !== CLOCK.id) return;
+    const left = Math.max(0, (CLOCK.end - now) / 1000), sec = Math.ceil(left);
+    const el = $('#clock');
+    if (el) {
+      el.style.setProperty('--p', (left / CLOCK.total).toFixed(4));
+      el.querySelector('b').textContent = sec;
+      el.classList.toggle('warn', left <= Math.min(10, CLOCK.total / 2));
+      el.classList.toggle('danger', left <= 3);
+    }
+    const m = $('#marquee'); if (m) m.classList.toggle('urgent', left <= 3);
+    if (sec !== CLOCK.last) {
+      CLOCK.last = sec;
+      if (sec > 0 && sec <= 3) { SFX.beep(sec); vibe(30); }
+      else if (sec > 0 && sec <= 10) SFX.clock(sec <= 5);
+    }
+    if (left <= 0) { CLOCK.id++; if (m) m.classList.remove('urgent'); timeUp(); return; }
+    requestAnimationFrame(f);
+  })(performance.now());
+}
+function timeUp(){ if (!S || !CLOCK_SECS[S.phase]) return; if (S.busy) { setTimeout(timeUp, 300); return; } handleGuess('', true); }
+
+/* ---------------- round flow ---------------- */
+function lockDeck(){ clockStop(); const d = $('#deck'); if (d) d.querySelectorAll('button,input').forEach(x => x.disabled = true); }
+
+async function suspense(text, secs, withCrash){
+  const m = $('#marquee'); if (!m) return;
+  const b = document.createElement('div'); b.className = 'bubble';
+  b.innerHTML = `<small>${S.phase === 'steal' ? 'FOR ALL THE POINTS' : 'SURVEY SAYS…'}</small><b>${esc(text)}</b>`;
+  m.appendChild(b); m.classList.add('hot');
+  SFX.roll(secs, withCrash);
+  await wait(reduced ? 200 : secs * 1000);
+  b.remove(); m.classList.remove('hot');
+}
+
+async function handleGuess(raw, timedOut){
+  if (S.busy) return; S.busy = true;
+  const guess = String(raw || '').trim().slice(0, 60);
+  lockDeck(); S.canUndo = false;
+  S.missLabel = timedOut ? "TIME'S UP" : null;
+  const steal = S.phase === 'steal';
+  if (!timedOut) await suspense(guess, steal ? SUSPENSE_STEAL : SUSPENSE_GUESS, false);
+  else { const g = $('#guess'); if (g) g.blur(); }
+  const idx = timedOut ? -1 : matchAnswer(guess, S.board);
+  const dup = idx >= 0 && S.open.has(idx);
+  try {
+    if (S.phase === 'fo1' || S.phase === 'fo2') await faceoffResult(idx, dup);
+    else if (S.phase === 'play') await playResult(idx, dup);
+    else if (S.phase === 'steal') await stealResult(idx, dup);
+  } finally { S.busy = false; }
+}
+
+async function reveal(idx, scoring){
+  const tile = $('#tile' + idx); if (!tile) return;
+  S.open.set(idx, scoring ? 'hit' : 'rest');
+  tile.classList.add('open'); if (!scoring) tile.classList.add('rest');
+  SFX.flip();
+  if (!scoring) { await wait(reduced ? 0 : 420); return; }
+  await wait(reduced ? 0 : 260);
+  tile.classList.add('flash');
+  if (!reduced) { const fl = document.createElement('i'); fl.className = 'flare'; tile.appendChild(fl); setTimeout(() => fl.remove(), 900); if (idx === 0) sparks(tile); }
+  const plus = document.createElement('span'); plus.className = 'plus'; plus.textContent = '+' + (S.board.a[idx].p * S.mult); tile.appendChild(plus); setTimeout(() => plus.remove(), 1200);
+  const pts = S.board.a[idx].p * S.mult;
+  if (idx === 0) { SFX.top(); vibe([30, 40, 30, 40, 120]); }
+  else { SFX.ding(); vibe(40); }
+  await countTo('#bank', S.bank, S.bank + pts); S.bank += pts;
+  if (idx === 0) await banner('TOP ANSWER!', `${S.board.a[0].t} · ${pts} points`, '', 1400);
+  else await wait(reduced ? 0 : 450);
+}
+
+function sparks(tile){
+  const r = tile.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  for (let i = 0; i < 26; i++) {
+    const p = document.createElement('i'); p.className = 'spark';
+    const a = Math.random() * Math.PI * 2, d = 80 + Math.random() * 160;
+    p.style.left = cx + 'px'; p.style.top = cy + 'px';
+    document.body.appendChild(p);
+    p.animate([{ transform:'translate(-50%,-50%) scale(1)', opacity:1 }, { transform:`translate(calc(-50% + ${Math.cos(a) * d}px), calc(-50% + ${Math.sin(a) * d}px)) scale(.2)`, opacity:0 }], { duration:700 + Math.random() * 400, easing:'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => p.remove();
+  }
+}
+function countTo(sel, from, to){
+  const el = $(sel); if (!el) return Promise.resolve();
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  if (reduced || from === to) { el.textContent = to; return Promise.resolve(); }
+  const dur = Math.min(900, 300 + Math.abs(to - from) * 12), start = performance.now();
+  let lastTick = 0;
+  return new Promise(res => {
+    (function f(now){
+      const p = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(from + (to - from) * e);
+      if (now - lastTick > 70 && p < 1) { SFX.tick(); lastTick = now; }
+      if (p < 1) requestAnimationFrame(f); else res();
+    })(start);
+  });
+}
+
+async function faceoffResult(idx, dup){
+  const answering = S.phase === 'fo1' ? S.fo.buzz : 1 - S.fo.buzz;
+  const hit = idx >= 0 && !dup;
+  if (hit) await reveal(idx, true);
+  else { SFX.bwomp(); vibe([60, 30, 60]); await showFx(`<div class="xs">${X_SVG}</div><div class="fx-label">${S.missLabel || (dup ? 'ALREADY UP THERE' : 'NOT ON THE BOARD')}</div>`, 900, true); }
+
+  if (S.phase === 'fo1') {
+    S.fo.first = hit ? idx : -1;
+    if (hit && idx === 0) return wonFaceoff(answering);
+    S.phase = 'fo2'; renderDeck(); return;
+  }
+  const a = S.fo.first, b = hit ? idx : -1;
+  if (a < 0 && b < 0) {
+    S.fo.misses++;
+    if (S.fo.misses >= 2) { const t = Math.random() < .5 ? 0 : 1; await banner('NOBODY HIT IT', `Coin flip: ${S.teams[t].name} gets the board`, 'blue', 1700); return wonFaceoff(t); }
+    await banner('NOBODY HIT IT', 'New players up. Buzz again.', 'blue', 1400);
+    S.fo.buzz = null; S.fo.first = null; S.phase = 'buzz'; renderDeck(); return;
+  }
+  let winner;
+  if (a < 0) winner = answering; else if (b < 0) winner = S.fo.buzz; else winner = b < a ? answering : S.fo.buzz;
+  wonFaceoff(winner);
+}
+
+function wonFaceoff(t){
+  S.fo.winner = t; S.phase = 'playpass';
+  if (allOpen()) return endRound(t, `${S.teams[t].name} CLEARED IT`);
+  renderDeck();
+}
+
+async function choosePlay(t){
+  SFX.tap(); vibe(20);
+  S.control = t; S.phase = 'play'; S.strikes = 0;
+  renderDeck(); lockDeck();
+  await banner(`${S.teams[t].name} PLAYS`, '3 strikes and the other team can steal', t ? '' : 'red', 1200);
+  renderDeck();
+}
+
+async function playResult(idx, dup){
+  if (idx >= 0 && !dup) {
+    await reveal(idx, true);
+    if (allOpen()) { await banner('BOARD CLEARED!', `${S.teams[S.control].name} keeps the bank`, S.control ? '' : 'red', 1500); return endRound(S.control, `${S.teams[S.control].name} TAKES ${S.bank}`); }
+    renderDeck(); return;
+  }
+  S.strikes++;
+  setControlGlow();
+  await strikeFx(S.strikes, S.missLabel || (dup ? 'ALREADY ON THE BOARD' : 'NOT ON THE BOARD'));
+  S.canUndo = !S.missLabel;
+  if (S.strikes >= STRIKES_TO_STEAL) {
+    S.phase = 'steal'; setControlGlow(); SFX.steal(); vibe([100, 60, 100]);
+    await banner(`${S.teams[1 - S.control].name} CAN STEAL`, `One answer for all ${S.bank} points`, 'blue', 1700);
+  }
+  renderDeck();
+}
+
+function undoStrike(){
+  if (!S.canUndo || S.strikes < 1) return;
+  SFX.tap(); S.strikes--; S.canUndo = false;
+  if (S.phase === 'steal') S.phase = 'play';
+  renderDeck();
+}
+
+async function stealResult(idx, dup){
+  const thief = 1 - S.control;
+  if (idx >= 0 && !dup) {
+    await reveal(idx, true);
+    SFX.win(); vibe([60, 40, 60, 40, 200]);
+    await banner('STOLEN!', `${S.teams[thief].name} takes all ${S.bank}`, thief ? '' : 'red', 1700);
+    return endRound(thief, `${S.teams[thief].name} STOLE ${S.bank}`);
+  }
+  await strikeFx(1, S.missLabel || 'NO STEAL');
+  await banner('SAVED!', `${S.teams[S.control].name} keeps ${S.bank}`, S.control ? '' : 'red', 1400);
+  return endRound(S.control, `${S.teams[S.control].name} HELD ON FOR ${S.bank}`);
+}
+
+function allOpen(){ return S.open.size === S.board.a.length; }
+
+function flyPoints(n, team){
+  const b = $('#bank'), t = $('#score' + team);
+  if (!b || !t || reduced || !n) return Promise.resolve();
+  const br = b.getBoundingClientRect(), tr = t.getBoundingClientRect();
+  const f = document.createElement('div'); f.className = 'flyer t' + team; f.textContent = '+' + n;
+  f.style.left = (br.left + br.width / 2) + 'px'; f.style.top = (br.top + br.height / 2) + 'px';
+  document.body.appendChild(f); SFX.whoosh();
+  const dx = (tr.left + tr.width / 2) - (br.left + br.width / 2), dy = (tr.top + tr.height / 2) - (br.top + br.height / 2);
+  const anim = f.animate([
+    { transform:'translate(-50%,-50%) scale(.6)', opacity:0 },
+    { transform:'translate(-50%,-50%) translateY(-60px) scale(1.5)', opacity:1, offset:.35 },
+    { transform:`translate(-50%,-50%) translate(${dx}px,${dy}px) scale(.7)`, opacity:1 }
+  ], { duration:900, easing:'cubic-bezier(.5,0,.2,1)' });
+  return anim.finished.then(() => { f.remove(); SFX.ding(); vibe(40); }).catch(() => f.remove());
+}
+async function endRound(winner, line){
+  S.phase = 'end'; S.endLine = 'THE REST OF THE BOARD'; S.canUndo = false; renderDeck();
+  for (let i = 0; i < S.board.a.length; i++) if (!S.open.has(i)) await reveal(i, false);
+  await wait(reduced ? 0 : 350);
+  const before = S.teams[winner].score;
+  S.teams[winner].score += S.bank;
+  const teamEl = $('#team' + winner); if (teamEl) teamEl.classList.add('on');
+  await flyPoints(S.bank, winner);
+  await Promise.all([countTo('#bank', S.bank, 0), countTo('#score' + winner, before, S.teams[winner].score)]);
+  SFX.ding();
+  S.roundWinner = winner; S.endLine = line; S.phase = 'next'; renderDeck();
+}
+
+/* ---------------- final ---------------- */
+async function finalScreen(){
+  const [a, b] = S.teams;
+  const winner = a.score === b.score ? -1 : (a.score > b.score ? 0 : 1);
+  app.innerHTML = `<div class="topbar">${soundBtn()}</div><section class="final"><div class="crown">AND THE WINNER IS…</div></section>`;
+  wireSound();
+  SFX.roll(2.2, true); vibe([20, 30, 20, 30, 20, 30, 20]);
+  await wait(reduced ? 300 : 2200);
+  const name = winner < 0 ? "IT'S A TIE" : S.teams[winner].name;
+  app.querySelector('.final').innerHTML = `
+    <div class="crown">${winner < 0 ? 'NOBODY BLINKED' : 'YOUR SURVEY SHOWDOWN CHAMPS'}</div>
+    <h2 class="winner ${winner < 0 ? '' : 't' + winner}">${esc(name)}</h2>
+    <div class="tally">${S.teams.map((t, i) => `<div class="${i === winner ? 'won' : ''}"><span class="tname" style="color:var(${i ? '--gold' : '--red'})">${esc(t.name)}</span><span class="tscore">${t.score}</span></div>`).join('')}</div>
+    <button class="btn red" id="againB">REMATCH</button>
+    <button class="btn ghost" id="teamsB">NEW TEAMS</button>`;
+  SFX.win(); confetti(); vibe([80, 50, 80, 50, 250]);
+  $('#againB').onclick = () => { SFX.tap(); newGame(); };
+  $('#teamsB').onclick = () => { SFX.tap(); setupScreen(); };
+}
+
+titleScreen();
+})();
+</script>
+
+<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body></html>

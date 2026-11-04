@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='./';return false;};</script>
+</head><body>
+<title>The Call</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap">
+<style>
+/* Layout: basement-party card game. One big card in the middle, everything else is
+   thumb buttons. Grape ground, solo-cup red, highlighter yellow. */
+:root{
+  --ground:#170A26;
+  --ground-2:#25113D;
+  --ground-3:#341A52;
+  --cup:#EF2B3A;
+  --cup-deep:#9E111D;
+  --hi:#FFE63B;
+  --hi-deep:#B89E00;
+  --cream:#FFF4E8;
+  --ink:#1A0F14;
+  --muted:#B9A6CF;
+  --cop:#2F6BFF;
+  --spicy:#E0187E;
+  --paper:#F4EEDC;
+  --display:"Bowlby One","Arial Black",Impact,sans-serif;
+  --body:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --ease-pop:cubic-bezier(.2,1.45,.4,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ground);color:var(--cream);font-family:var(--body);font-size:17px;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
+  background-image:radial-gradient(90% 55% at 50% 0%, var(--ground-3) 0%, transparent 70%)}
+#app{min-height:100%;max-width:760px;margin:0 auto;box-sizing:border-box;display:flex;flex-direction:column;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:14px 16px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hi);outline-offset:3px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:62px;padding:0 20px;border-radius:16px;
+  background:var(--cup);color:var(--cream);font-family:var(--display);font-size:22px;letter-spacing:.02em;text-transform:uppercase;
+  box-shadow:0 7px 0 var(--cup-deep);transition:transform .12s var(--ease-out), box-shadow .12s var(--ease-out)}
+.btn:active{transform:translateY(6px);box-shadow:0 1px 0 var(--cup-deep)}
+.btn.hi{background:var(--hi);color:var(--ink);box-shadow:0 7px 0 var(--hi-deep)}
+.btn.hi:active{box-shadow:0 1px 0 var(--hi-deep)}
+.btn.ghost{background:transparent;box-shadow:inset 0 0 0 2.5px var(--ground-3);min-height:52px;font-size:17px;color:var(--muted)}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:42px}
+.pill{display:flex;align-items:center;gap:6px;height:38px;padding:0 13px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.08em;box-shadow:inset 0 0 0 2px var(--ground-3);color:var(--muted)}
+.pill svg{width:17px;height:17px}
+.mode-tag{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--hi)}
+
+/* ---------- title ---------- */
+.title{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;padding-block:8px}
+.logo{position:relative;text-align:left}
+.logo .small{font-family:var(--display);font-size:clamp(16px,4.6vw,24px);color:var(--hi);letter-spacing:.04em}
+.logo h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(96px,30vw,190px);line-height:.82;color:var(--cream);text-shadow:6px 6px 0 var(--cup)}
+.logo .hand{position:absolute;right:-4px;top:clamp(34px,10vw,56px);width:clamp(110px,33vw,190px);transform:rotate(-14deg);animation:jab 1.6s var(--ease-out) infinite}
+@keyframes jab{0%,60%,100%{transform:rotate(-14deg) translateX(0)}70%{transform:rotate(-14deg) translateX(-16px)}}
+.steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;font-weight:700;font-size:17px;line-height:1.25}
+.steps b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--hi);color:var(--ink);font-family:var(--display);font-size:16px}
+
+/* ---------- age / mode gate ---------- */
+.gate{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.gate h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(34px,10vw,54px);line-height:.95;text-wrap:balance}
+.gate h2 em{font-style:normal;color:var(--hi)}
+.gate p{margin:0;font-size:18px;line-height:1.35;color:var(--muted);font-weight:500}
+.rules{display:grid;gap:8px;padding:14px;border-radius:14px;background:var(--ground-2)}
+.rules div{display:flex;gap:10px;align-items:baseline;font-weight:700}
+.rules div::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;background:var(--cup);transform:translateY(-2px)}
+.age{font-family:var(--display);font-size:13px;letter-spacing:.06em;color:var(--cup);margin-bottom:-6px}
+
+/* ---------- players ---------- */
+.players{flex:1;display:flex;flex-direction:column;gap:14px}
+.players h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(32px,9vw,48px);line-height:1}
+.players .sub{margin:-6px 0 0;color:var(--muted);font-weight:600}
+.addrow{display:flex;gap:8px}
+.addrow input{flex:1;min-width:0;height:60px;border:0;border-radius:14px;padding:0 16px;background:var(--cream);color:var(--ink);font-family:var(--body);font-weight:800;font-size:21px;box-sizing:border-box}
+.addrow .btn{width:auto;flex:0 0 auto;min-height:60px;font-size:18px}
+.plist{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:60px}
+.pchip{display:flex;align-items:center;gap:8px;height:46px;padding:0 8px 0 16px;border-radius:999px;background:var(--ground-2);font-weight:800;font-size:18px;box-shadow:inset 0 0 0 2px var(--ground-3);animation:chipin .35s var(--ease-pop)}
+.pchip button{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ground-3);color:var(--muted);font-size:18px;line-height:1}
+@keyframes chipin{from{transform:scale(.4);opacity:0}}
+.packs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pack{display:flex;flex-direction:column;gap:2px;padding:12px 10px;border-radius:14px;background:var(--ground-2);text-align:left;box-shadow:inset 0 0 0 2.5px var(--ground-3);min-width:0}
+.pack b{font-family:var(--display);font-size:15px;line-height:1.05;font-weight:400}
+.pack span{font-size:13px;color:var(--muted);font-weight:600;line-height:1.2}
+.pack.on{background:var(--cup);box-shadow:none}
+.pack.on span{color:var(--cream)}
+.label{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--muted)}
+.lenrow{display:flex;gap:8px}
+.lenrow button{flex:1;height:46px;border-radius:12px;background:var(--ground-2);font-weight:800;box-shadow:inset 0 0 0 2.5px var(--ground-3)}
+.lenrow button.on{background:var(--hi);color:var(--ink);box-shadow:none}
+
+/* ---------- card ---------- */
+.play{flex:1;display:flex;flex-direction:column;gap:14px}
+.meta{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px;letter-spacing:.1em;color:var(--muted)}
+.cardwrap{flex:1;display:grid;place-items:center;min-height:300px;perspective:900px}
+.card{position:relative;width:100%;max-width:520px;min-height:300px;box-sizing:border-box;padding:24px 22px 26px;border-radius:22px;background:var(--cream);color:var(--ink);
+  box-shadow:0 0 0 5px var(--cup), 10px 10px 0 5px var(--ink);display:flex;flex-direction:column;justify-content:space-between;gap:18px;transform:rotate(-1.5deg)}
+.card.deal{animation:deal .55s var(--ease-pop)}
+@keyframes deal{from{transform:translateY(60vh) rotate(18deg)}to{transform:rotate(-1.5deg)}}
+.card .kicker{font-family:var(--display);font-size:clamp(17px,4.8vw,24px);color:var(--cup);line-height:1}
+.card .prompt{margin:0;font-weight:800;font-size:clamp(30px,8.6vw,48px);line-height:1.02;text-wrap:balance;letter-spacing:-.01em}
+.card .foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card .tag{padding:5px 10px;border-radius:999px;background:var(--ink);color:var(--hi);font-size:12px;font-weight:800;letter-spacing:.1em}
+.card .corner{font-family:var(--display);font-size:28px;color:var(--cup);line-height:1}
+.card.twist{background:var(--hi);box-shadow:0 0 0 5px var(--ink), 10px 10px 0 5px var(--cup)}
+.card.twist .kicker{color:var(--ink)}
+.reader{align-self:center;padding:6px 14px;border-radius:999px;background:var(--ground-2);font-weight:700;font-size:15px;color:var(--muted)}
+.reader b{color:var(--hi);font-weight:800}
+.mod{align-self:center;padding:8px 14px;border-radius:12px;background:var(--hi);color:var(--ink);font-family:var(--display);font-size:15px;transform:rotate(2deg)}
+
+/* ---------- countdown ---------- */
+#fx{position:fixed;inset:0;z-index:100;pointer-events:none;display:grid;place-items:center;overflow:hidden}
+#fx.block{pointer-events:auto}
+.cd{position:absolute;inset:0;display:grid;place-items:center;background:var(--ground)}
+.cd .lbl{position:absolute;top:calc(18% + env(safe-area-inset-top,0px));font-family:var(--display);font-size:clamp(22px,6.5vw,36px);color:var(--hi);text-align:center;padding:0 16px}
+.cd .num{font-family:var(--display);font-size:clamp(200px,62vw,420px);line-height:1;color:var(--cream);text-shadow:10px 10px 0 var(--cup);animation:num .9s var(--ease-out) both}
+@keyframes num{0%{transform:scale(2.6);opacity:0}25%{transform:scale(1);opacity:1}80%{transform:scale(.92);opacity:1}100%{transform:scale(.7);opacity:0}}
+.cd.pulse{animation:bgpulse .9s ease-out}
+@keyframes bgpulse{0%{background:var(--cup)}100%{background:var(--ground)}}
+.point{position:absolute;inset:0;display:grid;place-items:center;background:var(--cup);animation:fadein .1s}
+.point b{position:relative;z-index:2;font-family:var(--display);font-weight:400;font-size:clamp(84px,27vw,200px);color:var(--cream);text-shadow:8px 8px 0 var(--ink);animation:slam .45s var(--ease-pop)}
+.point .h{position:absolute;width:clamp(150px,44vw,260px);z-index:1}
+@keyframes slam{from{transform:scale(3) rotate(-8deg);opacity:0}}
+@keyframes fadein{from{opacity:0}}
+
+/* ---------- pick ---------- */
+.pick{display:flex;flex-direction:column;gap:12px}
+.pick h3{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(24px,7vw,34px);line-height:1}
+.pick p{margin:-6px 0 0;color:var(--muted);font-weight:600}
+.names{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.nm{position:relative;min-height:86px;padding:12px 14px;border-radius:16px;background:var(--ground-2);box-shadow:inset 0 0 0 2.5px var(--ground-3);font-weight:800;font-size:25px;line-height:1.05;text-align:left;overflow-wrap:anywhere;transition:transform .15s var(--ease-pop), background .15s}
+.nm small{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-top:3px}
+.nm.on{background:var(--cup);box-shadow:none;transform:rotate(-2deg) scale(1.03)}
+.nm.on small{color:var(--cream)}
+.nm.on::after{content:"";position:absolute;right:10px;top:50%;width:30px;height:16px;transform:translateY(-50%);background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 64'%3E%3Cpath d='M8 34c0-12 6-20 16-22l30-1h56a8 8 0 0 1 0 16H70v20c0 8-6 13-14 13H26C15 60 8 50 8 34z' fill='%23FFF4E8' stroke='%231A0F14' stroke-width='5'/%3E%3C/svg%3E")}
+.pickrow{display:grid;grid-template-columns:1fr auto;gap:10px}
+.pickrow .btn.ghost{width:auto;padding:0 18px}
+
+/* ---------- reveal ---------- */
+.reveal{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;text-align:center}
+.reveal .who{font-family:var(--display);font-weight:400;font-size:clamp(54px,17vw,120px);line-height:.9;margin:0;color:var(--cream);text-shadow:6px 6px 0 var(--cup);overflow-wrap:break-word;animation:slam .55s var(--ease-pop) both;text-wrap:balance}
+.reveal .ptxt{margin:0;font-weight:700;font-size:18px;color:var(--muted);line-height:1.25}
+.penalty{align-self:center;padding:12px 18px;border-radius:14px;background:var(--hi);color:var(--ink);font-family:var(--display);font-size:clamp(20px,6vw,30px);line-height:1.05;transform:rotate(-2deg);box-shadow:6px 6px 0 var(--ink);animation:stamp .5s .35s var(--ease-pop) both;max-width:100%;box-sizing:border-box}
+@keyframes stamp{from{transform:rotate(-14deg) scale(2.2);opacity:0}}
+.burst{position:absolute;left:50%;top:14%;z-index:3;display:grid;place-items:center;width:clamp(190px,56vw,290px);aspect-ratio:1.4;transform:translateX(-50%) rotate(-8deg);pointer-events:none;animation:burst .6s var(--ease-pop) both}
+.burst::before{content:"";position:absolute;inset:0;background:var(--hi);clip-path:polygon(50% 0,59% 22%,80% 6%,75% 30%,100% 28%,83% 48%,100% 66%,76% 68%,82% 94%,60% 78%,50% 100%,40% 78%,18% 94%,24% 68%,0 66%,17% 48%,0 28%,25% 30%,20% 6%,41% 22%)}
+.burst span{position:relative;font-family:var(--display);font-size:clamp(22px,6.6vw,34px);color:var(--cup);text-shadow:2px 2px 0 var(--ink);line-height:1;text-align:center;padding:0 14%}
+@keyframes burst{0%{transform:translateX(-50%) rotate(-30deg) scale(0)}70%{transform:translateX(-50%) rotate(-4deg) scale(1.1)}100%{transform:translateX(-50%) rotate(-8deg) scale(1)}}
+.floater{position:fixed;z-index:90;font-family:var(--display);color:var(--hi);pointer-events:none;animation:floatup 2.4s ease-out forwards;text-shadow:3px 3px 0 var(--ink)}
+@keyframes floatup{0%{transform:translate(0,0) scale(.4) rotate(0);opacity:0}15%{opacity:1}100%{transform:translate(var(--dx),-55vh) scale(1.3) rotate(var(--rot));opacity:0}}
+.tear{position:fixed;z-index:90;width:14px;height:20px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:var(--cop);pointer-events:none;animation:fall 1.4s ease-in forwards}
+@keyframes fall{from{transform:translateY(0);opacity:1}to{transform:translateY(55vh);opacity:0}}
+.siren{position:fixed;inset:0;z-index:80;pointer-events:none;animation:siren .5s steps(2) 4}
+@keyframes siren{0%{background:color-mix(in srgb, var(--cup) 35%, transparent)}100%{background:color-mix(in srgb, var(--cop) 35%, transparent)}}
+body.shake #app{animation:shake .5s}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-12px) rotate(-1deg)}40%{transform:translateX(10px) rotate(1deg)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.shame{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.shame span{padding:5px 10px;border-radius:999px;background:var(--ground-2);font-size:14px;font-weight:800}
+.shame span b{color:var(--hi);margin-left:4px}
+
+/* ---------- verdict ---------- */
+.verdict{flex:1;display:flex;flex-direction:column;gap:14px;padding-block:6px}
+.verdict h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(40px,12vw,72px);line-height:.92}
+.verdict h2 span{color:var(--hi)}
+.vrow{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:14px;background:var(--ground-2);animation:chipin .4s var(--ease-pop) both}
+.vrow .rk{font-family:var(--display);font-size:24px;color:var(--muted);text-align:center}
+.vrow b{display:block;font-size:22px;font-weight:800;line-height:1;overflow-wrap:anywhere}
+.vrow small{display:block;margin-top:4px;font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--hi)}
+.vrow em{font-style:normal;font-family:var(--display);font-size:26px}
+.vrow.top{background:var(--cup)}
+.vrow.top .rk{color:var(--cream)}
+.foot-note{margin:0;font-size:13px;color:var(--muted);text-align:center;font-weight:600}
+
+.callrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.callrow .btn{font-size:18px;padding:0 10px}
+.drum{margin:0;font-family:var(--display);color:var(--hi);font-size:clamp(28px,8vw,44px);text-align:center;animation:slam .5s var(--ease-pop) both}
+.burst-space{height:clamp(120px,30vw,170px)}
+.twisttxt{font-size:15px!important;letter-spacing:.02em!important;text-transform:none;line-height:1.25;border-radius:12px!important;padding:8px 10px!important}
+.title-line{align-self:center;max-width:100%;font-family:var(--display);font-size:clamp(20px,6vw,32px);line-height:1.05;color:var(--hi);text-transform:uppercase;text-wrap:balance;animation:wordin .4s .2s var(--ease-out) both}
+@keyframes wordin{from{opacity:0;transform:translateY(10px)}}
+.badge{align-self:center;padding:5px 12px;border-radius:999px;background:var(--cup);font-family:var(--display);font-size:14px;letter-spacing:.08em;animation:stamp .5s var(--ease-pop) both}
+.react{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rbtn{min-height:52px;border-radius:14px;font-family:var(--display);font-size:17px;letter-spacing:.02em;transition:transform .12s var(--ease-out)}
+.rbtn:active{transform:translateY(3px)}
+.rbtn.guilty{background:var(--ground-2);box-shadow:inset 0 0 0 2.5px var(--cup);color:var(--cream)}
+.rbtn.object{background:var(--ground-2);box-shadow:inset 0 0 0 2.5px var(--hi);color:var(--hi)}
+.rbtn[disabled]{opacity:.35}
+.verdict-stamp{position:fixed;left:50%;top:42%;z-index:95;padding:14px 20px;border:5px solid currentColor;border-radius:10px;font-family:var(--display);font-size:clamp(26px,8vw,46px);line-height:1;text-align:center;background:var(--ground);pointer-events:none;transform:translate(-50%,-50%) rotate(-10deg);animation:vstamp 1.7s var(--ease-pop) forwards;max-width:86vw}
+.verdict-stamp.guilty{color:var(--cup)} .verdict-stamp.objection{color:var(--hi)}
+@keyframes vstamp{0%{transform:translate(-50%,-50%) rotate(-24deg) scale(2.6);opacity:0}18%{transform:translate(-50%,-50%) rotate(-10deg) scale(1);opacity:1}80%{opacity:1}100%{opacity:0}}
+.bb{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 16px;background:var(--ground)}
+.bb.red{background:var(--cup)} .bb.hi{background:var(--hi);color:var(--ink)}
+.bb b{font-family:var(--display);font-weight:400;font-size:min(11vw,110px);max-width:100%;overflow-wrap:anywhere;line-height:.9;text-shadow:6px 6px 0 var(--ink);animation:slam .5s var(--ease-pop) both}
+.bb.hi b{text-shadow:6px 6px 0 var(--cup)}
+.bb span{font-family:var(--display);font-size:clamp(20px,6vw,32px);letter-spacing:.04em;animation:wordin .4s .35s var(--ease-out) both}
+.faceoff{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;text-align:center}
+.fo-k{font-family:var(--display);font-size:clamp(20px,6vw,30px);color:var(--hi)}
+.fo-names{display:flex;flex-direction:column;align-items:center;gap:6px}
+.fo-names b{font-family:var(--display);font-weight:400;font-size:clamp(46px,14vw,96px);line-height:.95;overflow-wrap:anywhere;animation:slam .5s var(--ease-pop) both}
+.fo-names b:nth-of-type(odd){color:var(--cream);text-shadow:5px 5px 0 var(--cup)} .fo-names b:nth-of-type(even){color:var(--hi);text-shadow:5px 5px 0 var(--ink)}
+.vs{font-family:var(--display);font-size:22px;color:var(--muted)}
+.faceoff p{margin:0;font-weight:700;color:var(--muted)}
+.awards{display:grid;gap:10px}
+.award{display:grid;gap:2px;padding:14px 16px;border-radius:16px;background:var(--ground-2);animation:chipin .45s var(--ease-pop) both}
+.award small{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--hi)}
+.award b{font-family:var(--display);font-weight:400;font-size:clamp(28px,8vw,40px);line-height:1;overflow-wrap:anywhere}
+.award span{font-size:15px;color:var(--muted);font-weight:600}
+.award.top{background:var(--cup)} .award.top span{color:var(--cream)}
+.copied{font-size:13px;color:var(--hi);min-height:1.2em;text-align:center;font-weight:700}
+@keyframes handin0{from{translate:-60vw 0}}@keyframes handin1{from{translate:60vw 0}}
+.cardwrap{align-items:stretch}
+.card{min-height:min(60vh,560px)!important;--acc:var(--cup);box-shadow:0 0 0 6px var(--acc), 12px 12px 0 6px var(--ink)!important}
+.card .prompt{font-size:clamp(38px,11.4vw,68px)!important;line-height:1}
+.card .kicker{color:var(--acc)}
+.card .corner{color:var(--acc);font-size:44px}
+.card[data-pack=night]{--acc:var(--cop)}
+.card[data-pack=chaos]{--acc:var(--hi)}
+.card[data-pack=chaos] .kicker{color:var(--ink);background:var(--hi);align-self:flex-start;padding:4px 8px;border-radius:6px}
+.card[data-pack=chaos] .corner{color:var(--ink)}
+.card[data-pack=spicy]{--acc:var(--spicy)}
+.card[data-pack=queens] .tag{background:var(--cup);color:var(--hi)}
+.card[data-pack=night] .tag{background:var(--cop);color:var(--cream)}
+.card[data-pack=spicy] .tag{background:var(--spicy);color:var(--cream)}
+.news{align-self:center;width:100%;max-width:520px;box-sizing:border-box;padding:14px 16px 16px;background:var(--paper);color:var(--ink);transform:rotate(-2.5deg);box-shadow:8px 8px 0 var(--ink);animation:newsspin .8s var(--ease-pop) both;text-align:center}
+@keyframes newsspin{0%{transform:rotate(-540deg) scale(.1);opacity:0}100%{transform:rotate(-2.5deg) scale(1);opacity:1}}
+.news .mast{font-family:Georgia,"Times New Roman",serif;font-weight:900;font-size:clamp(24px,7.4vw,40px);letter-spacing:.02em;border-bottom:3px double var(--ink);padding-bottom:4px}
+.news .dateline{display:flex;justify-content:space-between;gap:8px;font-size:11px;font-weight:800;letter-spacing:.06em;border-bottom:1px solid var(--ink);padding:4px 0;margin-bottom:8px}
+.news .headline{margin:0;font-family:var(--display);font-weight:400;line-height:.95;text-transform:uppercase;overflow-wrap:break-word}
+.news .deck{margin-top:6px;font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:700;font-size:clamp(20px,6vw,30px);line-height:1.05}
+.news .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.news .cols i{height:34px;background:repeating-linear-gradient(180deg, color-mix(in srgb, var(--ink) 35%, transparent) 0 2px, transparent 2px 7px)}
+.news .src{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.award-card{position:relative;align-self:center;width:100%;max-width:520px;box-sizing:border-box;padding:18px 16px 22px;border-radius:18px;background:var(--hi);color:var(--ink);box-shadow:inset 0 0 0 4px var(--ink), 8px 8px 0 var(--cup);text-align:center;animation:slam .55s var(--ease-pop) both}
+.award-card .ribbon{font-size:13px;font-weight:800;letter-spacing:.16em}
+.award-card .aw-title{margin:4px 0 8px;font-family:var(--display);font-size:clamp(24px,7vw,38px);line-height:1;text-transform:uppercase;text-wrap:balance}
+.award-card .who{color:var(--ink);text-shadow:4px 4px 0 var(--cream);margin-top:6px}
+.award-card .medal{position:absolute;right:14px;top:-22px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 30%, var(--cream) 0 18%, var(--hi-deep) 19% 100%);box-shadow:0 0 0 4px var(--ink);animation:spin 1.2s var(--ease-out)}
+@keyframes spin{from{transform:rotate(-360deg) scale(0)}}
+.warn{align-self:center;width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.warn .stripes{height:22px;background:repeating-linear-gradient(-45deg, var(--hi) 0 16px, var(--ink) 16px 32px);animation:stripes .6s linear infinite}
+@keyframes stripes{to{background-position:45px 0}}
+.warn .warn-k{font-family:var(--display);font-size:clamp(30px,9vw,52px);color:var(--cup);text-shadow:4px 4px 0 var(--ink);animation:blink .5s steps(2) 4}
+@keyframes blink{50%{opacity:.2}}
+/* ---------- glow layer ---------- */
+.bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bgfx .floor{position:absolute;left:-60%;right:-60%;bottom:-6%;height:50%;
+  background-image:linear-gradient(color-mix(in srgb, var(--cup) 70%, transparent) 2px, transparent 2px),linear-gradient(90deg, color-mix(in srgb, var(--spicy) 60%, transparent) 2px, transparent 2px);
+  background-size:70px 70px;transform:perspective(400px) rotateX(64deg);transform-origin:50% 0;animation:floorrun 1.8s linear infinite;
+  -webkit-mask-image:linear-gradient(to top, black 10%, transparent 85%);mask-image:linear-gradient(to top, black 10%, transparent 85%);opacity:.5}
+@keyframes floorrun{to{background-position:0 70px}}
+.bgfx .orb{position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(70px);opacity:.32}
+.bgfx .orb.a{background:var(--cup);left:-14vmax;top:-12vmax;animation:drift1 13s ease-in-out infinite alternate}
+.bgfx .orb.b{background:var(--spicy);right:-16vmax;top:18vh;animation:drift2 15s ease-in-out infinite alternate}
+.bgfx .orb.c{background:var(--hi);left:30vw;bottom:-30vmax;opacity:.16;animation:drift1 17s ease-in-out infinite alternate-reverse}
+@keyframes drift1{to{transform:translate(12vmax,8vmax) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-10vmax,-6vmax) scale(.9)}}
+.logo h1{text-shadow:6px 6px 0 var(--cup), 0 0 40px color-mix(in srgb, var(--cup) 60%, transparent), 0 0 100px color-mix(in srgb, var(--spicy) 40%, transparent)}
+.card{transition:box-shadow .3s}
+.card::after{content:"";position:absolute;inset:-6px;border-radius:26px;pointer-events:none;box-shadow:0 0 50px color-mix(in srgb, var(--acc) 55%, transparent)}
+.btn{box-shadow:0 7px 0 var(--cup-deep), 0 0 26px color-mix(in srgb, var(--cup) 45%, transparent)}
+.btn.hi{box-shadow:0 7px 0 var(--hi-deep), 0 0 26px color-mix(in srgb, var(--hi) 40%, transparent)}
+.btn.ghost{box-shadow:inset 0 0 0 2.5px var(--ground-3)}
+/* ---------- TV / laptop mode ---------- */
+@media (min-width:1100px) and (min-aspect-ratio:5/4){
+  #app{max-width:min(94vw,170vh);padding-block:2.4vh}
+  .topbar{min-height:5vh}
+  .pill{height:4.6vh;font-size:1.7vh;padding:0 1.4vw}
+  .pill svg{width:2.2vh;height:2.2vh}
+  .mode-tag{font-size:1.8vh}
+  .btn{min-height:9vh;font-size:3.6vh;border-radius:2vh}
+  .btn.ghost{min-height:7.5vh;font-size:2.6vh}
+  .title{max-width:min(90vw,130vh);width:100%;margin:0 auto;gap:3vh}
+  .logo .small{font-size:3.4vh}
+  .logo h1{font-size:24vh}
+  .logo .hand{width:28vh;top:7vh}
+  .steps li{font-size:2.8vh;grid-template-columns:5vh 1fr}
+  .steps b{width:5vh;height:5vh;font-size:2.4vh}
+  .gate,.players,.verdict{max-width:min(90vw,120vh);width:100%;margin:0 auto}
+  .gate h2{font-size:8vh}
+  .gate p,.rules div{font-size:2.6vh}
+  .age{font-size:2vh}
+  .players h2{font-size:7vh}
+  .players .sub{font-size:2.4vh}
+  .addrow input{height:8vh;font-size:3.2vh}
+  .pchip{height:6vh;font-size:2.6vh}
+  .pack b{font-size:2.6vh} .pack span{font-size:2vh}
+  .label{font-size:1.8vh}
+  .lenrow button{height:6.4vh;font-size:2.4vh}
+  .meta{font-size:1.9vh}
+  .card{max-width:min(88vw,150vh)!important;min-height:62vh!important;padding:4vh 3.4vw!important;border-radius:3vh}
+  .card .kicker{font-size:3.6vh}
+  .card .prompt{font-size:9vh!important}
+  .card .tag{font-size:2vh;padding:.8vh 1.2vw}
+  .card .corner{font-size:7vh}
+  .reader{font-size:2.4vh;padding:1vh 1.6vw}
+  #countB{max-width:min(88vw,150vh);align-self:center}
+  .mod{font-size:2.4vh}
+  .cd .lbl{font-size:4.4vh}
+  .cd .num{font-size:52vh}
+  .point b{font-size:24vh}
+  .point .h{width:34vh}
+  .pick h3{font-size:6vh}
+  .pick p{font-size:2.4vh}
+  .names{grid-template-columns:repeat(auto-fill,minmax(32vh,1fr));gap:1.6vh}
+  .nm{min-height:13vh!important;font-size:4.4vh!important;border-radius:2vh}
+  .nm small{font-size:1.8vh}
+  .callrow{max-width:90vh}
+  .reveal{gap:2vh}
+  .burst{width:44vh;top:9vh}
+  .burst span{font-size:5vh}
+  .burst-space{height:26vh}
+  .title-line{font-size:5.4vh}
+  .penalty{font-size:4.4vh;padding:1.6vh 2vw}
+  .shame span{font-size:2vh;padding:.8vh 1.2vw}
+  #nextB{max-width:90vh;align-self:center}
+  .news{max-width:120vh;padding:3vh 3vw}
+  .news .mast{font-size:7vh}
+  .news .dateline{font-size:1.6vh}
+  .news .deck{font-size:4.6vh}
+  .news .cols i{height:6vh}
+  .news .src{font-size:1.6vh}
+  .award-card{max-width:120vh;padding:3.4vh 3vw}
+  .award-card .ribbon{font-size:2vh}
+  .award-card .aw-title{font-size:6.4vh}
+  .award-card .medal{width:9vh;height:9vh;top:-4vh}
+  .warn{max-width:130vh}
+  .warn .stripes{height:4vh}
+  .warn .warn-k{font-size:8vh}
+  .bb b{font-size:14vh}
+  .bb span{font-size:4vh}
+  .faceoff .fo-names b{font-size:12vh}
+  .verdict h2{font-size:10vh}
+  .award{padding:2vh 2vw}
+  .award small{font-size:1.8vh} .award b{font-size:6vh} .award span{font-size:2.2vh}
+  .vrow{grid-template-columns:7vh 1fr auto;padding:1.6vh 1.6vw}
+  .vrow .rk{font-size:3.4vh} .vrow b{font-size:3.4vh} .vrow small{font-size:1.8vh} .vrow em{font-size:4vh}
+  .foot-note,.copied{font-size:2vh}
+  .verdict-stamp{font-size:7vh}
+}
+@media (max-height:700px){
+  .burst{top:7%;width:clamp(160px,46vw,230px)}
+  .burst-space{height:96px}
+  .reveal{gap:12px}
+  .card{min-height:250px;padding:18px 18px 20px}
+  .cardwrap{min-height:250px}
+  .logo h1{font-size:clamp(80px,25vw,150px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="bgfx" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div><div class="floor"></div></div>
+<div id="app"></div>
+<div id="fx"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------------- TUNABLE SETTINGS ---------------- */
+const MIN_PLAYERS = 3, MAX_PLAYERS = 14;
+const LENGTHS = [10, 15, 25];          // cards per game
+const TWIST_EVERY = 5;                 // a twist card after every N normal cards
+const COUNT_FROM = 3;
+
+/* ---------------- CARDS ----------------
+   [what they're most likely to do, the sound + sticker, the title they earn] */
+const PACKS = {
+  queens: { name:"QUEEN'S", desc:'Campus, Stauff, Stages', cards:[
+    ['sleep through an 8:30 in Mac-Corry', 'snore', 'The Human Snooze Button'],
+    ['still get lost in Mac-Corry in fourth year', 'womp', 'Mac-Corry Missing Person'],
+    ['get shushed on Stauff 4th floor for chewing too loud', 'shush', "Stauffer's Most Wanted"],
+    ['cry in a Stauffer cubicle during exams', 'cry', 'Stauffer Cubicle Crier'],
+    ['bring a full grocery haul to a \u201cquick\u201d Stauff session', 'nom', 'Snack Session Specialist'],
+    ["say they're from Toronto when they're really from Oakville", 'scratch', 'Hometown \u201cToronto\u201d'],
+    ['run into their TA at Stages', 'gasp', 'Saw Their TA at Stages'],
+    ["end up on Overheard at Queen's", 'gasp', 'Overheard Celebrity'],
+    ['join six clubs in September and go to zero by October', 'womp', 'Clubs Fair Victim'],
+    ['spend their whole OSAP refund on Hoco weekend', 'chaching', 'OSAP Hoco Investor'],
+    ['still think about their first-year floor crush', 'heart', 'Still Thinks About the Floor Crush'],
+    ['date someone from their frosh group all four years', 'bells', 'Frosh Group Forever'],
+    ['get dyed purple without even being in engineering', 'splat', 'Honorary Engineer'],
+    ['lose their voice on day one of being a FREC', 'scream', 'Voiceless FREC'],
+    ['know the Clark Hall bartender by name', 'clink', 'Clark Hall Regular'],
+    ['go to QP trivia just to flirt with the other team', 'heart', 'Trivia Flirt'],
+    ["wait two hours in Trin's line and leave after ten minutes", 'tick', 'Trin Line Veteran'],
+    ['be the one who knows everyone at Stages', 'airhorn', 'Mayor of Stages'],
+    ["still be at Bubba's at 3am", 'nom', "Bubba's After-Hours Regular"],
+    ["spend their rent money at Osmow's", 'chaching', "Osmow's Platinum Member"],
+    ['take an Uber from Vic Hall to Stauffer', 'horn', 'Ubers to Stauffer'],
+    ['sleep through a 3am Vic Hall fire alarm', 'snore', 'Fire Alarm Immune'],
+    ['get chased by a goose by the lake', 'ouch', 'Goose Victim'],
+    ['leave Kingston every single weekend', 'poof', 'Weekend Ghost'],
+    ['keep their frosh tam on display like a trophy', 'boing', 'Tam Shrine Keeper'],
+    ['pretend to be in Commerce at a party', 'scratch', 'Fake Commerce Kid'],
+    ['date someone in Commerce for the LinkedIn connections', 'chaching', 'LinkedIn Romantic'],
+    ["start a Queen's vs Western fight at a Toronto bar", 'scratch', 'Rivalry Starter'],
+    ['secretly transfer to Western', 'gasp', 'Western Spy'],
+    ['lose their voice by Saturday of Hoco', 'scream', 'Hoco Voice: Gone'],
+    ['cry during the Oil Thigh', 'cry', 'Oil Thigh Crier'],
+    ['wear a Canada Goose in September', 'chaching', 'Goose Season Starts Early'],
+    ['know every Tims worker on campus by name', 'clink', 'Tims Regular'],
+    ["complain about the wind off the lake like it's personal", 'boo', 'At War With the Wind'],
+    ['name the mouse living in their student house', 'squeak', 'Mouse Whisperer'],
+    ['still live in the University District at 30', 'gasp', 'Twelfth-Year Senior']
+  ]},
+  night: { name:'NIGHT OUT', desc:'Bars, Ubers, bad calls', cards:[
+    ['lose their phone tonight', 'phone', 'Phone? What Phone?'],
+    ['start beef with a bouncer', 'ouch', "The Bouncer's Arch-Nemesis"],
+    ['Irish goodbye without telling anyone', 'poof', 'Ghost of the Pregame'],
+    ['eat the whole order in the Uber before getting home', 'nom', 'Uber Eats (Literally)'],
+    ['cry in the bar bathroom', 'cry', 'Bar Bathroom Crier'],
+    ['make five new best friends in the bathroom line', 'gasp', 'Mayor of the Bathroom Line'],
+    ["say “I'm not drinking tonight” and be the wildest one there", 'scratch', 'Famous Last Words'],
+    ['fall asleep at the pregame', 'snore', 'Pregame Napper'],
+    ['take over the aux and kill the vibe', 'scratch', 'Aux Cord Criminal'],
+    ['show up two hours late to the pregame', 'tick', 'Fashionably Two Hours Late'],
+    ['spend $200 on a Thursday', 'chaching', 'Thursday Tycoon'],
+    ['send a paragraph to the group chat at 3am', 'typing', '3AM Essayist'],
+    ["wake up with a new contact they don't remember", 'phone', 'Mystery Contact Collector'],
+    ['dance on the table', 'airhorn', 'Tabletop Performer'],
+    ['get cut off first', 'siren', 'First One Cut Off'],
+    ["end up holding everyone's stuff all night", 'womp', 'The Human Coat Check'],
+    ['drunk-call their mom', 'phone', 'Called Mom at 2AM'],
+    ['lose one shoe and keep partying', 'womp', 'Cinderella of Princess Street'],
+    ["make friends with a stranger's dog at 2am", 'heart', 'Dog Whisperer After Dark']
+  ]},
+  chaos: { name:'CHAOS', desc:'Absurd what-ifs', cards:[
+    ['accidentally become best friends with the Uber driver', 'horn', "The Uber Driver's Best Friend"],
+    ['fight a goose on campus and lose', 'ouch', 'Defeated by a Goose'],
+    ['start a cult by accident', 'bells', 'Accidental Cult Leader'],
+    ['survive the longest in a zombie apocalypse', 'fanfare', 'Last One Standing'],
+    ['go viral for all the wrong reasons', 'airhorn', 'Viral for the Wrong Reasons'],
+    ['reply-all to the whole class by accident', 'typing', 'Reply-All Royalty'],
+    ['get banned from a Walmart', 'siren', 'Banned for Life'],
+    ['adopt a raccoon and call it their child', 'squeak', 'Raccoon Parent'],
+    ['get the villain edit on a reality show', 'gasp', 'The Villain Edit'],
+    ["text “you up?” to their mom by accident", 'phone', "Texted Mom “You Up?”"],
+    ['cry at a dog food commercial', 'cry', 'Cries at Dog Commercials'],
+    ['get lost in IKEA for a whole day', 'womp', 'Lives in the IKEA Showroom Now']
+  ]},
+  spicy: { name:'AFTER DARK', desc:'Dating and drama', cards:[
+    ['hook up with their ex this weekend', 'kiss', 'The Ex Files: Reopened'],
+    ['have a secret situationship right now', 'shush', 'Secret Situationship Haver'],
+    ["slide into their TA's DMs", 'phone', "The TA's DM Slider"],
+    ['get caught sneaking someone out of res', 'siren', 'Res Escape Artist'],
+    ['fall in love at 1am and forget their name by 9', 'heart', 'In Love by 1, Forgot by 9'],
+    ['marry the first person they dated at school', 'bells', 'School Sweetheart'],
+    ['send a risky text to the wrong chat', 'gasp', 'Wrong Chat, Wrong Time'],
+    ['ghost someone after one date', 'boo', 'Professional Ghost'],
+    ['get back with their ex. Again.', 'womp', 'Back With the Ex (Again)'],
+    ['have a crush on someone in this room', 'heart', 'Someone in This Room, Huh?'],
+    ["stalk their ex's new partner on Instagram", 'typing', 'Instagram Detective'],
+    ['kiss someone at Stages and pretend it never happened', 'kiss', 'Stages Amnesia'],
+    ['hook up with someone on their floor, then see them at every caf meal', 'gasp', 'Caf Awkwardness Champion'],
+    ['get sexiled by their roommate in first year', 'shush', 'Sexiled Survivor'],
+    ['slide into the DMs of someone they saw on Overheard', 'phone', 'Overheard Opportunist'],
+    ["be “just friends” with everyone they've hooked up with", 'gasp', "“We're Just Friends”"]
+  ]}
+};
+const TWISTS = [
+  { id:'cheers', title:'CHEERS!', drink:'Everybody drinks. Glasses up.', dry:'Everybody gets a call-out. Nobody’s innocent.', sound:'clink', instant:true },
+  { id:'reverse', title:'REVERSE CARD', drink:'Next card: everyone who points at the winner drinks instead of them.', dry:'Next card: everyone who points at the winner takes the call-out instead.', sound:'scratch' },
+  { id:'double', title:'DOUBLE TROUBLE', drink:'Next card: 2 sips for every finger.', dry:'Next card: call-outs count double.', sound:'airhorn' },
+  { id:'buddy', title:'PARTNER IN CRIME', drink:'Next card: whoever gets called picks a buddy who drinks with them.', dry:'Next card: whoever gets called picks a partner in crime to share it.', sound:'bells' }
+];
+const STICKERS = {
+  snore:'ZZZ…', shush:'SHHH!', splat:'SPLAT!', womp:'WOMP WOMP', chaching:'CHA-CHING!', cry:'WAAAAH', siren:'WEE-OO!', tick:'TICK TOCK',
+  nom:'NOM NOM', fanfare:'ALL RISE', airhorn:'BWAAAMP!', squeak:'SQUEAK!', cough:'*COUGH*', gasp:'OHHHHH!', scream:'AAAAAH!', boing:'BOING!',
+  ouch:'OUCH!', phone:'BZZT BZZT', poof:'POOF!', scratch:'SCRRRT!', typing:'TYPE TYPE', kiss:'MWAH!', heart:'BA-DUM', bells:'DING DONG', boo:'BOO!', clink:'CHEERS!', horn:'BEEP BEEP!'
+};
+
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const app = $('#app'), fx = $('#fx');
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const vibe = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = { get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+
+/* ---------------- sound: everything synthesised live ---------------- */
+const SFX = (() => {
+  let ctx = null, out = null, nb = null, muted = store.get('call-muted', false);
+  function init(){
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+    ctx = new C(); const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -12; comp.ratio.value = 4;
+    out = ctx.createGain(); out.gain.value = muted ? 0 : .95; out.connect(comp); comp.connect(ctx.destination);
+    const len = ctx.sampleRate * 2; nb = ctx.createBuffer(1, len, ctx.sampleRate); const d = nb.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    return ctx;
+  }
+  const env = (g, t, a, p, dur) => { g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(p, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + dur); };
+  function osc(type, f, t, dur, vol, o = {}){ const n = ctx.createOscillator(), g = ctx.createGain(); n.type = type; n.frequency.setValueAtTime(f, t); if (o.f2) n.frequency.exponentialRampToValueAtTime(o.f2, t + (o.glide || dur)); env(g, t, o.a || .005, vol, dur); n.connect(g); g.connect(out); n.start(t); n.stop(t + dur + .05); return n; }
+  function noise(t, dur, vol, o = {}){ const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = o.type || 'bandpass'; f.frequency.setValueAtTime(o.f || 1000, t); if (o.f2) f.frequency.exponentialRampToValueAtTime(o.f2, t + dur); f.Q.value = o.q || 1; const g = ctx.createGain(); env(g, t, o.a || .002, vol, dur); s.connect(f); f.connect(g); g.connect(out); s.start(t, Math.random()); s.stop(t + dur + .05); }
+  // a cartoon voice: sawtooth through vowel formants, with a pitch path and vibrato
+  function voice(t, pts, dur, vol, formants, o = {}){
+    const n = ctx.createOscillator(); n.type = 'sawtooth';
+    n.frequency.setValueAtTime(pts[0], t); pts.forEach((p, i) => i && n.frequency.linearRampToValueAtTime(p, t + dur * i / (pts.length - 1)));
+    if (o.vib) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = o.vib; lg.gain.value = o.vibAmt || 12; l.connect(lg); lg.connect(n.frequency); l.start(t); l.stop(t + dur + .05); }
+    const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + (o.a || .05)); g.gain.setValueAtTime(vol, t + dur * .75); g.gain.exponentialRampToValueAtTime(.0001, t + dur); g.connect(out);
+    formants.forEach(([f, q, a]) => { const b = ctx.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = f; b.Q.value = q; const bg = ctx.createGain(); bg.gain.value = a; n.connect(b); b.connect(bg); bg.connect(g); });
+    n.start(t); n.stop(t + dur + .05);
+  }
+  const A = [[800,6,1.2],[1200,8,.8],[2500,10,.3]], O = [[500,6,1.2],[900,8,.7],[2400,10,.2]], U = [[350,6,1.2],[700,8,.5]], E = [[600,6,1],[1800,8,.8],[2600,10,.3]];
+  function bell(t, f, v){ [[1,1,1.2],[2,.45,.8],[2.76,.3,.6],[5.4,.12,.3]].forEach(([m, a, d]) => osc('sine', f * m, t, d, v * a, { a:.002 })); }
+  function brass(t, f, dur, vol = .12){ const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 1.4; fl.frequency.setValueAtTime(500, t); fl.frequency.linearRampToValueAtTime(3200, t + .05); fl.frequency.exponentialRampToValueAtTime(1100, t + dur); const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .03); g.gain.setValueAtTime(vol, t + dur * .7); g.gain.exponentialRampToValueAtTime(.0001, t + dur); fl.connect(g); g.connect(out); [-8, 8].forEach(c => { const n = ctx.createOscillator(); n.type = 'sawtooth'; n.frequency.value = f; n.detune.value = c; n.connect(fl); n.start(t); n.stop(t + dur + .05); }); }
+  function snoreOnce(t){
+    noise(t, .9, .22, { type:'bandpass', f:250, f2:700, q:1.2, a:.5 });                 // inhale
+    const n = ctx.createOscillator(); n.type = 'sawtooth'; n.frequency.setValueAtTime(62, t + .95); n.frequency.linearRampToValueAtTime(48, t + 1.8);
+    const am = ctx.createGain(); am.gain.value = 0; const l = ctx.createOscillator(); l.frequency.value = 28; const lg = ctx.createGain(); lg.gain.value = .5; l.connect(lg); lg.connect(am.gain);
+    const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 420; const g = ctx.createGain(); env(g, t + .95, .15, .5, .9);
+    n.connect(am); am.connect(f); f.connect(g); g.connect(out); n.start(t + .95); n.stop(t + 1.9); l.start(t + .95); l.stop(t + 1.9);
+    osc('sine', 950, t + 1.75, .35, .05, { f2:620 });                                   // little whistle
+  }
+  const S = {
+    snore: t => { snoreOnce(t); snoreOnce(t + 2); },
+    shush: t => { noise(t, 1.1, .35, { type:'highpass', f:2800, q:.7, a:.15 }); },
+    splat: t => { noise(t, .35, .45, { type:'lowpass', f:1800, f2:200 }); osc('sine', 140, t, .3, .5, { f2:50 }); },
+    womp: t => { [392, 370, 349.2].forEach((f, i) => brass(t + i * .34, f, .3, .13)); brass(t + 1.02, 329.6, 1.1, .13); },
+    chaching: t => { noise(t, .08, .35, { type:'highpass', f:3000 }); noise(t + .1, .06, .3, { type:'bandpass', f:1500 }); bell(t + .18, 2637, .3); bell(t + .3, 3520, .25); },
+    cry: t => { voice(t, [420, 560, 380], .9, .32, A, { vib:7, vibAmt:30 }); voice(t + 1.0, [460, 600, 360], 1.1, .3, A, { vib:7, vibAmt:35 }); },
+    siren: t => { const n = ctx.createOscillator(), g = ctx.createGain(); n.type = 'triangle'; n.frequency.setValueAtTime(660, t); [0,1,2,3].forEach(i => n.frequency.linearRampToValueAtTime(i % 2 ? 660 : 960, t + (i + 1) * .45)); env(g, t, .05, .3, 1.8); n.connect(g); g.connect(out); n.start(t); n.stop(t + 1.85); },
+    tick: t => { for (let i = 0; i < 6; i++) noise(t + i * .32, .05, .4, { type:'bandpass', f: i % 2 ? 1400 : 2100, q:6 }); bell(t + 1.95, 1760, .2); },
+    nom: t => { for (let i = 0; i < 4; i++) { voice(t + i * .22, [180, 140], .18, .3, U); noise(t + i * .22, .05, .2, { type:'lowpass', f:600 }); } },
+    fanfare: t => { [392, 523.25, 659.25, 783.99].forEach((f, i) => brass(t + i * .12, f, i === 3 ? 1.1 : .14, .12)); [523.25, 659.25, 783.99].forEach(f => brass(t + .6, f, 1.1, .07)); },
+    airhorn: t => { [0, .2, .4].forEach(d => [466, 554, 698].forEach(f => brass(t + d, f, .15, .07))); [466, 554, 698].forEach(f => brass(t + .65, f, .9, .08)); },
+    squeak: t => { [0, .2, .38].forEach(d => osc('sine', 2100, t + d, .12, .18, { f2:2900, glide:.08 })); },
+    cough: t => { [0, .3, .5].forEach((d, i) => { noise(t + d, .16, .5, { type:'bandpass', f:700 - i * 80, q:1.5 }); voice(t + d, [180, 140], .14, .15, A); }); },
+    gasp: t => { for (let i = 0; i < 7; i++) { const p = 150 + Math.random() * 180; voice(t + Math.random() * .1, [p, p * 1.15, p * .9], 1.6, .06, O, { a:.25, vib:5 + Math.random() * 2, vibAmt:6 }); } },
+    scream: t => { voice(t, [600, 900, 820, 700], 1.4, .25, A, { vib:9, vibAmt:40 }); },
+    boing: t => { const n = ctx.createOscillator(), g = ctx.createGain(), l = ctx.createOscillator(), lg = ctx.createGain(); n.type = 'sine'; n.frequency.setValueAtTime(160, t); n.frequency.exponentialRampToValueAtTime(330, t + .7); l.frequency.value = 14; lg.gain.setValueAtTime(90, t); lg.gain.exponentialRampToValueAtTime(1, t + .8); l.connect(lg); lg.connect(n.frequency); env(g, t, .005, .45, .85); n.connect(g); g.connect(out); n.start(t); l.start(t); n.stop(t + .9); l.stop(t + .9); },
+    ouch: t => { osc('sine', 120, t, .25, .6, { f2:40 }); noise(t, .12, .5, { type:'lowpass', f:2500 }); voice(t + .18, [520, 620, 300], .6, .3, O); },
+    phone: t => { for (let i = 0; i < 2; i++) { const s = t + i * .5; const n = ctx.createOscillator(), g = ctx.createGain(), am = ctx.createOscillator(), ag = ctx.createGain(); n.type = 'square'; n.frequency.value = 170; am.frequency.value = 40; ag.gain.value = .5; am.connect(ag); env(g, s, .01, .22, .32); ag.connect(g.gain); n.connect(g); g.connect(out); n.start(s); am.start(s); n.stop(s + .35); am.stop(s + .35); } bell(t + 1.05, 1318.5, .2); bell(t + 1.2, 1760, .18); },
+    poof: t => { noise(t, .5, .4, { type:'bandpass', f:300, f2:4000, q:.8, a:.03 }); osc('sine', 900, t + .1, .3, .1, { f2:2400 }); },
+    scratch: t => { noise(t, .18, .45, { type:'bandpass', f:2600, f2:500, q:3 }); noise(t + .2, .22, .45, { type:'bandpass', f:500, f2:3000, q:3 }); noise(t + .44, .3, .4, { type:'bandpass', f:2800, f2:300, q:3 }); },
+    typing: t => { for (let i = 0; i < 14; i++) noise(t + i * .075 + Math.random() * .03, .02, .3, { type:'highpass', f:2500 + Math.random() * 1500 }); bell(t + 1.2, 1760, .15); },
+    kiss: t => { osc('sine', 500, t, .12, .3, { f2:1400, glide:.08 }); noise(t + .1, .04, .5, { type:'bandpass', f:2200, q:2 }); voice(t + .15, [300, 260], .35, .18, U); },
+    heart: t => { for (let i = 0; i < 4; i++) { osc('sine', 70, t + i * .6, .18, .7, { f2:45 }); osc('sine', 62, t + i * .6 + .18, .2, .5, { f2:40 }); } },
+    bells: t => { [[1046.5,0],[1318.5,.25],[1568,.5],[1318.5,.75],[1046.5,1.0]].forEach(([f, d]) => bell(t + d, f, .22)); },
+    boo: t => { voice(t, [220, 160], 1.2, .3, U, { vib:5, vibAmt:20, a:.2 }); noise(t, 1.2, .15, { type:'bandpass', f:500, f2:200, a:.3 }); },
+    horn: t => { [0, .32].forEach(d => { [392, 494].forEach(f => osc('square', f, t + d, d ? .5 : .22, .08)); }); },
+    gavel: t => { [0, .22, .44].forEach((d, i) => { osc('sine', 180 - i * 10, t + d, .18, .7, { f2:70 }); noise(t + d, .06, .5, { type:'bandpass', f:900, q:2 }); }); },
+    objection: t => { brass(t, 392, .12, .13); brass(t + .13, 523.25, .5, .13); voice(t + .1, [200, 330, 280], .55, .2, E); },
+    unanimous: t => { const n = ctx.createOscillator(), g = ctx.createGain(); n.type = 'triangle'; n.frequency.setValueAtTime(660, t); [0,1,2,3].forEach(i => n.frequency.linearRampToValueAtTime(i % 2 ? 660 : 990, t + (i + 1) * .3)); env(g, t, .03, .25, 1.25); n.connect(g); g.connect(out); n.start(t); n.stop(t + 1.3); [466, 554, 698].forEach(f => brass(t + .1, f, .25, .08)); [466, 554, 698].forEach(f => brass(t + .45, f, 1.2, .09)); for (let i = 0; i < 7; i++) { const p = 150 + Math.random() * 180; voice(t + .5 + Math.random() * .1, [p, p * 1.15, p * .9], 1.3, .05, O, { a:.2, vib:6, vibAmt:6 }); } },
+    tie: t => { brass(t, 146.8, .22, .16); brass(t + .28, 138.6, .22, .16); brass(t + .56, 130.8, .9, .16); osc('sine', 65, t + .56, .9, .3); },
+    clink: t => { [0, .18].forEach(d => [2637, 3951, 5274].forEach((f, i) => osc('sine', f * (1 + d * .02), t + d, .9 - i * .2, .18 - i * .04, { a:.001 }))); }
+  };
+  const play = fn => { if (muted || !init()) return; try { fn(ctx.currentTime + .02); } catch (e) {} };
+  return {
+    unlock(){ init(); },
+    has: k => !!S[k],
+    isMuted: () => muted,
+    setMuted(m){ muted = m; store.set('call-muted', m); if (out) out.gain.value = m ? 0 : .95; if (!m) init(); },
+    fx(k){ play(t => S[k] && S[k](t)); },
+    tap(){ play(t => osc('triangle', 680, t, .05, .1)); },
+    deal(){ play(t => { noise(t, .22, .25, { type:'bandpass', f:900, f2:3000, q:.8 }); osc('square', 1500, t + .18, .02, .04); }); },
+    beat(n){ play(t => { const f = [110, 130, 165, 196][Math.min(3, n)]; osc('sine', f, t, .35, .8, { f2:f * .5 }); noise(t, .08, .3, { type:'lowpass', f:900 }); }); },
+    point(){ play(t => { [466, 554, 698].forEach(f => brass(t, f, .7, .1)); noise(t, .5, .3, { type:'highpass', f:4000 }); osc('sine', 80, t, .5, .6, { f2:35 }); }); },
+    roll(dur){ play(t => { let x = t; while (x < t + dur) { const p = (x - t) / dur, v = .05 + .17 * p; noise(x, .07, v, { type:'highpass', f:900, q:.7 }); x += .075 - .037 * p; } noise(t + dur, 1.2, .25, { type:'highpass', f:4200, q:.5 }); }); },
+    select(){ play(t => osc('triangle', 990, t, .07, .12, { f2:1300 })); }
+  };
+})();
+/* iPhone: let sound play even when the silent switch is on */
+(function(){
+  const SILENT = 'data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+  let el = null;
+  function wake(){
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    SFX.unlock();
+    try {
+      if (!el) { el = document.createElement('audio'); el.src = SILENT; el.loop = true; el.setAttribute('playsinline', ''); el.preload = 'auto'; }
+      if (el.paused && !document.hidden) { const p = el.play(); if (p && p.catch) p.catch(() => {}); }
+    } catch (e) {}
+  }
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, wake, { passive:true }));
+  document.addEventListener('visibilitychange', () => { if (document.hidden && el) el.pause(); });
+})();
+
+const ICON_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const ICON_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const soundBtn = () => `<button class="pill" id="soundBtn" aria-pressed="${!SFX.isMuted()}">${SFX.isMuted() ? ICON_OFF + 'OFF' : ICON_ON + 'ON'}</button>`;
+function wireSound(){ const b = $('#soundBtn'); if (!b) return; b.onclick = () => { SFX.setMuted(!SFX.isMuted()); b.outerHTML = soundBtn(); wireSound(); SFX.tap(); }; }
+const HAND = (cls = '', style = '') => `<svg class="${cls}" style="${style}" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 34c0-12 6-20 16-22l30-1h56a8 8 0 0 1 0 16H70v20c0 8-6 13-14 13H26C15 60 8 50 8 34z" fill="var(--cream)" stroke="var(--ink)" stroke-width="5" stroke-linejoin="round"/><path d="M30 12c2-7 12-9 16-2" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><path d="M40 34h22M40 46h18" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></svg>`;
+
+/* ---------------- state ---------------- */
+let players = store.get('call-players', []);
+let drinking = store.get('call-drinking', null);
+let packSel = store.get('call-packs', ['queens', 'night', 'chaos']);
+let length = store.get('call-length', 15);
+if (!LENGTHS.includes(length)) length = 15;
+let G = null;
+const usedPrompts = new Set();   // no repeats until the deck runs out
+
+/* ---------------- screens ---------------- */
+function titleScreen(){
+  app.innerHTML = `
+  <div class="topbar"><a class="pill" href="./" onclick="return __allGames(event)" style="text-decoration:none">&larr; ALL GAMES</a>${soundBtn()}</div>
+  <section class="title">
+    <div class="logo"><div class="small">WHO'S MOST LIKELY TO…</div><h1>THE<br>CALL</h1>${HAND('hand')}</div>
+    <ol class="steps">
+      <li><b>1</b>Read the card out loud.</li>
+      <li><b>2</b>Tap the button. On 3, everyone points at someone.</li>
+      <li><b>3</b>Tap whoever got the most fingers. The card gets its revenge.</li>
+    </ol>
+    <button class="btn" id="go">LET'S GO</button>
+  </section>`;
+  wireSound();
+  $('#go').onclick = () => { SFX.unlock(); SFX.fx('airhorn'); vibe(30); gateScreen(); };
+}
+
+function gateScreen(){
+  app.innerHTML = `
+  <div class="topbar"><button class="pill" id="back">BACK</button>${soundBtn()}</div>
+  <section class="gate">
+    <div class="age">DRINKING MODE IS 19+</div>
+    <h2>Playing with <em>drinks</em>, or without?</h2>
+    <div class="rules">
+      <div>Sips, not shots. Water counts.</div>
+      <div>Anyone can pass on any card, no questions.</div>
+      <div>Without drinks it's the same game. You just rack up call-outs.</div>
+    </div>
+    <button class="btn" id="drinkB">DRINKING MODE (19+)</button>
+    <button class="btn hi" id="dryB">NO DRINKS</button>
+  </section>`;
+  wireSound();
+  $('#back').onclick = () => { SFX.tap(); titleScreen(); };
+  $('#drinkB').onclick = () => { drinking = true; store.set('call-drinking', true); SFX.fx('clink'); vibe(20); playersScreen(); };
+  $('#dryB').onclick = () => { drinking = false; store.set('call-drinking', false); SFX.tap(); vibe(20); playersScreen(); };
+}
+
+function playersScreen(){
+  app.innerHTML = `
+  <div class="topbar"><button class="pill" id="back">BACK</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span>${soundBtn()}</div>
+  <section class="players">
+    <h2>WHO'S PLAYING?</h2>
+    <p class="sub">Add everyone in the room. ${MIN_PLAYERS} or more.</p>
+    <form class="addrow" id="addF" autocomplete="off">
+      <input id="pname" maxlength="16" placeholder="Name" autocapitalize="words" enterkeyhint="done" aria-label="Player name">
+      <button class="btn hi" type="submit">ADD</button>
+    </form>
+    <div class="plist" id="plist"></div>
+    <div class="label">PICK YOUR CARDS</div>
+    <div class="packs">${Object.entries(PACKS).map(([k, p]) => `<button class="pack ${packSel.includes(k) ? 'on' : ''}" data-k="${k}"><b>${esc(p.name)}</b><span>${esc(p.desc)}</span></button>`).join('')}</div>
+    <div class="label">HOW LONG?</div>
+    <div class="lenrow">${LENGTHS.map(n => `<button data-n="${n}" class="${n === length ? 'on' : ''}">${n} CARDS</button>`).join('')}</div>
+    <button class="btn" id="start" style="margin-top:4px">DEAL THE FIRST CARD</button>
+  </section>`;
+  wireSound();
+  const drawList = () => {
+    $('#plist').innerHTML = players.map((p, i) => `<span class="pchip">${esc(p)}<button data-i="${i}" aria-label="Remove ${esc(p)}">&times;</button></span>`).join('') || '<span class="sub" style="color:var(--muted);font-weight:600">Nobody yet.</span>';
+    $('#plist').querySelectorAll('button').forEach(b => b.onclick = () => { players.splice(+b.dataset.i, 1); store.set('call-players', players); SFX.tap(); drawList(); });
+    const ok = players.length >= MIN_PLAYERS && packSel.length;
+    const s = $('#start'); s.disabled = !ok; s.textContent = players.length < MIN_PLAYERS ? `ADD ${MIN_PLAYERS - players.length} MORE` : (packSel.length ? 'DEAL THE FIRST CARD' : 'PICK A PACK');
+  };
+  drawList();
+  $('#addF').onsubmit = e => {
+    e.preventDefault(); const inp = $('#pname'); const v = inp.value.trim().replace(/\s+/g, ' ');
+    if (!v || players.length >= MAX_PLAYERS) return;
+    if (players.some(p => p.toLowerCase() === v.toLowerCase())) { inp.value = ''; return; }
+    players.push(v); store.set('call-players', players); inp.value = ''; SFX.select(); vibe(10); drawList(); inp.focus();
+  };
+  app.querySelectorAll('.pack').forEach(b => b.onclick = () => {
+    const k = b.dataset.k; packSel = packSel.includes(k) ? packSel.filter(x => x !== k) : [...packSel, k];
+    store.set('call-packs', packSel); b.classList.toggle('on'); SFX.tap(); drawList();
+  });
+  app.querySelectorAll('.lenrow button').forEach(b => b.onclick = () => {
+    length = +b.dataset.n; store.set('call-length', length); app.querySelectorAll('.lenrow button').forEach(x => x.classList.toggle('on', x === b)); SFX.tap();
+  });
+  $('#back').onclick = () => { SFX.tap(); gateScreen(); };
+  $('#start').onclick = () => { SFX.tap(); vibe(20); newGame(); };
+}
+
+function newGame(){
+  let pool = packSel.flatMap(k => PACKS[k].cards.map(c => ({ prompt:c[0], s:c[1], title:c[2], pack:PACKS[k].name, pk:k })));
+  let fresh = pool.filter(c => !usedPrompts.has(c.prompt));
+  if (fresh.length < Math.min(length, pool.length)) { usedPrompts.clear(); fresh = pool; }
+  const cards = shuffle(fresh.slice()).slice(0, length);
+  cards.forEach(c => usedPrompts.add(c.prompt));
+  const deck = [], twists = shuffle(TWISTS.slice());
+  let ti = 0;
+  cards.forEach((c, i) => { if (i > 0 && i % TWIST_EVERY === 0) deck.push({ twist: twists[ti++ % twists.length] }); deck.push(c); });
+  G = { deck, i: -1, n: 0, total: cards.length, mod: null,
+        st: Object.fromEntries(players.map(p => [p, { calls:0, unan:0, ties:0, objections:0, guilty:0, titles:[] }])) };
+  nextCard();
+}
+const stat = p => G.st[p] || (G.st[p] = { calls:0, unan:0, ties:0, objections:0, guilty:0, titles:[] });
+
+/* ---------------- a card ---------------- */
+function topbar(){ return `<div class="topbar"><button class="pill" id="endB">END</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span>${soundBtn()}</div>`; }
+function wireTop(){ wireSound(); const e = $('#endB'); if (e) e.onclick = () => { SFX.tap(); verdictScreen(); }; }
+
+function nextCard(){
+  document.querySelectorAll('.verdict-stamp,.floater,.tear,.siren').forEach(x => x.remove());
+  G.i++;
+  if (G.i >= G.deck.length) return verdictScreen();
+  const c = G.deck[G.i];
+  SFX.deal(); vibe(10);
+  if (c.twist) return twistCard(c.twist);
+  G.n++;
+  const mod = G.mod ? TWISTS.find(t => t.id === G.mod) : null;
+  app.innerHTML = `${topbar()}
+  <section class="play">
+    <div class="meta"><span>CARD ${G.n} OF ${G.total}</span><span>${esc(c.pack)}</span></div>
+    <div class="cardwrap"><article class="card deal" data-pack="${c.pk}">
+      <div class="kicker">WHO'S MOST LIKELY TO…</div>
+      <p class="prompt">${esc(c.prompt)}?</p>
+      <div class="foot"><span class="tag">${esc(c.pack)}</span><span class="corner">?</span></div>
+    </article></div>
+    <div class="reader"><b>${esc(players[(G.n - 1) % players.length])}</b> reads this one out loud</div>
+    ${mod ? `<div class="mod">${esc(mod.title)}: ${esc(drinking ? mod.drink : mod.dry)}</div>` : ''}
+    <button class="btn" id="countB">POINT IN 3, 2, 1</button>
+  </section>`;
+  wireTop();
+  $('#countB').onclick = () => countdown(c);
+}
+
+async function twistCard(t){
+  app.innerHTML = `${topbar()}
+  <section class="play">
+    <div class="meta"><span>TWIST CARD</span><span>${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span></div>
+    <div class="cardwrap"><article class="card twist deal">
+      <div class="kicker">TWIST!</div>
+      <p class="prompt">${esc(t.title)}</p>
+      <div class="foot"><span class="tag twisttxt">${esc(drinking ? t.drink : t.dry)}</span></div>
+    </article></div>
+    <button class="btn" id="okB">${t.instant ? 'DONE. NEXT CARD' : 'GOT IT'}</button>
+  </section>`;
+  wireTop();
+  await wait(reduced ? 0 : 350);
+  SFX.fx(t.sound); vibe([40, 30, 80]);
+  if (t.instant) players.forEach(p => stat(p).calls++);
+  else G.mod = t.id;
+  $('#okB').onclick = () => { SFX.tap(); nextCard(); };
+}
+
+/* ---------------- countdown + point ---------------- */
+async function countdown(c, only){
+  SFX.unlock(); vibe(20);
+  fx.classList.add('block');
+  for (let n = COUNT_FROM; n >= 1; n--) {
+    fx.innerHTML = `<div class="cd pulse"><div class="lbl">${only ? 'RE-POINT: ' + esc(only.join(' OR ')) : 'GET READY TO POINT'}</div><div class="num">${n}</div></div>`;
+    SFX.beat(COUNT_FROM - n); vibe(60);
+    await wait(reduced ? 250 : 680);
+  }
+  const hands = [
+    'left:-30px;top:18%;transform:rotate(18deg)', 'right:-30px;top:12%;transform:scaleX(-1) rotate(20deg)',
+    'left:-40px;bottom:16%;transform:rotate(-20deg)', 'right:-40px;bottom:20%;transform:scaleX(-1) rotate(-18deg)',
+    'left:28%;top:-40px;transform:rotate(90deg)', 'left:34%;bottom:-40px;transform:rotate(-90deg)'
+  ];
+  fx.innerHTML = `<div class="point"><b>POINT!</b>${hands.map((s, i) => HAND('h', s + `;animation:handin${i % 2} .35s ${i * 40}ms var(--ease-pop) both`)).join('')}</div>`;
+  SFX.point(); vibe([120, 40, 120]);
+  await wait(reduced ? 300 : 950);
+  fx.innerHTML = ''; fx.classList.remove('block');
+  pickScreen(c, only);
+}
+
+/* ---------------- who got called ---------------- */
+function pickScreen(c){
+  let tie = false;
+  const sel = new Set();
+  app.innerHTML = `${topbar()}
+  <section class="pick">
+    <h3 id="pickH">WHO GOT THE MOST FINGERS?</h3>
+    <p id="pickP">Tap their name.</p>
+    <div class="names">${players.map((p, i) => `<button class="nm" data-i="${i}">${esc(p)}<small>${stat(p).calls ? stat(p).calls + ' call-out' + (stat(p).calls > 1 ? 's' : '') : 'clean record'}</small></button>`).join('')}</div>
+    <div class="callrow">
+      <button class="btn ghost" id="tieB">IT'S A TIE</button>
+      <button class="btn ghost" id="skipB">SKIP CARD</button>
+    </div>
+  </section>`;
+  wireTop();
+  app.querySelectorAll('.nm').forEach(b => b.onclick = () => {
+    const p = players[+b.dataset.i];
+    SFX.select(); vibe(12);
+    if (!tie) { b.classList.add('on'); setTimeout(() => reveal(c, [p]), 180); return; }
+    if (sel.has(p)) sel.delete(p); else sel.add(p);
+    b.classList.toggle('on', sel.has(p));
+    const t = $('#tieB'); t.disabled = sel.size < 2; t.textContent = sel.size < 2 ? 'TAP EVERYONE TIED' : `CALL ALL ${sel.size}`;
+  });
+  $('#tieB').onclick = () => {
+    if (!tie) {
+      tie = true; SFX.tap();
+      $('#pickH').textContent = "IT'S A TIE"; $('#pickP').textContent = 'Tap everyone who tied, then call them.';
+      const t = $('#tieB'); t.className = 'btn'; t.disabled = true; t.textContent = 'TAP EVERYONE TIED';
+      return;
+    }
+    if (sel.size > 1) reveal(c, [...sel]);
+  };
+  $('#skipB').onclick = () => { SFX.tap(); G.mod = null; nextCard(); };
+}
+
+/* ---------------- reveal ---------------- */
+function penaltyText(who, mod){
+  const many = who.length > 1, names = who.join(' & ');
+  if (drinking) {
+    if (mod === 'reverse') return `Everyone who pointed at ${many ? 'them' : names} drinks!`;
+    if (mod === 'double') return many ? '2 sips per finger, each of you' : '2 sips for every finger on you';
+    if (mod === 'buddy') return `${many ? 'You each pick' : 'Pick'} a buddy. 1 sip per finger, together`;
+    return many ? '1 sip per finger, each of you' : '1 sip for every finger on you';
+  }
+  if (mod === 'reverse') return 'Reverse! The pointers take the call-out';
+  if (mod === 'double') return 'Double call-out';
+  if (mod === 'buddy') return 'Pick a partner in crime to share it';
+  return many ? '+1 call-out each' : '+1 call-out';
+}
+async function reveal(c, who){
+  const mod = G.mod; G.mod = null;
+  const many = who.length > 1;
+  vibe(20);
+  if (many) { SFX.fx('tie'); await bigBanner('DOUBLE TROUBLE', 'It\'s a tie. You all take it.', 'hi', 1500); }
+  else {
+    app.innerHTML = `${topbar()}<section class="reveal"><p class="drum">THE CALL IS…</p></section>`;
+    wireTop();
+    SFX.roll(reduced ? .2 : .9);
+    await wait(reduced ? 200 : 950);
+  }
+  const pts = mod === 'double' ? 2 : 1;
+  who.forEach(p => { const s = stat(p); if (mod !== 'reverse') s.calls += pts; if (many) s.ties++; s.titles.push(c.title); });
+  const sticker = STICKERS[c.s] || 'OOF!';
+  app.innerHTML = `${topbar()}
+  <section class="reveal">
+    ${revealArt(c, who, sticker, many)}
+    <div class="penalty">${esc(penaltyText(who, mod))}</div>
+    <div class="shame">${players.filter(p => stat(p).calls).sort((a, b) => stat(b).calls - stat(a).calls).slice(0, 6).map(p => `<span>${esc(p)}<b>${stat(p).calls}</b></span>`).join('')}</div>
+    <button class="btn hi" id="nextB">${G.i >= G.deck.length - 1 ? 'THE FINAL RECEIPTS' : 'NEXT CARD'}</button>
+  </section>`;
+  wireTop();
+  SFX.fx(c.s); effect(c.s);
+  $('#nextB').onclick = () => { SFX.tap(); vibe(10); nextCard(); };
+}
+
+const REVEAL_KIND = {
+  siren:'warning', ouch:'warning', scream:'warning', splat:'warning', cough:'warning',
+  fanfare:'award', bells:'award', clink:'award', chaching:'award', airhorn:'award',
+  gasp:'news', scratch:'news', typing:'news', phone:'news', boo:'news', poof:'news', horn:'news'
+};
+function revealArt(c, who, sticker, many){
+  const names = who.join(' & ');
+  const kind = REVEAL_KIND[c.s] || 'stamp';
+  if (kind === 'news') {
+    const d = new Date().toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' }).toUpperCase();
+    return `<div class="news"><div class="mast">THE KINGSTON CALL</div><div class="dateline"><span>${esc(d)}</span><span>EXTRA! EXTRA!</span></div>
+      <h2 class="headline" style="font-size:${whoSize(who, 13)}">${esc(names)}</h2>
+      <div class="deck">named \u201c${esc(c.title)}\u201d</div>
+      <div class="cols"><i></i><i></i><i></i></div><div class="src">Sources: everyone in this room</div></div>`;
+  }
+  if (kind === 'award') {
+    return `<div class="award-card"><div class="ribbon">AND THE AWARD FOR</div><div class="aw-title">${esc(c.title)}</div><div class="ribbon">GOES TO</div>
+      <h2 class="who" style="font-size:${whoSize(who)}">${esc(names)}</h2><div class="medal" aria-hidden="true"></div></div>`;
+  }
+  if (kind === 'warning') {
+    return `<div class="warn"><div class="stripes"></div><div class="warn-k">WARNING</div>
+      <h2 class="who" style="font-size:${whoSize(who)}">${esc(names)}</h2><div class="title-line">${many ? 'ALL OF YOU: ' : ''}${esc(c.title)}</div><div class="stripes"></div></div>`;
+  }
+  return `<div class="burst"><span>${esc(sticker)}</span></div><div class="burst-space"></div>
+    <h2 class="who" style="font-size:${whoSize(who)}">${esc(names)}</h2>
+    <div class="title-line">${many ? 'ALL OF YOU: ' : ''}${esc(c.title)}</div>`;
+}
+function whoSize(who, cap = 17){
+  const longest = Math.max(...who.join(' & ').split(/\s+/).map(w => w.length));
+  return `min(${cap}vw, ${(88 / (longest * 0.8)).toFixed(1)}vw, 120px)`;
+}
+function bigBanner(big, small, tone, ms){
+  fx.classList.add('block');
+  fx.innerHTML = `<div class="bb ${tone}"><b>${esc(big)}</b><span>${esc(small)}</span></div>`;
+  if (tone === 'red') { const s = document.createElement('div'); s.className = 'siren'; document.body.appendChild(s); setTimeout(() => s.remove(), 2200); }
+  return wait(reduced ? 300 : ms).then(() => { fx.innerHTML = ''; fx.classList.remove('block'); });
+}
+
+function effect(k){
+  const add = el => { document.body.appendChild(el); setTimeout(() => el.remove(), 2600); };
+  const floaters = (chars, n, size) => { for (let i = 0; i < n; i++) { const f = document.createElement('div'); f.className = 'floater'; f.textContent = chars[i % chars.length]; f.style.left = (15 + Math.random() * 70) + 'vw'; f.style.top = (55 + Math.random() * 25) + 'vh'; f.style.fontSize = (size + Math.random() * size) + 'px'; f.style.setProperty('--dx', ((Math.random() - .5) * 30) + 'vw'); f.style.setProperty('--rot', ((Math.random() - .5) * 60) + 'deg'); f.style.animationDelay = (i * 140) + 'ms'; add(f); } };
+  if (reduced) return;
+  if (k === 'snore') floaters(['Z', 'z', 'Z'], 9, 28);
+  else if (k === 'chaching') floaters(['$'], 12, 30);
+  else if (k === 'kiss' || k === 'heart') floaters(['♥'], 12, 30);
+  else if (k === 'cry') { for (let i = 0; i < 16; i++) { const t = document.createElement('div'); t.className = 'tear'; t.style.left = (35 + Math.random() * 30) + 'vw'; t.style.top = (30 + Math.random() * 6) + 'vh'; t.style.animationDelay = (i * 110) + 'ms'; add(t); } }
+  else if (k === 'siren') { const s = document.createElement('div'); s.className = 'siren'; add(s); }
+  else if (k === 'nom') floaters(['NOM'], 6, 20);
+  else if (k === 'squeak') floaters(['EEK'], 5, 22);
+  else if (k === 'tick') floaters(['TICK', 'TOCK'], 6, 20);
+  else if (k === 'horn') floaters(['BEEP'], 6, 22);
+  else if (k === 'gasp' || k === 'scream') floaters(['!', '?!'], 10, 34);
+  if (['ouch', 'scratch', 'splat', 'airhorn', 'scream', 'siren'].includes(k)) { document.body.classList.remove('shake'); void document.body.offsetWidth; document.body.classList.add('shake'); setTimeout(() => document.body.classList.remove('shake'), 550); vibe([60, 30, 120]); }
+}
+
+/* ---------------- the final receipts ---------------- */
+function verdictScreen(){
+  const ps = players.filter(p => G && G.st[p]);
+  const rows = ps.map(p => [p, G.st[p]]).sort((a, b) => b[1].calls - a[1].calls || b[1].unan - a[1].unan);
+  const top = (key) => { const r = ps.map(p => [p, G.st[p][key]]).sort((a, b) => b[1] - a[1]); return r.length && r[0][1] > 0 ? r[0] : null; };
+  const most = top('calls'), ties = top('ties');
+  const angel = rows.length > 2 ? rows[rows.length - 1] : null;
+  const awards = [
+    most && ['MOST WANTED', most[0], `called out ${most[1]} time${most[1] > 1 ? 's' : ''}`],
+    ties && ['TIE MAGNET', ties[0], `in ${ties[1]} tie${ties[1] > 1 ? 's' : ''}`],
+    angel && ['ANGEL (ALLEGEDLY)', angel[0], angel[1].calls ? `only ${angel[1].calls} call-out${angel[1].calls > 1 ? 's' : ''}` : 'never got called. Suspicious.']
+  ].filter(Boolean);
+  app.innerHTML = `
+  <div class="topbar"><span class="mode-tag">THE FINAL RECEIPTS</span>${soundBtn()}</div>
+  <section class="verdict">
+    <h2>THE GROUP<br>HAS <span>SPOKEN</span></h2>
+    <div class="awards">${awards.map(([t, p, d], i) => `<div class="award ${i === 0 ? 'top' : ''}" style="animation-delay:${i * 120}ms"><small>${esc(t)}</small><b>${esc(p)}</b><span>${esc(d)}</span></div>`).join('')}</div>
+    <div class="label">EVERYONE'S TITLES</div>
+    ${rows.map(([p, s], i) => `<div class="vrow" style="animation-delay:${(awards.length + i) * 90}ms"><span class="rk">${i + 1}</span><div><b>${esc(p)}</b><small>${esc(s.titles.length ? s.titles[s.titles.length - 1] : 'Flew under the radar')}</small></div><em>${s.calls}</em></div>`).join('')}
+    <button class="btn hi" id="copyB">COPY THE RECEIPTS</button>
+    <div class="copied" id="copied"></div>
+    <p class="foot-note">${drinking ? 'Drink some water. Seriously.' : 'Call-outs carry no legal weight.'}</p>
+    <button class="btn" id="againB">RUN IT BACK</button>
+    <button class="btn ghost" id="editB">CHANGE PLAYERS OR CARDS</button>
+  </section>`;
+  wireSound();
+  SFX.fx('fanfare'); vibe([60, 40, 160]);
+  const text = 'THE CALL: THE FINAL RECEIPTS\n' + awards.map(([t, p, d]) => `${t}: ${p} (${d})`).join('\n') + '\n\n' +
+    rows.map(([p, s]) => `${p}: ${s.titles.length ? s.titles[s.titles.length - 1] : 'Flew under the radar'}`).join('\n');
+  $('#copyB').onclick = async () => { SFX.tap(); try { await navigator.clipboard.writeText(text); $('#copied').textContent = 'Copied. Drop it in the group chat.'; } catch (e) { $('#copied').textContent = text.replace(/\n+/g, ' · '); } };
+  $('#againB').onclick = () => { SFX.tap(); newGame(); };
+  $('#editB').onclick = () => { SFX.tap(); playersScreen(); };
+}
+
+titleScreen();
+})();
+</script>
+
+<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body></html>

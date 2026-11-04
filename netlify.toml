@@ -1,0 +1,5 @@
+# Netlify reads this. The site is the site/ folder; the Crews API is netlify/functions/api.mjs at /api/*.
+[build]
+  publish = "site"
+  command = "echo 'no build step'"
+  functions = "netlify/functions"

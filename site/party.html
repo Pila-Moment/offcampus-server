@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Off Campus Party Games</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bungee+Inline&family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+:root{
+  --night:#07060F; --night-2:#120F24; --night-3:#1C1836; --text:#F6F1E8; --muted:#A49FC0;
+  --gold:#FFC83D; --gold-deep:#B97F05; --red:#FF3B4A; --navy:#0A1036; --tile:#2246E6; --stone:#E6E0D2;
+  --lake:#0C2B35; --pin:#FF5A1F; --amber:#FFB23F; --mint:#7FE0C4; --grape:#170A26; --cup:#EF2B3A; --hi:#FFE63B;
+  --ink:#111111; --cream:#FFF5DE; --good:#3BD67A; --blue:#2D4BFF;
+  --display:"Bowlby One","Arial Black",Impact,sans-serif;
+  --marquee:"Bungee Inline","Bowlby One","Arial Black",sans-serif;
+  --tall:"Big Shoulders Display","Oswald","Arial Narrow",Impact,sans-serif;
+  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+  --ease-pop:cubic-bezier(.2,1.45,.4,1); --ease-out:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+html,body{min-height:100%}
+body{margin:0;background:var(--night);color:var(--text);font-family:var(--mono);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid var(--hi);outline-offset:3px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+.bgfx{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bgfx .orb{position:absolute;width:52vmax;height:52vmax;border-radius:50%;filter:blur(100px);opacity:.22;will-change:transform}
+.bgfx .a{background:var(--tile);left:-20vmax;top:-22vmax;animation:d1 14s ease-in-out infinite alternate}
+.bgfx .b{background:var(--pin);right:-22vmax;bottom:-20vmax;animation:d2 16s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(10vmax,8vmax) scale(1.1)}}
+@keyframes d2{to{transform:translate(-10vmax,-6vmax) scale(.9)}}
+.wrap{position:relative;z-index:1;box-sizing:border-box;display:flex;flex-direction:column;gap:clamp(14px,2.4vh,26px);max-width:1180px;margin:0 auto;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:14px 28px}
+.tabs{display:flex;gap:6px;align-items:stretch;position:sticky;top:0;z-index:20;padding:10px 0;margin:-10px 0 0;background:color-mix(in srgb, var(--night) 88%, transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.tabs a{flex:1;display:grid;place-items:center;min-height:46px;padding:0 6px;border-radius:12px;background:var(--night-2);box-shadow:inset 0 0 0 1.5px var(--night-3);color:var(--muted);text-decoration:none;font-family:var(--display);font-size:clamp(12px,3.4vw,16px);letter-spacing:.03em;text-align:center;line-height:1}
+.tabs a.home{flex:0 0 46px;color:var(--gold)}
+.tabs a.on{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 var(--gold-deep)}
+.kick{font-size:12px;font-weight:700;letter-spacing:.26em;color:var(--mint)}
+.h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(40px,min(9vw,11vh),96px);line-height:.9;text-wrap:balance}
+.h1 span{color:var(--gold)}
+.lede{margin:0;font-size:clamp(14px,1.8vh,17px);line-height:1.5;font-weight:600;color:var(--muted);max-width:62ch}
+.lede b{color:var(--text)}
+.btn{box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;padding:0 20px;border-radius:16px;font-family:var(--display);font-size:19px;letter-spacing:.03em;text-decoration:none;
+  background:var(--gold);color:var(--ink);box-shadow:0 6px 0 var(--gold-deep);transition:transform .12s, box-shadow .12s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--gold-deep)}
+.demo{font-size:11px;color:var(--muted);line-height:1.5}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted);font-weight:600;padding-top:8px}
+footer b{color:var(--text)}
+.toast{position:fixed;left:50%;bottom:12%;z-index:60;transform:translateX(-50%);padding:10px 16px;border-radius:12px;background:var(--cream);color:var(--ink);font-family:var(--display);font-size:14px;letter-spacing:.03em;box-shadow:0 6px 0 var(--gold-deep);animation:toast 1.8s var(--ease-out) forwards;white-space:nowrap}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,10px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+.cab{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:clamp(10px,1.6vh,18px);min-height:clamp(280px,46vh,520px);padding:clamp(18px,2.6vh,30px);border-radius:clamp(18px,2.4vh,28px);
+  text-decoration:none;color:inherit;overflow:hidden;isolation:isolate;transition:transform .35s var(--ease-pop), box-shadow .35s;outline:none}
+.cab:focus-visible,.cab:hover{transform:translateY(-8px) scale(1.015)}
+.cab .art{position:absolute;inset:0;z-index:-1}
+.cab .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cab .num{font-family:var(--display);font-size:clamp(14px,2vh,20px);opacity:.75}
+.cab .who{font-size:clamp(11px,1.5vh,14px);font-weight:700;letter-spacing:.14em;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.cab h2{margin:0;line-height:.9;text-wrap:balance}
+.cab p{margin:0;font-size:clamp(13px,1.8vh,17px);line-height:1.35;font-weight:600;max-width:34ch}
+.cab .play{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;padding:clamp(10px,1.5vh,14px) clamp(18px,1.6vw,24px);border-radius:14px;font-family:var(--display);font-size:clamp(16px,2.4vh,26px);letter-spacing:.03em}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.8vw,26px)}
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0;padding:0;list-style:none;counter-reset:st}
+.howto li{counter-increment:st;display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:var(--night-2);font-size:13px;font-weight:600;line-height:1.35}
+.howto li::before{content:counter(st);flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--cup);font-family:var(--display);font-size:16px;color:var(--text)}
+.ph{font-family:var(--marquee);font-weight:400;color:var(--text);text-shadow:0 4px 0 var(--cup)}
+@media (max-width:900px){ .grid,.howto{grid-template-columns:1fr} .cab{min-height:250px} }
+/* Survey Showdown cabinet */
+.c1{background:var(--navy);box-shadow:0 0 0 3px var(--gold), 0 0 50px color-mix(in srgb, var(--gold) 35%, transparent)}
+.c1 .art{background:radial-gradient(90% 60% at 50% 0%, color-mix(in srgb, var(--tile) 70%, var(--navy)) 0%, transparent 70%)}
+.c1 .art::before{content:"";position:absolute;inset:10px;border-radius:inherit;background-image:radial-gradient(circle, var(--text) 0 2px, color-mix(in srgb, var(--gold) 70%, transparent) 3px, transparent 5px);background-size:20px 20px;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:8px;animation:chase 1s steps(2) infinite;opacity:.9}
+@keyframes chase{to{background-position:10px 0}}
+.c1 h2{font-family:var(--marquee);font-weight:400;font-size:clamp(30px,min(3vw,6vh),60px);color:var(--gold);text-shadow:0 4px 0 color-mix(in srgb, var(--red) 70%, var(--ink)), 0 0 30px color-mix(in srgb, var(--gold) 50%, transparent)}
+.c1 h2 span{color:var(--text);display:block}
+.c1 .who{background:var(--red)}
+.c1 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.c1 .tiles i{height:clamp(18px,3vh,34px);border-radius:5px;background:linear-gradient(180deg, color-mix(in srgb, var(--tile) 60%, white), var(--tile));box-shadow:0 0 12px color-mix(in srgb, var(--tile) 60%, transparent)}
+.c1 .tiles i:first-child{background:var(--text)}
+.c1 .play{background:var(--gold);color:var(--ink);box-shadow:0 5px 0 color-mix(in srgb, var(--gold) 55%, var(--ink))}
+
+/* Drop the Pin cabinet */
+.c2{background:var(--lake);box-shadow:0 0 0 3px var(--mint), 0 0 50px color-mix(in srgb, var(--mint) 30%, transparent)}
+.c2 .art{background:
+  repeating-linear-gradient(0deg, transparent 0 30px, color-mix(in srgb, var(--mint) 12%, transparent) 30px 31px),
+  repeating-linear-gradient(90deg, transparent 0 30px, color-mix(in srgb, var(--mint) 12%, transparent) 30px 31px),
+  radial-gradient(70% 55% at 75% 25%, color-mix(in srgb, var(--amber) 28%, transparent) 0%, transparent 70%)}
+.c2 h2{font-family:var(--tall);font-weight:900;font-size:clamp(54px,min(5.4vw,10vh),112px);text-transform:uppercase;color:var(--stone)}
+.c2 h2 em{font-style:normal;color:var(--pin);text-shadow:0 0 30px color-mix(in srgb, var(--pin) 60%, transparent)}
+.c2 .who{background:var(--mint);color:var(--ink)}
+.c2 .nix{display:flex;gap:6px}
+.c2 .nix i{display:grid;place-items:center;width:clamp(30px,4vh,50px);height:clamp(40px,5.4vh,66px);border-radius:8px;background:var(--ink);font-style:normal;font-family:var(--tall);font-weight:800;font-size:clamp(28px,4.2vh,52px);color:var(--amber);text-shadow:0 0 10px var(--amber), 0 0 22px var(--pin);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--amber) 30%, transparent)}
+.c2 .pinart{position:absolute;right:clamp(16px,2vw,34px);top:28%;width:clamp(60px,9vh,120px);animation:bob 2.4s ease-in-out infinite;z-index:-1}
+@keyframes bob{50%{transform:translateY(-12px)}}
+.c2 .play{background:var(--pin);color:var(--ink);box-shadow:0 5px 0 color-mix(in srgb, var(--pin) 55%, var(--ink))}
+
+/* The Call cabinet */
+.c3{background:var(--grape);box-shadow:0 0 0 3px var(--cup), 0 0 50px color-mix(in srgb, var(--cup) 40%, transparent)}
+.c3 .art{background:radial-gradient(80% 60% at 30% 10%, color-mix(in srgb, var(--cup) 45%, transparent) 0%, transparent 70%), radial-gradient(60% 50% at 90% 90%, color-mix(in srgb, var(--hi) 18%, transparent) 0%, transparent 70%)}
+.c3 h2{font-family:var(--display);font-weight:400;font-size:clamp(54px,min(5.2vw,10vh),112px);color:var(--text);text-shadow:6px 6px 0 var(--cup), 0 0 40px color-mix(in srgb, var(--cup) 50%, transparent)}
+.c3 .who{background:var(--hi);color:var(--ink)}
+.c3 .hand{position:absolute;right:-10px;top:30%;width:clamp(110px,15vh,220px);transform:rotate(-14deg);animation:jab 1.6s ease-out infinite;z-index:-1}
+@keyframes jab{0%,60%,100%{transform:rotate(-14deg)}70%{transform:rotate(-14deg) translateX(-18px)}}
+.c3 .play{background:var(--cup);color:var(--text);box-shadow:0 5px 0 color-mix(in srgb, var(--cup) 50%, var(--ink))}
+.c3 .age{font-size:clamp(11px,1.5vh,15px);font-weight:700;color:var(--hi);letter-spacing:.06em}
+
+</style>
+</head><body>
+<div class="bgfx" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div></div>
+<main class="wrap">
+<nav class="tabs" aria-label="Off Campus"><a class="home" href="./" aria-label="Off Campus home">OC</a><a href="daily.html" class="">DAILY</a><a href="party.html" class="on">PARTY GAMES</a><a href="prizes.html" class="">PRIZES</a></nav>
+<div class="kick">PLAY THESE WITH YOUR FRIENDS</div>
+<h1 class="h1 ph">PARTY GAMES</h1>
+<ol class="howto"><li>Plug a laptop into the TV, or everyone huddles round a phone</li><li>Turn the sound up and pick a game</li><li>Teams, pointing, yelling. Friendships not guaranteed.</li></ol>
+<section class="grid" aria-label="Games">
+    <a class="cab c1" href="showdown.html">
+      <div class="art"></div>
+      <div class="top"><span class="num">01</span><span class="who">2 TEAMS</span></div>
+      <div>
+        <h2>SURVEY<span>SHOWDOWN</span></h2>
+      </div>
+      <div class="tiles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p>We asked 100 Queen's students. Buzz in, guess the top answers, steal the bank.</p>
+      <span class="play">PLAY</span>
+    </a>
+
+    <a class="cab c2" href="droppin.html">
+      <div class="art"></div>
+      <svg class="pinart" viewBox="0 0 36 46" aria-hidden="true"><path d="M18 45C18 45 3 27 3 17a15 15 0 0 1 30 0c0 10-15 28-15 28z" fill="var(--pin)" stroke="var(--ink)" stroke-width="2.5"/><circle cx="18" cy="17" r="6" fill="var(--stone)" stroke="var(--ink)" stroke-width="2"/></svg>
+      <div class="top"><span class="num">02</span><span class="who">1–8 PLAYERS</span></div>
+      <h2>Drop<br>the <em>Pin</em></h2>
+      <div class="nix" aria-hidden="true"><i>1</i><i>8</i><i>9</i><i>9</i></div>
+      <p>A Kingston photo from any year since 1850. Drop a pin, dial the year, ride the time machine.</p>
+      <span class="play">PLAY</span>
+    </a>
+
+    <a class="cab c3" href="thecall.html">
+      <div class="art"></div>
+      <svg class="hand" viewBox="0 0 120 64" aria-hidden="true"><path d="M8 34c0-12 6-20 16-22l30-1h56a8 8 0 0 1 0 16H70v20c0 8-6 13-14 13H26C15 60 8 50 8 34z" fill="var(--text)" stroke="var(--ink)" stroke-width="5" stroke-linejoin="round"/><path d="M30 12c2-7 12-9 16-2" fill="none" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><path d="M40 34h22M40 46h18" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></svg>
+      <div class="top"><span class="num">03</span><span class="who">3+ PLAYERS</span></div>
+      <h2>THE<br>CALL</h2>
+      <div class="age">DRINKING MODE OPTIONAL · 19+</div>
+      <p>Who's most likely to…? Everyone points on three. Most fingers gets called out.</p>
+      <span class="play">PLAY</span>
+    </a>
+  </section>
+<footer><span><b>Free to play.</b> No purchase necessary. Prizes from Kingston spots drop soon.</span><span>Off Campus · Kingston · Not affiliated with Queen's University</span></footer>
+</main>
+<script>window.ocToast=function(t){var d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},1900)};</script><script>
+(function(){
+  var els = document.querySelectorAll('[data-cd]'); if (!els.length) return;
+  function tick(){
+    var p = {}; new Intl.DateTimeFormat('en-CA', { timeZone:'America/Toronto', hour:'numeric', minute:'numeric', second:'numeric', hour12:false }).formatToParts(new Date()).forEach(function(x){ p[x.type] = x.value; });
+    var secs = (4 - (+p.hour % 24)) * 3600 - (+p.minute) * 60 - (+p.second); if (secs <= 0) secs += 86400;
+    var t = Math.floor(secs / 3600) + 'h ' + String(Math.floor(secs % 3600 / 60)).padStart(2, '0') + 'm';
+    els.forEach(function(el){ el.textContent = t; });
+  }
+  tick(); setInterval(tick, 15000);
+})();
+</script>
+<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body></html>
