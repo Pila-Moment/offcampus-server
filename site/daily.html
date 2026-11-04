@@ -1118,9 +1118,14 @@ button.gate{width:100%;border:0;font:inherit;color:inherit;cursor:pointer;-webki
 @media (max-height:700px){.row3{display:none}}
 @media (max-height:760px){#crewsbox:has(.ct[data-v=league].on) ~ .gate{display:none}}
 @media (max-height:900px){.how{display:none}#after{gap:9px!important;margin-top:16px!important}#after .pts{font-size:34px}#after .facts div{padding:7px 12px}#after .facts b{font-size:19px}.crewcta span{display:block;font-size:10.5px}}
+/* challenge link */
+.chal{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;padding:12px 16px;border-radius:16px;background:color-mix(in srgb, var(--red) 16%, var(--night-2));box-shadow:inset 0 0 0 2px var(--red)}
+.chal small{grid-column:1;font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--muted)}
+.chal b{grid-column:1;font-family:var(--display);font-weight:400;font-size:40px;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+.chal span{grid-column:2;grid-row:1 / span 2;font-family:var(--display);font-size:17px;line-height:1.15;color:var(--red)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
-<link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"></head><body data-mode="intro">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"><meta property="og:title" content="Off Campus · The Queen's Daily"><meta property="og:description" content="How well do you know Queen's? Today's five: 3 minutes, free, same five for everyone at Queen's."><meta property="og:url" content="https://offcampusontario.ca/daily.html"><meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head><body data-mode="intro">
 <div class="bgfx" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div></div>
 <main id="app" class="wrap"></main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1335,6 +1340,7 @@ function intro(){
     ${GUEST ? `<div class="guest"><b>PREVIEW FOR ${esc(GUEST.name.toUpperCase())}</b><span>Play it like a student, or jump straight to where your spot shows up.</span><button id="skip">SKIP TO THE PRIZE SPIN &rarr;</button></div>` : ''}
     <p class="sub">Five rounds about ${esc(DAY.school)}, about three minutes. Everyone at ${esc(DAY.school)} gets the same five today.</p>
     <div class="goal"><b>${fmt(UNLOCK)}</b><span>${PRIZES_LIVE || GUEST ? `Score ${fmt(UNLOCK)} out of 5,000 to unlock today's <em>free prize spin</em>.` : `Score ${fmt(UNLOCK)} out of 5,000 to unlock the prize spin. <em>Prizes from Kingston spots drop soon.</em>`}</span></div>
+    ${CHAL !== null && !GUEST ? `<div class="chal"><small>YOUR FRIEND GOT</small><b>${fmt(CHAL)}</b><span>Same five, today only.<br>Can you beat it?</span></div>` : ''}
     <div id="joinbox"></div><div id="crewstrip"></div>
     <div class="five" aria-label="Today's rounds">
       <div class="r"><b>1</b><span>RECEIPTS</span></div><div class="s"><b>2</b><span>SHOW­DOWN</span></div><div class="r"><b>3</b><span>RECEIPTS</span></div><div class="s"><b>4</b><span>SHOW­DOWN</span></div><div class="p"><b>5</b><span>DROP PIN</span></div></div>
@@ -1351,7 +1357,7 @@ function intro(){
 async function sendQuestion(r){
   SFX.tap(); vibe(15); track('send-q');
   const text = `${r.pct}% of ${DAY.school} said YES to this:\n"${r.q}"\nWhat would you say? Play today's five:`;
-  const url = `https://${SHARE_URL}/?ref=q`;
+  const url = `https://${SHARE_URL}/daily.html?ref=q`;
   try { if (navigator.share) { await navigator.share({ text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text + ' ' + url); toast('COPIED, SEND IT'); } catch (e) { toast('COULDN\'T COPY'); }
 }
@@ -1703,6 +1709,11 @@ async function joinCard(el){
 /* ================= SCORE CARD, RESULTS, ALREADY-PLAYED SCREEN ================= */
 const IG_URL = 'https://instagram.com/offcampuskingston';
 const SHARE_URL = 'offcampusontario.ca';
+// A friend's challenge: daily.html?ref=share&s=3212&d=2 (only counts on the same day's five)
+const CHAL = (() => { const q = new URLSearchParams(location.search), sc = parseInt(q.get('s'), 10), d = parseInt(q.get('d'), 10);
+  const key = 'oc-chal-' + d;
+  if (Number.isFinite(sc) && sc >= 0 && sc <= 5000 && d === DAY.no) { store.set(key, sc); return sc; }
+  const saved = store.get('oc-chal-' + DAY.no); return Number.isFinite(saved) ? saved : null; })();
 async function drawCard(total, pts, types, stamp){
   try { await document.fonts.ready; } catch (e) {}
   const c = document.createElement('canvas'); c.width = 1080; c.height = 1350; const x = c.getContext('2d');
@@ -1737,7 +1748,7 @@ function saveDay(){
 }
 function stampFor(st, newBest){ return st.n >= 2 ? `${st.n}-DAY STREAK` : newBest ? 'NEW PERSONAL BEST' : `DAY ${pad3(DAY.no)} DONE`; }
 function wireShare(total, pts, types, stamp){
-  const text = `Off Campus · ${DAY.school} Daily #${pad3(DAY.no)}\n${fmt(total)}/5,000 ${pts.map(sqEmoji).join('')}\nBet you can't beat me. Same five for everyone at ${DAY.school} today: https://${SHARE_URL}/?ref=share`;
+  const text = `Off Campus · ${DAY.school} Daily #${pad3(DAY.no)}\n${fmt(total)}/5,000 ${pts.map(sqEmoji).join('')}\nBet you can't beat me. Same five for everyone at ${DAY.school} today: https://${SHARE_URL}/daily.html?ref=share&s=${total}&d=${DAY.no}`;
   let png = null; const getPng = async () => png || (png = await drawCard(total, pts, types, stamp));
   const copy = async () => { try { await navigator.clipboard.writeText(text); toast('COPIED, PASTE IT ANYWHERE'); } catch (e) { toast('COULDN\'T COPY'); } };
   $('#see').onclick = async () => { SFX.tap(); const src = await getPng(); const d = document.createElement('div'); d.className = 'lightbox'; d.innerHTML = `<img src="${src}" alt="Your score card" style="border-radius:14px;max-height:84vh">`; d.onclick = () => d.remove(); document.body.appendChild(d); };
@@ -1757,7 +1768,7 @@ async function results(){
   const ok = S.total >= UNLOCK || !!GUEST;
   let stamp, st = { n:0, best:S.total, days:1 };
   if (GUEST) stamp = `BEAT ${beatPct(S.total)}% OF ${DAY.school.toUpperCase()} TODAY`;
-  else { const r = saveDay(); st = r.st; stamp = stampFor(st, r.newBest); track('finish'); if (S.total >= UNLOCK) track('unlocked'); }
+  else { const r = saveDay(); st = r.st; stamp = CHAL !== null ? (S.total > CHAL ? `BEAT YOUR FRIEND BY ${fmt(S.total - CHAL)}` : S.total === CHAL ? 'TIED YOUR FRIEND' : `${fmt(CHAL - S.total)} SHORT OF YOUR FRIEND`) : stampFor(st, r.newBest); if (CHAL !== null) track(S.total > CHAL ? 'chal-won' : 'chal-lost'); track('finish'); if (S.total >= UNLOCK) track('unlocked'); }
   const pts = S.results.map(r => r.pts), types = S.results.map(r => r.type);
   const live = PRIZES_LIVE || !!GUEST;
   app.innerHTML = `<section class="screen">${TABS('daily')}
