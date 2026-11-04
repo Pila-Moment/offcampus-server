@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='./';return false;};</script>
-</head><body>
+<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='party.html';return false;};</script>
+<style>.ocr{display:inline-flex;align-items:center;gap:8px;margin-left:auto;flex:0 0 auto}.ocr .ochome{text-decoration:none}.ocr:has(~ *){margin-left:0}:has(> a[onclick*="__allGames"]) > .ocr .ochome{display:none}</style></head><body>
 <title>Drop the Pin: Kingston</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1200,7 +1200,7 @@ function titleScreen(){
   document.body.classList.remove('reveal');
   app.innerHTML = `
   <section class="title">
-    <div class="top"><a class="sound" href="./" onclick="return __allGames(event)" style="text-decoration:none">&larr; ALL GAMES</a>${soundBtn()}</div>
+    <div class="top"><a class="sound" href="./" onclick="return __allGames(event)" style="text-decoration:none">&larr; ALL GAMES</a><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     <div class="hero">
       <svg class="pinmark" viewBox="0 0 36 46" aria-hidden="true"><path d="M18 45C18 45 3 27 3 17a15 15 0 0 1 30 0c0 10-15 28-15 28z" fill="var(--pin)" stroke="var(--ink)" stroke-width="2.5"/><circle cx="18" cy="17" r="6" fill="var(--stone)" stroke="var(--ink)" stroke-width="2"/></svg>
       <h1>Drop<br>the <em>Pin</em></h1>
@@ -1226,7 +1226,7 @@ function titleScreen(){
 function partySetup(){
   app.innerHTML = `
   <section class="setup">
-    <div class="top"><button class="sound" id="back">BACK</button>${soundBtn()}</div>
+    <div class="top"><button class="sound" id="back">BACK</button><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     <h2>WHO'S PLAYING?</h2>
     <p class="fine" style="font-size:14px">Everyone guesses every photo in secret, one at a time. Then the time machine shows all your pins at once.</p>
     <form class="addrow" id="addF" autocomplete="off">
@@ -1263,7 +1263,7 @@ function passScreen(){
   if (map) { map.remove(); map = null; }
   app.innerHTML = `
   <section class="pass">
-    <div class="hud"><div class="rn">ROUND ${G.i + 1}<span>/${G.rounds.length}</span></div>${soundBtn()}</div>
+    <div class="hud"><div class="rn">ROUND ${G.i + 1}<span>/${G.rounds.length}</span></div><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     <div class="pass-mid">
       <div class="lbl">PASS THE PHONE TO</div>
       <div class="pass-name" style="color:${pl.col}">${esc(pl.name)}</div>
@@ -1282,7 +1282,7 @@ async function guessScreen(){
   document.body.classList.remove('reveal');
   app.innerHTML = `
   <section class="round">
-    <div class="hud"><div class="rn">ROUND ${G.i + 1}<span>/${G.rounds.length}</span></div>${G.party ? `<div class="who-chip" style="--c:${pl.col}">${esc(pl.name)}</div>` : `<div class="tot"><small>SCORE</small>${fmt(pl.total)}</div>`}${soundBtn()}</div>
+    <div class="hud"><div class="rn">ROUND ${G.i + 1}<span>/${G.rounds.length}</span></div>${G.party ? `<div class="who-chip" style="--c:${pl.col}">${esc(pl.name)}</div>` : `<div class="tot"><small>SCORE</small>${fmt(pl.total)}</div>`}<span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     <div class="stage">
       <div class="photo" id="photo"><img src="${esc(P.img)}" alt="A photo somewhere in Kingston" id="pimg"><span class="zoom">TAP TO ZOOM</span><div class="shutter"></div></div>
       <div class="mapwrap"><div id="map"></div><div class="maphint" id="hint">TAP THE MAP TO DROP YOUR PIN</div>
@@ -1517,7 +1517,7 @@ async function finalScreen(){
   const champ = order[0];
   app.innerHTML = `
   <section class="final">
-    <div class="hud"><span class="kicker">DROP THE PIN · KINGSTON</span>${soundBtn()}</div>
+    <div class="hud"><span class="kicker">DROP THE PIN · KINGSTON</span><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     ${solo ? '' : `<div class="of">THE WINNER IS</div><div class="champ" style="color:${champ.col}">${esc(champ.name)}</div>`}
     <div><div class="big" id="fbig">0</div><div class="of">OUT OF ${fmt(max)}</div></div>
     <div class="rank" id="frank" style="visibility:hidden">${esc(rankFor(champ.total))}</div>

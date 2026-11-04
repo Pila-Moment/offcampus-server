@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='./';return false;};</script>
-</head><body>
+<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='party.html';return false;};</script>
+<style>.ocr{display:inline-flex;align-items:center;gap:8px;margin-left:auto;flex:0 0 auto}.ocr .ochome{text-decoration:none}.ocr:has(~ *){margin-left:0}:has(> a[onclick*="__allGames"]) > .ocr .ochome{display:none}</style></head><body>
 <title>The Call</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -602,7 +602,7 @@ const usedPrompts = new Set();   // no repeats until the deck runs out
 /* ---------------- screens ---------------- */
 function titleScreen(){
   app.innerHTML = `
-  <div class="topbar"><a class="pill" href="./" onclick="return __allGames(event)" style="text-decoration:none">&larr; ALL GAMES</a>${soundBtn()}</div>
+  <div class="topbar"><a class="pill" href="./" onclick="return __allGames(event)" style="text-decoration:none">&larr; ALL GAMES</a><span class="ocr"><a class="pill ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="title">
     <div class="logo"><div class="small">WHO'S MOST LIKELY TO…</div><h1>THE<br>CALL</h1>${HAND('hand')}</div>
     <ol class="steps">
@@ -618,7 +618,7 @@ function titleScreen(){
 
 function gateScreen(){
   app.innerHTML = `
-  <div class="topbar"><button class="pill" id="back">BACK</button>${soundBtn()}</div>
+  <div class="topbar"><button class="pill" id="back">BACK</button><span class="ocr"><a class="pill ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="gate">
     <div class="age">DRINKING MODE IS 19+</div>
     <h2>Playing with <em>drinks</em>, or without?</h2>
@@ -638,7 +638,7 @@ function gateScreen(){
 
 function playersScreen(){
   app.innerHTML = `
-  <div class="topbar"><button class="pill" id="back">BACK</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span>${soundBtn()}</div>
+  <div class="topbar"><button class="pill" id="back">BACK</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span><span class="ocr"><a class="pill ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="players">
     <h2>WHO'S PLAYING?</h2>
     <p class="sub">Add everyone in the room. ${MIN_PLAYERS} or more.</p>
@@ -694,7 +694,7 @@ function newGame(){
 const stat = p => G.st[p] || (G.st[p] = { calls:0, unan:0, ties:0, objections:0, guilty:0, titles:[] });
 
 /* ---------------- a card ---------------- */
-function topbar(){ return `<div class="topbar"><button class="pill" id="endB">END</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span>${soundBtn()}</div>`; }
+function topbar(){ return `<div class="topbar"><button class="pill" id="endB">END</button><span class="mode-tag">${drinking ? 'DRINKING MODE' : 'NO DRINKS'}</span><span class="ocr"><a class="pill ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>`; }
 function wireTop(){ wireSound(); const e = $('#endB'); if (e) e.onclick = () => { SFX.tap(); verdictScreen(); }; }
 
 function nextCard(){
@@ -905,7 +905,7 @@ function verdictScreen(){
     angel && ['ANGEL (ALLEGEDLY)', angel[0], angel[1].calls ? `only ${angel[1].calls} call-out${angel[1].calls > 1 ? 's' : ''}` : 'never got called. Suspicious.']
   ].filter(Boolean);
   app.innerHTML = `
-  <div class="topbar"><span class="mode-tag">THE FINAL RECEIPTS</span>${soundBtn()}</div>
+  <div class="topbar"><span class="mode-tag">THE FINAL RECEIPTS</span><span class="ocr"><a class="pill ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="verdict">
     <h2>THE GROUP<br>HAS <span>SPOKEN</span></h2>
     <div class="awards">${awards.map(([t, p, d], i) => `<div class="award ${i === 0 ? 'top' : ''}" style="animation-delay:${i * 120}ms"><small>${esc(t)}</small><b>${esc(p)}</b><span>${esc(d)}</span></div>`).join('')}</div>

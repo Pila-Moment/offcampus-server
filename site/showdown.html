@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
-<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='./';return false;};</script>
-</head><body>
+<script>window.__allGames=function(e){if(e)e.preventDefault();try{if(document.referrer&&new URL(document.referrer).pathname.replace(/[^/]*$/,'')===location.pathname.replace(/[^/]*$/,'')){history.back();return false;}}catch(x){}location.href='party.html';return false;};</script>
+<style>.ocr{display:inline-flex;align-items:center;gap:8px;margin-left:auto;flex:0 0 auto}.ocr .ochome{text-decoration:none}.ocr:has(~ *){margin-left:0}:has(> a[onclick*="__allGames"]) > .ocr .ochome{display:none}</style></head><body>
 <title>Survey Showdown</title>
 <title>Survey Showdown</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -865,7 +865,7 @@ function pickBoards(){
 /* ---------------- screens ---------------- */
 function titleScreen(){
   app.innerHTML = `
-  <div class="topbar"><a class="sound" href="./" onclick="return __allGames(event)" style="margin-right:auto;text-decoration:none">&larr; ALL GAMES</a>${soundBtn()}</div>
+  <div class="topbar"><a class="sound" href="./" onclick="return __allGames(event)" style="margin-right:auto;text-decoration:none">&larr; ALL GAMES</a><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="title-screen">
     <div class="logo"><div class="logo-in">
       <h1>SURVEY<span>SHOWDOWN</span></h1>
@@ -885,7 +885,7 @@ function titleScreen(){
 
 function setupScreen(){
   app.innerHTML = `
-  <div class="topbar">${soundBtn()}</div>
+  <div class="topbar"><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
   <section class="setup">
     <h2>NAME YOUR TEAMS</h2>
     <p class="sub">Faculty vs faculty, guys vs girls, your house vs theirs.</p>
@@ -939,7 +939,7 @@ function renderGame(){
     <header class="scores">
       ${[0,1].map(t => `<div class="team t${t}" id="team${t}"><span class="tag">PLAYING</span><span class="tname">${esc(S.teams[t].name)}</span><span class="tscore" id="score${t}">${S.teams[t].score}</span></div>`).join('')}
     </header>
-    <div class="roundline"><span class="rlabel">ROUND ${S.round + 1}/${ROUNDS} <i class="house">100 SURVEYED</i></span><span class="strikes" id="strikes" hidden><i></i><i></i><i></i></span>${soundBtn()}</div>
+    <div class="roundline"><span class="rlabel">ROUND ${S.round + 1}/${ROUNDS} <i class="house">100 SURVEYED</i></span><span class="strikes" id="strikes" hidden><i></i><i></i><i></i></span><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
     <section class="qcard"><div class="asked">WE ASKED 100 QUEEN'S STUDENTS</div><p id="qtext"></p></section>
     <div class="marquee" id="marquee"><div class="board" id="board" style="grid-template-rows:repeat(${Math.ceil(S.board.a.length / 2)},1fr)">${tiles}</div></div>
     <section class="deck" id="deck" aria-live="polite"></section>
@@ -1253,7 +1253,7 @@ async function endRound(winner, line){
 async function finalScreen(){
   const [a, b] = S.teams;
   const winner = a.score === b.score ? -1 : (a.score > b.score ? 0 : 1);
-  app.innerHTML = `<div class="topbar">${soundBtn()}</div><section class="final"><div class="crown">AND THE WINNER IS…</div></section>`;
+  app.innerHTML = `<div class="topbar"><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div><section class="final"><div class="crown">AND THE WINNER IS…</div></section>`;
   wireSound();
   SFX.roll(2.2, true); vibe([20, 30, 20, 30, 20, 30, 20]);
   await wait(reduced ? 300 : 2200);
