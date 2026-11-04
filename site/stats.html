@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Off Campus Stats</title>
+<style>
+:root{--night:#07060F;--night2:#141126;--text:#F6F1E8;--muted:#A49FC0;--gold:#FFC83D;--mint:#7FE0C4;--good:#3BD67A;--red:#FF3B4A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--night);color:var(--text);font:600 14px/1.4 ui-monospace,Menlo,monospace;padding:max(18px,env(safe-area-inset-top)) 16px 40px}
+h1{margin:0 0 4px;font:900 28px/1 system-ui,sans-serif;letter-spacing:-.01em}
+h1 span{color:var(--gold)}
+.sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{padding:14px;border-radius:16px;background:var(--night2)}
+.tile small{display:block;font-size:10.5px;letter-spacing:.14em;color:var(--muted)}
+.tile b{display:block;font:900 40px/1.05 system-ui,sans-serif;margin-top:6px;font-variant-numeric:tabular-nums}
+.tile em{font-style:normal;font-size:11.5px;color:var(--muted)}
+.tile.hi{box-shadow:inset 0 0 0 2px var(--gold)} .tile.hi b{color:var(--gold)}
+.tile.ok b{color:var(--good)}
+h2{margin:24px 0 10px;font-size:11px;letter-spacing:.18em;color:var(--mint)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding:12px;border-radius:16px;background:var(--night2)}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%;font-size:11px}
+.bar i{display:block;width:100%;min-height:3px;border-radius:6px 6px 2px 2px;background:var(--mint)}
+.bar.today i{background:var(--gold)}
+.bar span{color:var(--muted);font-size:10px}
+.links a{display:block;margin-top:10px;padding:14px;border-radius:14px;background:var(--night2);color:var(--text);text-decoration:none}
+.links a b{color:var(--gold)}
+.err{color:var(--red)}
+</style><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"></head><body>
+<h1>OFF CAMPUS <span>STATS</span></h1>
+<div class="sub" id="when">Loading…</div>
+<div class="grid" id="grid"></div>
+<h2>PLAYERS, LAST 7 DAYS</h2>
+<div class="bars" id="bars"></div>
+<h2>MORE</h2>
+<div class="links">
+  <a href="https://offcampusontario.goatcounter.com" target="_blank" rel="noopener"><b>GoatCounter</b> · visits, where they came from (?ref=), starts, finishes, shares, crew invites</a>
+</div>
+<script>
+const fmt = n => Number(n || 0).toLocaleString('en-CA');
+async function load(){
+  try {
+    const r = await fetch('/api/stats', { cache:'no-store' }); const s = await r.json();
+    const back = s.playersYesterday ? Math.round(100 * s.cameBackToday / s.playersYesterday) : 0;
+    document.getElementById('when').textContent = `Queen's Daily No. ${String(s.day).padStart(3, '0')} · updated ${new Date().toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' })} · pull down to refresh`;
+    document.getElementById('grid').innerHTML = `
+      <div class="tile hi"><small>PLAYED TODAY</small><b>${fmt(s.playersToday)}</b></div>
+      <div class="tile ok"><small>CAME BACK TODAY</small><b>${back}%</b><em>${fmt(s.cameBackToday)} of yesterday's ${fmt(s.playersYesterday)}</em></div>
+      <div class="tile"><small>ALL-TIME PLAYERS</small><b>${fmt(s.playersAllTime)}</b><em>goal: 100 this week</em></div>
+      <div class="tile"><small>CREWS</small><b>${fmt(s.crews)}</b></div>`;
+    const days = (s.last7Days || []).slice().reverse(), max = Math.max(1, ...days.map(d => d.players));
+    document.getElementById('bars').innerHTML = days.map(d => `<div class="bar ${d.day === s.day ? 'today' : ''}"><b>${d.players}</b><i style="height:${Math.round(90 * d.players / max)}%"></i><span>#${d.day}</span></div>`).join('');
+  } catch (e) { document.getElementById('when').innerHTML = '<span class="err">Couldn\'t load the stats. Try again in a minute.</span>'; }
+}
+load();
+</script>
+</body></html>

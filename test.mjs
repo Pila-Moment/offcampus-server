@@ -44,4 +44,6 @@ ok(lg.members.length === 2 && lg.members[0].nick === 'Maya' && lg.members[0].win
 ok(lg.members.find(m => m.nick === 'Josh').avg === 3450 && lg.best.pin && lg.best.pin.nick === 'Josh' && lg.best.showdown.nick === 'Josh' && lg.members.find(m => m.nick === 'Maya').showdown === 360, 'league: averages and best at each game');
 ok(!JSON.stringify(lg).includes(A) && !JSON.stringify(lg).includes(B), 'league hides player ids');
 ok((await call('GET', '/api/crews/ZZZZZZ/league')).status === 404, 'league: unknown crew');
+const st = (await call('GET', '/api/stats', null, later)).body;
+ok(st.playersToday === 1 && st.playersYesterday === 2 && st.cameBackToday === 1 && st.last7Days.length >= 2, 'stats: came back the next day ' + JSON.stringify(st));
 console.log('all tests passed');
