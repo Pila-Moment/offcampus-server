@@ -1338,7 +1338,7 @@ let S = null;
 function fresh(){ S = { i:-1, results:[], total:0 }; }
 const R = () => DAY.rounds[S.i];
 const KIND = { receipts:'RECEIPTS', survey:'SURVEY SHOWDOWN', pin:'DROP THE PIN' };
-const TABS = on => `<nav class="tabs" aria-label="Off Campus"><a class="home" href="./" aria-label="Off Campus home">OC</a><a href="daily.html" class="${on === 'daily' ? 'on' : ''}">DAILY</a><a href="party.html" class="${on === 'party' ? 'on' : ''}">PARTY GAMES</a><a href="prizes.html" class="${on === 'prizes' ? 'on' : ''}">PRIZES</a></nav>`;
+const TABS = on => `<nav class="tabs" aria-label="Off Campus"><a class="home" href="./" aria-label="Off Campus home">OC</a><a href="daily.html" class="${on === 'daily' ? 'on' : ''}">DAILY</a><a href="party.html" class="${on === 'party' ? 'on' : ''}">PARTY GAMES</a><a href="clubs.html" class="${on === 'clubs' ? 'on' : ''}">CLUBS</a></nav>`;
 const unlockText = t => t >= UNLOCK ? 'PRIZE SPIN UNLOCKED' : `${fmt(UNLOCK - t)} MORE TO UNLOCK THE PRIZE SPIN`;
 function hud(){
   return `<div class="hud"><div class="rn"><small>${KIND[R().type]}</small>ROUND ${S.i + 1}/${DAY.rounds.length}</div>
@@ -1371,7 +1371,7 @@ function intro(){
     <h1>TODAY'S <span>FIVE</span></h1>
     ${GUEST ? `<div class="guest"><b>PREVIEW FOR ${esc(GUEST.name.toUpperCase())}</b><span>Play it like a student, or jump straight to where your spot shows up.</span><button id="skip">SKIP TO THE PRIZE SPIN &rarr;</button></div>` : ''}
     <p class="sub">Five rounds about ${esc(DAY.school)}, about three minutes. Everyone at ${esc(DAY.school)} gets the same five today.</p>
-    <div class="goal"><b>${fmt(UNLOCK)}</b><span>${PRIZES_LIVE || GUEST ? `Score ${fmt(UNLOCK)} out of 5,000 to unlock today's <em>free prize spin</em>.` : `Score ${fmt(UNLOCK)} out of 5,000 to unlock the prize spin. <em>Prizes from Kingston spots drop soon.</em>`}</span></div>
+    ${PRIZES_LIVE || GUEST ? `<div class="goal"><b>${fmt(UNLOCK)}</b><span>${PRIZES_LIVE || GUEST ? `Score ${fmt(UNLOCK)} out of 5,000 to unlock today's <em>free prize spin</em>.` : `Score ${fmt(UNLOCK)} out of 5,000 to unlock the prize spin. <em>Prizes from Kingston spots drop soon.</em>`}</span></div>` : ''}
     ${CHAL !== null && !GUEST ? `<div class="chal"><small>YOUR FRIEND GOT</small><b>${fmt(CHAL)}</b><span>Same five, today only.<br>Can you beat it?</span></div>` : ''}
     <div id="joinbox"></div><div id="crewstrip"></div>
     <div class="five" aria-label="Today's rounds">
@@ -1899,7 +1899,7 @@ async function results(){
       <div class="squares">${S.results.map((r, k) => `<div class="sq"><i style="background:${sqColor(r.pts)};animation-delay:${600 + k * 120}ms"></i><span>${SQLAB[r.type]}</span><b>${fmt(r.pts)}</b></div>`).join('')}</div>
       <span class="rankstamp">${esc(stamp)}</span></div>
     ${GUEST ? '' : '<div id="crewsbox"></div>'}
-    ${ok
+    ${!live ? '' : ok
       ? (live ? `<div class="gate ok"><b>YOU UNLOCKED A PRIZE!</b><span>You needed ${fmt(UNLOCK)}. You got ${fmt(S.total)}.</span></div><button class="btn pulse dock go" id="prize">SPIN FOR YOUR PRIZE!</button>`
               : `<button class="gate ok" id="prize" type="button"><b>YOU'D HAVE UNLOCKED A PRIZE!</b><span>You beat ${fmt(UNLOCK)}. The prize wheel drops soon.</span><i class="gate-go">SEE WHAT'S COMING &rarr;</i></button>`)
       : `<div class="gate"><b>${fmt(UNLOCK - S.total)} POINTS SHORT</b><span>${live ? `You needed ${fmt(UNLOCK)} to unlock the prize spin.` : `When prizes drop, ${fmt(UNLOCK)} unlocks the spin.`} New five at 4am.</span></div>`}
@@ -1913,7 +1913,7 @@ async function results(){
   startCountdown();
   wireShare(S.total, pts, types, stamp);
   if (!GUEST) postScore({ total:S.total, pts }).then(() => renderCrews($('#crewsbox'), S.total));
-  if (ok) $('#prize').onclick = () => { SFX.ok(); vibe(20); live ? prize() : prizeTeaser(); };
+  if (ok && $('#prize')) $('#prize').onclick = () => { SFX.ok(); vibe(20); live ? prize() : prizeTeaser(); };
   if (!GUEST && store.get('oc-savelater') !== DAY.no) setTimeout(saveSheet, 2600);
 }
 function doneScreen(rec){
@@ -1929,7 +1929,7 @@ function doneScreen(rec){
       <span class="rankstamp" style="animation-delay:0s">${esc(stamp)}</span></div>
     <div id="crewsbox"></div>
     ${statsRow(st)}
-    <div class="gate ok" style="box-shadow:inset 0 0 0 2px var(--gold)"><b style="color:var(--gold)">PRIZE WHEEL DROPS SOON</b><span>Score ${fmt(UNLOCK)} and you'll spin for free stuff from Kingston spots.</span></div>
+    ${PRIZES_LIVE ? `<div class="gate ok" style="box-shadow:inset 0 0 0 2px var(--gold)"><b style="color:var(--gold)">PRIZE WHEEL DROPS SOON</b><span>Score ${fmt(UNLOCK)} and you'll spin for free stuff from Kingston spots.</span></div>` : ''}
     ${tailHTML()}
     <button class="btn pulse dock go" id="share">CHALLENGE YOUR FRIENDS</button>
   </section>`;

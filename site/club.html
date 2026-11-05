@@ -79,6 +79,7 @@ input[type=range]{width:100%;accent-color:var(--gold);height:40px}
 .bar{position:relative;height:50px;border-radius:12px;background:var(--night-2);overflow:hidden;box-shadow:inset 0 0 0 2px var(--paper)}
 .bar i{position:absolute;inset:0 auto 0 0;background:var(--gold);transition:width 1.1s var(--ease-out)}
 .bar span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-family:var(--display);font-size:22px;color:var(--ink);mix-blend-mode:normal}
+.bar.low span{color:var(--text)}
 .bar em{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:8px}.split div{padding:10px 12px;border-radius:12px;background:var(--night-2)}.split div.win{box-shadow:inset 0 0 0 2px var(--gold)}
 .split b{display:block;font-family:var(--display);font-weight:400;font-size:28px}.split span{font-size:12px;font-weight:700}
@@ -88,6 +89,20 @@ input[type=range]{width:100%;accent-color:var(--gold);height:40px}
 .tops{display:flex;flex-direction:column;gap:5px}.tops div{display:flex;justify-content:space-between;padding:8px 12px;border-radius:10px;background:var(--night-2);font-weight:700}.tops div.hit{box-shadow:inset 0 0 0 2px var(--good)}
 .verdict{align-self:center;padding:6px 14px;background:var(--red);color:var(--paper);font-family:var(--display);font-size:20px;transform:rotate(-3deg);box-shadow:0 0 0 3px var(--night), 0 0 0 5px var(--red)}
 .verdict.good{background:var(--good);color:var(--ink);box-shadow:0 0 0 3px var(--night), 0 0 0 5px var(--good)}
+.execbar{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px 12px;border-radius:12px;background:var(--red);color:var(--paper);font-size:11px;font-weight:700;letter-spacing:.1em;text-align:left}
+.execbar b{font-family:var(--display);font-weight:400;font-size:14px;letter-spacing:0;white-space:nowrap}
+.lockbox{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.stamp{display:inline-block;padding:6px 14px;background:var(--gold);color:var(--ink);font-family:var(--display);font-size:18px;transform:rotate(-3deg);box-shadow:0 0 0 3px var(--night), 0 0 0 5px var(--gold)}
+.stamp.go{background:var(--good);box-shadow:0 0 0 3px var(--night), 0 0 0 5px var(--good)}
+.what{margin:0;padding:12px 14px 12px 32px;border-radius:14px;background:var(--night-2);display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:700}
+.what li::marker{color:var(--gold)}
+.btn.red{background:var(--red);color:var(--paper);box-shadow:0 6px 0 color-mix(in srgb, var(--red) 55%, black)}
+.btn.red.armed{animation:pulse .7s var(--ease-out) infinite alternate}
+@keyframes pulse{to{transform:scale(1.025)}}
+.btn.wide{width:100%}
+button.said{align-self:flex-start;padding:0;text-align:left}
+em.you{font-style:normal;margin-left:6px;padding:2px 6px;border-radius:6px;background:var(--gold);color:var(--ink);font-size:10px;letter-spacing:.08em}
+.tops div b{white-space:nowrap}
 /* finish */
 .score{padding:16px;border-radius:20px;background:var(--night-2);box-shadow:0 0 0 3px var(--gold);text-align:center}
 .score b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(50px,15vw,74px);line-height:.95;color:var(--gold)}
@@ -110,15 +125,14 @@ input[type=range]{width:100%;accent-color:var(--gold);height:40px}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 .foot{font-size:11px;color:var(--muted);text-align:center}.foot a{color:var(--mint)}
 @media (max-height:700px){.card{padding:14px}.card .q{font-size:clamp(24px,7.4vw,32px)}.screen{gap:10px}.yn button{min-height:58px}.pts{font-size:34px}.pct b{font-size:44px}}
+@media (max-height:660px){.introchips{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"><meta property="og:title" content="Your club's game · Off Campus"><meta property="og:description" content="How well do you know your club? 5 questions, 2 minutes. See how everyone really answered."><meta property="og:url" content="https://offcampusontario.ca/clubs"><meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head><body>
 <main id="app"></main>
 <script>
 /* ================= settings you can change ================= */
-const FIRST_IN_POINTS = 750;      // points when nobody in the club has answered before you
-const PCT_PTS_PER_POINT = 25;     // yes/no: every 1% off costs this many points
-const NAME_HIT_POINTS = 400;      // name-it: points for each of your answers that matches a clubmate's (max 1,000)
 const MAX_PICKS = 5;
+const RELEASE_MIN = 5;           // must match RELEASE_MIN on the server (lib/clubs.mjs)
 
 const API = (() => { const t = new URLSearchParams(location.search).get('api'); if (t && /^http:\/\/localhost:\d+$/.test(t)) return t; return /(^|\.)offcampusontario\.ca$|\.netlify\.app$/.test(location.hostname) ? '' : null; })();
 const $ = s => document.querySelector(s), app = $('#app');
@@ -145,8 +159,10 @@ const clubUrl = slug => `${SITE}/club/${slug}`;
 const head = right => `<div class="top"><a class="logo" href="/" style="color:inherit;text-decoration:none">OFF <span>CAMPUS</span></a><span class="chip">${right || 'CLUB GAMES'}</span></div>`;
 
 /* ================= QUESTION BANK =================
-   {club} = club name · {thing} = what you do together · {spot} = where you end up after · {lore} = something every member has done.
-   Each type has its own questions, then the general ones fill in. */
+   {club} = club name · {thing} = what you do together · {spot} = where you end up after · {lore} = something every member has done
+   {debateA} / {debateB} = the debate the club never settles. Each club type has its own questions, then the general ones fill in.
+   yn  = yes/no: members answer, then guess what % of the club said yes
+   pop = most popular: members pick one, then guess the club's top pick */
 const TYPES = [
   ['sports', 'Sports & fitness', 'practice'], ['outdoors', 'Outdoors & trips', 'trips'], ['gaming', 'Gaming', 'game nights'],
   ['performing', 'Dance & performing', 'rehearsal'], ['cultural', 'Cultural', 'events'], ['business', 'Business & pro', 'events'],
@@ -155,49 +171,53 @@ const BANK = {
   yn: {
     sports:['Have you ever pretended to be injured to skip {thing}?', 'Have you ever posted a workout just for the likes?', 'Have you ever been way more competitive than the game needed?'],
     outdoors:['Have you ever packed way too much for a trip?', 'Have you ever been the reason a trip ran late?', 'Would you survive a night outside with no gear?'],
-    gaming:['Have you ever blamed lag for your own mistake?', 'Have you ever put your rank in a dating-app bio?', 'Have you ever gamed all night before an exam?'],
+    gaming:['Have you ever blamed lag for your own mistake?', 'Have you ever said "one more game" and played two more hours?', 'Have you ever gamed all night before an exam?'],
     performing:['Have you ever forgotten the choreo mid-show and just vibed?', 'Have you ever practised in a Stauffer bathroom?', 'Have you ever cried after a performance?'],
     cultural:['Have you ever stayed for the food more than the event?', 'Have you ever made a best friend at your first event?', 'Have you ever called your parents mid-event to settle a debate?'],
     business:['Have you ever networked at a party?', 'Have you ever put your club role on LinkedIn before doing anything?', 'Have you ever worn a quarter-zip to a social?'],
     faculty:['Have you ever skipped the lecture but gone to the social?', 'Do you think your faculty has it hardest at Queen\'s?', 'Have you ever studied with {club} the night before and still panicked?'],
     social:['Have you ever been the last one to leave a {club} social?', 'Have you ever made up a reason to leave early?', 'Have you ever slept through a {club} event?'],
-    all:['Have you ever had a crush on someone in {club}?', 'Have you ever ended up at {spot} after {thing}?', 'Have you ever {lore}?', 'Have you ever joined {club} mostly for the socials?', 'Do you think {club} is the best club at Queen\'s?', 'Have you ever brought a date to a {club} event?', 'Have you ever skipped {thing} and lied about why?'] },
-  tot: {
-    sports:[['Win ugly', 'Lose looking good'], ['Post-game Osmow\'s', 'Post-game nap']], outdoors:[['Tent', 'Cabin'], ['Sunrise hike', 'Sleep in']],
-    gaming:[['PC', 'Console'], ['Carry the team', 'Get carried']], performing:[['Front row', 'Back row'], ['Rehearsal', 'Show night']],
-    cultural:[['Plan the event', 'Show up for the food'], ['Home cooking', 'Osmow\'s']], business:[['Coffee chat', 'Happy hour'], ['Bay Street', 'Start your own thing']],
-    faculty:[['Study group', 'Solo grind'], ['Stauffer', 'Douglas Library']], social:[['Host', 'Guest'], ['Stay in', 'Go out']],
-    all:[['{debateA}', '{debateB}'], ['Pregame at a house', 'Straight to the bar'], ['Stages', 'Ale House'], ['Mute the group chat', 'Read every message'], ['Wear the merch everywhere', 'Never wear the merch']] },
-  name: {
-    sports:['Name an excuse for missing {thing}.'], outdoors:['Name the first thing someone forgets on a trip.'], gaming:['Name an excuse after losing a game.'],
-    performing:['Name something that goes wrong at every show.'], cultural:['Name the best food at a {club} event.'], business:['Name a word you\'ll hear at every {club} event.'],
-    faculty:['Name what you\'d find in {club}\'s study room.'], social:['Name something that always happens at a {club} social.'],
-    all:['Name something every {club} member has said at least once.', 'Name the best thing about {club}.', 'Name the worst part of {thing}.', 'Name what {club} talks about way too much.', 'Name where {club} ends up after {thing}.'] } };
-const TOT_Q = { '{debateA}':'{club}\'s never-ending debate: {debateA} or {debateB}?', default:'{A} or {B}?' };
+    all:['Have you ever {lore}?', 'Have you ever ended up at {spot} after {thing}?', 'Have you ever joined {club} mostly for the socials?', 'Do you think {club} is the best club at Queen\'s?',
+      'Have you ever skipped {thing} and lied about why?', 'Have you ever had a crush on someone in {club}?', 'Have you ever brought a date to a {club} event?', 'Have you ever muted the {club} group chat?'] },
+  pop: {
+    sports:[['Right after {thing}, what\'s your first move?', ['Water', 'Food', 'Stretch', 'Lie down forever']], ['Best excuse for missing {thing}?', ['Too cold', 'Midterm', '"Injured"', 'Overslept']]],
+    outdoors:[['First thing someone forgets on a trip?', ['Charger', 'Rain jacket', 'Snacks', 'Socks']], ['Best part of a trip?', ['The view', 'The food', 'The drive', 'The campfire']]],
+    gaming:[['Classic excuse after a bad game?', ['Lag', 'Teammates', 'Matchmaking', '"Wasn\'t trying"']], ['Best game night snack?', ['Chips', 'Pizza', 'Energy drink', 'Candy']]],
+    performing:[['What goes wrong at every show?', ['A costume', 'The music', 'Someone blanks', 'The lights']], ['Best part of show night?', ['The bows', 'Backstage', 'The afterparty', 'The pics']]],
+    cultural:[['Best part of a {club} event?', ['The food', 'The music', 'The people', 'The pics']], ['What do you leave a {club} event with?', ['Leftovers', 'A new friend', 'A story', 'A food coma']]],
+    business:[['Word you\'ll hear at every {club} event?', ['Networking', 'Synergy', 'LinkedIn', 'Coffee chat']], ['Dream job after Queen\'s?', ['Bay Street', 'My own company', 'Big tech', 'No idea']]],
+    faculty:[['Where does {club} actually study?', ['Stauffer', 'Douglas', 'Someone\'s house', 'We don\'t']], ['Worst part of exam season?', ['No sleep', 'The library', 'Group projects', 'The caffeine']]],
+    social:[['What always happens at a {club} social?', ['Someone leaves early', 'Aux fight', 'Food runs out', 'Someone falls asleep']], ['Best night for a {club} social?', ['Thursday', 'Friday', 'Saturday', 'Any night']]],
+    all:[['Where does {club} end up after {thing}?', ['{spot}', 'Someone\'s house', 'Osmow\'s', 'Straight to bed']], ['{club}\'s never-ending debate:', ['{debateA}', '{debateB}']],
+      ['Best part of {club}?', ['The people', 'The socials', 'The {thing}', 'The group chat']], ['How do you read the {club} group chat?', ['Instantly', 'Same day', 'Only when tagged', 'Muted']],
+      ['Best spot for a night out?', ['Stages', 'Ale House', 'Trin', 'A house party']]] } };
 
 function fill(t, f){
   return t.replace(/\{club\}/g, f.club).replace(/\{thing\}/g, f.thing).replace(/\{spot\}/g, f.spot).replace(/\{lore\}/g, f.lore.replace(/^(have|has)\s+/i, '').replace(/[.?!]+$/, ''))
     .replace(/\{debateA\}/g, f.debateA).replace(/\{debateB\}/g, f.debateB);
 }
 function options(f){
-  const need = t => (!/\{spot\}/.test(t) || f.spot) && (!/\{lore\}/.test(t) || f.lore) && (!/\{debate/.test(t) || (f.debateA && f.debateB));
-  const mine = t => /\{(lore|spot|debate)/.test(Array.isArray(t) ? t.join(' ') : t);
-  const pickTexts = kind => { const all = [...(BANK[kind][f.type] || []), ...BANK[kind].all].filter(t => need(Array.isArray(t) ? t.join(' ') : t)); return [...all.filter(mine), ...all.filter(t => !mine(t))]; };
+  const text = t => Array.isArray(t) ? t[0] + ' ' + t[1].join(' ') : t;
+  const need = t => { const s = text(t); return (!/\{spot\}/.test(s) || f.spot) && (!/\{lore\}/.test(s) || f.lore) && (!/\{debate/.test(s) || (f.debateA && f.debateB)); };
+  const mine = t => /\{(lore|spot|debate)/.test(text(t));
+  const pickTexts = kind => { const all = [...(BANK[kind][f.type] || []), ...BANK[kind].all].filter(need); return [...all.filter(mine), ...all.filter(t => !mine(t))]; };
   const out = [];
   if (f.trivia && f.trivia.q && f.trivia.right && f.trivia.wrong.filter(Boolean).length) {
-    const opts = [f.trivia.right, ...f.trivia.wrong.filter(Boolean)]; const order = opts.map((o, i) => [o, Math.random()]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+    const opts = [f.trivia.right, ...f.trivia.wrong.filter(Boolean)]; const order = opts.map(o => [o, Math.random()]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
     out.push({ kind:'trivia', q:f.trivia.q, opts:order, right:order.indexOf(f.trivia.right) });
   }
-  pickTexts('yn').slice(0, 6).forEach(t => out.push({ kind:'yn', q:fill(t, f) }));
-  pickTexts('tot').slice(0, 5).forEach(pair => { const o = pair.map(x => fill(x, f)); out.push({ kind:'tot', q:fill(/\{debateA\}/.test(pair[0]) ? TOT_Q['{debateA}'] : TOT_Q.default.replace('{A}', o[0]).replace('{B}', o[1]), f), opts:o }); });
-  pickTexts('name').slice(0, 5).forEach(t => out.push({ kind:'name', q:fill(t, f) }));
-  // sensible starting picks: trivia if they wrote one, 2 yes/no, 1 this-or-that, 1 name-it
-  const want = { trivia:1, yn:2, tot:1, name:1 }, got = {};
-  out.forEach(o => { got[o.kind] = got[o.kind] || 0; if (got[o.kind] < want[o.kind] && out.filter(x => x.on).length < MAX_PICKS) { o.on = true; got[o.kind]++; } });
-  if (out.filter(x => x.on).length < MAX_PICKS) { const extra = out.find(o => !o.on && o.kind === 'yn'); if (extra) extra.on = true; }
+  pickTexts('yn').slice(0, 7).forEach(t => out.push({ kind:'yn', q:fill(t, f) }));
+  pickTexts('pop').slice(0, 5).forEach(([q, o]) => {
+    const seen = new Set(), opts = o.map(x => fill(x, f)).filter(x => { const k = x.toLowerCase(); if (!x || seen.has(k)) return false; seen.add(k); return true; });
+    if (opts.length >= 2) out.push({ kind:'pop', q:fill(q, f), opts });
+  });
+  // starting picks: trivia if they wrote one, 3 yes/no, 1 most popular (a 4th yes/no if there's no trivia)
+  const want = { trivia:1, yn:out.some(o => o.kind === 'trivia') ? 3 : 4, pop:1 }, got = {};
+  out.forEach(o => { got[o.kind] = got[o.kind] || 0; if (got[o.kind] < want[o.kind]) { o.on = true; got[o.kind]++; } });
   return out;
 }
-const KIND_LABEL = { yn:'YES / NO · then guess the club\'s %', tot:'THIS OR THAT · then guess what most picked', name:'NAME IT · match your clubmates\' answers', trivia:'CLUB TRIVIA' };
+const KIND_LABEL = { yn:'YES / NO · they guess the club\'s %', pop:'MOST POPULAR · they guess the club\'s top pick', trivia:'CLUB TRIVIA' };
+const KIND_SHORT = { yn:'YES / NO', pop:'MOST POPULAR', trivia:'TRIVIA' };
 
 /* ================= EXEC: MAKE A CLUB GAME ================= */
 const B = { club:'', type:'social', you:nick(), thing:'', spot:'', lore:'', debateA:'', debateB:'', trivia:{ q:'', right:'', wrong:['', ''] }, opts:null };
@@ -205,10 +225,10 @@ function builder1(){
   window.scrollTo(0, 0);
   app.innerHTML = `<section class="screen">${head('FOR CLUB EXECS')}
     <div class="kick">STEP 1 OF 3</div><h1>MAKE YOUR <span>CLUB'S GAME</span></h1>
-    <p class="sub">3 minutes. Your members play on their phones, compete on a club leaderboard, and you get their real answers. Free.</p>
+    <p class="sub">3 minutes, free. Members guess how the club answered. You release the results when you're ready: real answers, a leaderboard and a post for your Instagram.</p>
     <label class="field"><span>CLUB NAME</span><input id="bn" maxlength="32" placeholder="e.g. Queen's Run Club" value="${esc(B.club)}"></label>
     <div class="field"><span>WHAT KIND OF CLUB</span><div class="types">${TYPES.map(t => `<button type="button" data-t="${t[0]}" class="${B.type === t[0] ? 'on' : ''}">${t[1]}</button>`).join('')}</div></div>
-    <label class="field"><span>YOUR NAME</span><input id="by" maxlength="16" placeholder="So you show up on the leaderboard" value="${esc(B.you)}"></label>
+    <label class="field"><span>YOUR NAME</span><input id="by" maxlength="16" placeholder="For the leaderboard" value="${esc(B.you)}"></label>
     <button class="btn dock" id="next1">NEXT</button></section>`;
   app.querySelectorAll('.types button').forEach(b => b.onclick = () => { B.type = b.dataset.t; app.querySelectorAll('.types button').forEach(x => x.classList.toggle('on', x === b)); vibe(8); });
   $('#next1').onclick = () => { B.club = $('#bn').value.trim(); B.you = $('#by').value.trim(); if (B.club.length < 2) { toast('NAME YOUR CLUB'); return; } if (B.you) store.set('oc-nick', B.you); track('club-make-1'); builder2(); };
@@ -237,10 +257,10 @@ function builder2(){
 }
 function builder3(){
   window.scrollTo(0, 0);
-  const groups = ['trivia', 'yn', 'tot', 'name'].filter(k => B.opts.some(o => o.kind === k));
+  const groups = ['trivia', 'yn', 'pop'].filter(k => B.opts.some(o => o.kind === k));
   const picked = () => B.opts.filter(o => o.on).length;
   app.innerHTML = `<section class="screen">${head('FOR CLUB EXECS')}
-    <div class="kick">STEP 3 OF 3</div><h2>PICK ${MAX_PICKS} QUESTIONS</h2><p class="sub">Tap to pick. Tap the words to edit them.</p>
+    <div class="kick">STEP 3 OF 3</div><h2>PICK ${MAX_PICKS} QUESTIONS</h2><p class="sub">Best mix: 3 yes/no, 1 most popular, 1 trivia. Tap to pick. Tap the words to edit them.</p>
     <div class="count" id="cnt"></div>
     ${groups.map(k => `<div class="group"><h3>${KIND_LABEL[k]}</h3>${B.opts.map((o, i) => o.kind !== k ? '' : `<div class="opt ${o.on ? 'on' : ''}" data-i="${i}"><button type="button" class="tick" aria-label="Pick">${o.on ? '✓' : ''}</button><div style="flex:1"><textarea rows="2" data-i="${i}">${esc(o.q)}</textarea>${o.opts ? `<div class="opts">${o.opts.map((x, j) => esc(x) + (o.kind === 'trivia' && j === o.right ? ' ✓' : '')).join(' · ')}</div>` : ''}</div></div>`).join('')}</div>`).join('')}
     <button class="btn go dock" id="make">MAKE OUR GAME</button></section>`;
@@ -254,182 +274,252 @@ function builder3(){
   app.querySelectorAll('.opt textarea').forEach(t => { grow(t); t.oninput = () => { B.opts[+t.dataset.i].q = t.value; grow(t); }; });
   sync();
   $('#make').onclick = async () => {
-    const cards = B.opts.filter(o => o.on).map(({ on, ...c }) => c); const btn = $('#make'); btn.disabled = true; btn.textContent = 'MAKING IT…';
+    const ORDER = ['yn', 'pop', 'trivia'];
+    const cards = B.opts.filter(o => o.on).map(({ on, ...c }) => c).sort((a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind)); const btn = $('#make'); btn.disabled = true; btn.textContent = 'MAKING IT…';
     try { const r = await api('POST', '/api/clubs', { playerId:PLAYER_ID, nick:B.you, name:B.club, type:B.type, cards }); store.set('oc-clubkey-' + r.slug, r.key); track('club-made'); made(r); }
     catch (e) { btn.disabled = false; btn.textContent = 'MAKE OUR GAME'; toast(API === null ? 'OPEN THIS ON OFFCAMPUSONTARIO.CA' : 'COULDN\'T MAKE IT, TRY AGAIN'); }
   };
 }
+const gameMsg = name => `ok ${name} we have our own game now 👀 5 questions about us, 2 min. guess how everyone answered, results drop soon:`;
+const resultsMsg = name => `The ${name} results are in 👀 see your score + how everyone actually answered. haven't played? you still can:`;
 function made(r){
   window.scrollTo(0, 0);
   const link = clubUrl(r.slug), admin = `${link}?results&k=${r.key}`;
-  const msg = `ok ${B.club} we have our own game now 👀 5 questions about us, takes 2 min. see who knows the club best + how everyone actually answered:`;
   app.innerHTML = `<section class="screen">${head('READY')}
     <h1>${esc(B.club.toUpperCase())}'S GAME <span>IS LIVE</span></h1>
     <div class="linkbox">${esc(link)}</div>
     <button class="btn" id="send">SEND IT TO THE CLUB CHAT</button>
-    <a class="btn ghost" href="${API ? `/club.html?c=${esc(r.slug)}&api=${encodeURIComponent(API)}` : `/club/${esc(r.slug)}`}">PLAY IT FIRST</a>
-    <div class="panel"><b class="kick">YOUR RESULTS PAGE</b><p class="sub">Everyone's real answers, the leaderboard, and a results post for your club's Instagram. Save this link, it's only for execs.</p>
-      <button class="btn ghost" id="copyadmin">COPY MY RESULTS LINK</button></div>
+    <a class="btn ghost" href="${pageUrl(r.slug)}">PLAY IT FIRST</a>
+    <div class="panel"><b class="kick">WHEN ${RELEASE_MIN}+ HAVE PLAYED, RELEASE THE RESULTS</b><p class="sub">You decide when. Open the club link on this phone and you'll see the button. Or save your exec link for any phone.</p>
+      <button class="btn ghost" id="copyadmin">COPY MY EXEC LINK</button></div>
     <p class="foot">Questions? DM <a href="https://instagram.com/offcampuskingston">@offcampuskingston</a></p></section>`;
-  $('#send').onclick = () => { track('club-send'); shareText(msg, link); };
-  $('#copyadmin').onclick = async () => { try { await navigator.clipboard.writeText(admin); toast('SAVED TO CLIPBOARD'); } catch (e) { toast(admin); } };
+  $('#send').onclick = () => { track('club-send'); shareText(gameMsg(B.club), link); };
+  $('#copyadmin').onclick = async () => { try { await navigator.clipboard.writeText(admin); toast('COPIED, SAVE IT SOMEWHERE'); } catch (e) { toast(admin); } };
 }
 
 /* ================= MEMBERS: PLAY THE CLUB GAME ================= */
 let G = null, S = null;
+const pageUrl = (slug, extra) => API ? `/club.html?c=${encodeURIComponent(slug)}&api=${encodeURIComponent(API)}${extra ? '&' + extra : ''}` : `/club/${slug}${extra ? '?' + extra : ''}`;
+const execKey = () => new URLSearchParams(location.search).get('k') || store.get('oc-clubkey-' + G.slug) || '';
+const NAME = () => esc(G.name.toUpperCase());
 async function loadGame(slug){
   app.innerHTML = `<section class="screen">${head()}<p class="sub">Loading…</p></section>`;
-  try { G = await api('GET', `/api/clubs/${slug}?playerId=${PLAYER_ID}`); } catch (e) { app.innerHTML = `<section class="screen">${head()}<h2>CAN'T FIND THAT CLUB</h2><p class="sub">Check the link, or <a style="color:var(--mint)" href="/clubs">make your own club game</a>.</p></section>`; return; }
-  if (new URLSearchParams(location.search).has('results') || (G.me && G.me.score !== null)) return results(true);
+  const k = new URLSearchParams(location.search).get('k') || store.get('oc-clubkey-' + slug) || '';
+  try { G = await api('GET', `/api/clubs/${slug}?playerId=${PLAYER_ID}${k ? '&k=' + encodeURIComponent(k) : ''}`); }
+  catch (e) { app.innerHTML = `<section class="screen">${head()}<h2>CAN'T FIND THAT CLUB</h2><p class="sub">Check the link, or <a style="color:var(--mint)" href="/clubs">make your own club game</a>.</p></section>`; return; }
+  if (G.exec && k) store.set('oc-clubkey-' + slug, k);
+  if (G.legacy) { app.innerHTML = `<section class="screen">${head()}<h2>THIS CLUB GAME IS FROM AN OLDER VERSION</h2><p class="sub">Make a fresh one in 3 minutes.</p><a class="btn dock" href="/club.html?new">MAKE A NEW CLUB GAME</a></section>`; return; }
+  const q = new URLSearchParams(location.search);
+  if (q.has('results')) return G.exec ? execPage() : (G.released ? report() : (G.me && G.me.done ? locked() : intro()));
+  if (G.me && G.me.done) return G.released ? scorePage() : locked();
   intro();
 }
+const execBar = () => G.exec ? `<button class="execbar" id="execbar"><span>YOU'RE THE EXEC · ${G.released ? 'RESULTS ARE OUT' : `${G.played} PLAYED`}</span><b>${G.released ? 'SEND RESULTS →' : 'RELEASE RESULTS →'}</b></button>` : '';
+function wireExecBar(){ const b = $('#execbar'); if (b) b.onclick = () => { vibe(10); execPage(); }; }
 function intro(){
   window.scrollTo(0, 0);
-  const kinds = G.cards.map(c => ({ yn:'YES/NO', tot:'THIS OR THAT', name:'NAME IT', trivia:'TRIVIA' })[c.kind]);
-  app.innerHTML = `<section class="screen">${head()}
-    <div class="kick">${G.cards.length} QUESTIONS · 2 MINUTES</div><h1>HOW WELL DO YOU KNOW <span>${esc(G.name.toUpperCase())}?</span></h1>
-    <p class="sub">Answer, then guess how the club answered. Top score wins the club leaderboard.</p>
-    <div class="chips">${kinds.map((k, i) => `<span>${i + 1} · ${k}</span>`).join('')}</div>
-    <label class="field"><span>YOUR NAME FOR THE LEADERBOARD</span><input id="nk" maxlength="16" value="${esc(nick())}" placeholder="Your name"></label>
-    <p class="foot">Anonymous: the club only ever sees totals, never who said what.</p>
-    <button class="btn dock" id="go">PLAY</button></section>`;
-  $('#go').onclick = () => { const n = $('#nk').value.trim(); if (!n) { toast('ADD YOUR NAME'); return; } store.set('oc-nick', n); S = { i:0, pts:[] }; track('club-start'); vibe(15); round(); };
+  const startAt = G.cards.findIndex((_, i) => !G.me || G.me.ans[i] === undefined), resuming = startAt > 0;
+  app.innerHTML = `<section class="screen">${head()}${execBar()}
+    <div class="kick">${G.cards.length} QUESTIONS · 2 MINUTES</div><h1>HOW WELL DO YOU KNOW <span>${NAME()}?</span></h1>
+    <p class="sub">${G.released ? 'The results are in. Answer, guess how the club answered, and see your score straight away.' : 'Answer each one, then guess how the rest of the club answered. Results drop when your exec releases them.'}</p>
+    <div class="chips introchips">${G.cards.map((c, i) => `<span>${i + 1} · ${KIND_SHORT[c.kind]}</span>`).join('')}</div>
+    <div class="note">${G.released ? `<b>${G.played}</b> members answered` : G.played ? `<b>${G.played}</b> ${G.played === 1 ? 'has' : 'have'} played so far` : 'Be one of the first to play'}</div>
+    <label class="field"><span>YOUR NAME · SHOWS ON THE CLUB LEADERBOARD</span><input id="nk" maxlength="16" value="${esc((G.me && G.me.nick) || nick())}" placeholder="Your name"></label>
+    <p class="foot">Nobody sees who said what. The club only sees totals.</p>
+    <button class="btn dock" id="go">${resuming ? 'KEEP GOING' : 'PLAY'}</button></section>`;
+  wireExecBar();
+  $('#go').onclick = () => { const n = $('#nk').value.trim(); if (!n) { toast('ADD YOUR NAME'); return; } store.set('oc-nick', n); S = { i:Math.max(0, startAt), pts:{}, trivia:null }; track('club-start'); vibe(15); round(); };
 }
-const hud = () => `<div class="hud"><span class="chip">${esc(G.name.toUpperCase())}</span><div class="dots">${G.cards.map((c, i) => `<i class="${i < S.i ? 'on' : i === S.i ? 'now' : ''}"></i>`).join('')}</div><b>${fmt(S.pts.reduce((a, b) => a + b, 0))}</b></div>`;
+const hud = () => `<div class="hud"><span class="chip">${NAME()}</span><div class="dots">${G.cards.map((c, i) => `<i class="${i < S.i ? 'on' : i === S.i ? 'now' : ''}"></i>`).join('')}</div><b>${G.released ? fmt(Object.values(S.pts).reduce((a, b) => a + b, 0)) : `${S.i + 1}/${G.cards.length}`}</b></div>`;
 function round(){
   if (S.i >= G.cards.length) return finish();
   window.scrollTo(0, 0);
   const c = G.cards[S.i];
-  ({ yn:roundYN, tot:roundTOT, name:roundNAME, trivia:roundTRIVIA })[c.kind](c);
+  ({ yn:roundYN, pop:roundPOP, trivia:roundTRIVIA })[c.kind](c);
 }
-async function answer(a){ try { return await api('POST', `/api/clubs/${G.slug}/answer`, { playerId:PLAYER_ID, nick:nick(), card:S.i, answer:a }); } catch (e) { return null; } }
-function next(pts){ S.pts.push(pts); }
-const nextBtn = () => `<button class="btn dock" id="nx">${S.i + 1 < G.cards.length ? 'NEXT' : 'SEE MY SCORE'}</button>`;
-function wireNext(){ $('#nx').onclick = () => { vibe(10); S.i++; round(); }; }
-const card = (c, small) => `<div class="card${small ? ' small' : ''}"><small>${({ yn:'YES OR NO', tot:'THIS OR THAT', name:'NAME IT', trivia:'CLUB TRIVIA' })[c.kind]} · ${S.i + 1} OF ${G.cards.length}</small><p class="q">${esc(c.q)}</p></div>`;
-const firstNote = () => `<div class="note">You're one of the first to answer. <b>+${FIRST_IN_POINTS}</b> for being early. Check the club's results later.</div>`;
+// Save one card. Tries 3 times; if the network is gone, the player keeps their answer and taps TRY AGAIN.
+async function save(payload){
+  for (let t = 0; t < 3; t++) { try { return await api('POST', `/api/clubs/${G.slug}/answer`, { playerId:PLAYER_ID, nick:nick(), card:S.i, ...payload }); } catch (e) { if (/old club/.test(e.message)) return null; await new Promise(r => setTimeout(r, 700)); } }
+  return null;
+}
+async function lockIn(btn, payload, after){
+  btn.disabled = true; btn.textContent = 'LOCKING IN…';
+  const r = await save(payload);
+  if (!r) { btn.disabled = false; btn.textContent = 'NO CONNECTION · TRY AGAIN'; btn.onclick = () => lockIn(btn, payload, after); return; }
+  after(r);
+}
+const nextBtn = () => `<button class="btn dock" id="nx">${S.i + 1 < G.cards.length ? 'NEXT' : G.released ? 'SEE MY SCORE' : 'FINISH'}</button>`;
+function goNext(){ vibe(10); S.i++; round(); }
+function wireNext(){ $('#nx').onclick = goNext; }
+const card = (c, small) => `<div class="card${small ? ' small' : ''}"><small>${KIND_SHORT[c.kind]} · ${S.i + 1} OF ${G.cards.length}</small><p class="q">${esc(c.q)}</p></div>`;
+const verdictFor = off => off <= 2 ? ['DEAD ON', 'good'] : off <= 7 ? ['SO CLOSE', 'good'] : off <= 15 ? ['NOT BAD', ''] : ['WAY OFF', ''];
+// Before the results are out: a quick LOCKED IN, then straight to the next card
+function lockedFlash(st, line){
+  st.innerHTML = `<div class="reveal"><span class="verdict good">LOCKED IN</span><div class="note">${line}</div></div>`; vibe([15, 25]);
+  setTimeout(goNext, 1000);
+}
+function showPoints(st, html, pts){ S.pts[S.i] = pts; st.innerHTML = `<div class="reveal">${html}<div class="pts">+${fmt(pts)}<small> / 1,000</small></div></div>${nextBtn()}`; wireNext(); vibe([20, 30, 40]); }
 
 function roundYN(c){
-  let said = null, guess = 50;
+  let guess = 50;
   app.innerHTML = `<section class="screen">${hud()}${card(c)}<div id="st"></div></section>`;
   const st = $('#st');
-  st.innerHTML = `<div class="lbl">YOUR ANSWER · ANONYMOUS</div><div class="yn"><button class="y" id="y">YES</button><button class="n" id="n">NO</button></div>`;
-  const pick = v => { said = v; vibe(15);
-    st.innerHTML = `<div class="said">YOU SAID ${v ? 'YES' : 'NO'}</div><div class="lbl">NOW GUESS: WHAT % OF ${esc(G.name.toUpperCase())} SAID YES?</div>
-      <div class="pct"><button id="m">−</button><b id="pv">${guess}%</b><button id="p">+</button></div><input type="range" id="r" min="0" max="100" value="${guess}">
+  st.innerHTML = `<div class="lbl">FIRST, YOUR ANSWER · NOBODY SEES IT</div><div class="yn"><button class="y" id="y">YES</button><button class="n" id="n">NO</button></div>`;
+  const pick = said => { vibe(15);
+    st.innerHTML = `<button class="said" id="chg">YOU SAID ${said ? 'YES' : 'NO'} · CHANGE</button><div class="lbl">NOW GUESS: WHAT % OF ${NAME()} SAID YES?</div>
+      <div class="pct"><button id="m" aria-label="Less">−</button><b id="pv">${guess}%</b><button id="p" aria-label="More">+</button></div><input type="range" id="r" min="0" max="100" value="${guess}" aria-label="Your guess">
       <button class="btn dock" id="lock">LOCK IT IN</button>`;
     const set = x => { guess = Math.max(0, Math.min(100, x)); $('#pv').textContent = guess + '%'; $('#r').value = guess; };
     $('#r').oninput = e => set(+e.target.value); $('#m').onclick = () => set(guess - 1); $('#p').onclick = () => set(guess + 1);
-    $('#lock').onclick = async () => { $('#lock').disabled = true; const r = await answer(said); const b = r && r.before;
-      let pts, html;
-      if (!b || !b.n) { pts = FIRST_IN_POINTS; html = firstNote(); }
-      else { const pct = Math.round(100 * b.yes / b.n), off = Math.abs(pct - guess); pts = Math.max(0, 1000 - off * PCT_PTS_PER_POINT);
-        html = `<div class="lbl">${esc(G.name.toUpperCase())} SAID YES</div><div class="bar"><i id="fill" style="width:0"></i><span>${pct}%</span><em>${b.n} ANSWERED</em></div>
-          <span class="verdict ${off <= 7 ? 'good' : ''}">${off <= 2 ? 'DEAD ON' : off <= 7 ? 'SO CLOSE' : off <= 15 ? 'NOT BAD' : 'WAY OFF'}</span>`;
-        setTimeout(() => { const f = $('#fill'); if (f) f.style.width = pct + '%'; }, 60); }
-      next(pts); st.innerHTML = `<div class="reveal">${html}<div class="pts">+${fmt(pts)}<small> / 1,000</small></div></div>${nextBtn()}`; wireNext(); vibe([20, 30, 40]); };
+    $('#chg').onclick = () => roundYN(c);
+    $('#lock').onclick = () => lockIn($('#lock'), { answer:said, guess }, r => {
+      if (!r.released || !r.result) return lockedFlash(st, `You said <b>${said ? 'YES' : 'NO'}</b> · you guessed <b>${guess}%</b>`);
+      const res = r.result, pct = res.n ? Math.round(100 * res.yes / res.n) : 0, [v, cls] = verdictFor(Math.abs(pct - guess));
+      showPoints(st, `<div class="lbl">WE ASKED ${res.n} OF ${NAME()}</div><div class="bar${pct < 35 ? ' low' : ''}"><i id="fill" style="width:0"></i><span>${pct}% YES</span><em>${res.yes} OF ${res.n}</em></div>
+        <div class="note">You guessed <b>${guess}%</b></div><span class="verdict ${cls}">${v}</span>`, r.points);
+      setTimeout(() => { const f = $('#fill'); if (f) f.style.width = pct + '%'; }, 60);
+    });
   };
   $('#y').onclick = () => pick(true); $('#n').onclick = () => pick(false);
 }
-function roundTOT(c){
-  let mine = null;
+function roundPOP(c){
   app.innerHTML = `<section class="screen">${hud()}${card(c, true)}<div id="st"></div></section>`;
   const st = $('#st');
-  st.innerHTML = `<div class="lbl">YOUR PICK · ANONYMOUS</div><div class="pick">${c.opts.map((o, i) => `<button data-i="${i}">${esc(o)}</button>`).join('')}</div>`;
-  st.querySelectorAll('button').forEach(b => b.onclick = () => { mine = +b.dataset.i; vibe(15);
-    st.innerHTML = `<div class="said">YOU PICKED ${esc(c.opts[mine].toUpperCase())}</div><div class="lbl">NOW GUESS: WHAT DID MOST OF ${esc(G.name.toUpperCase())} PICK?</div>
-      <div class="pick two">${c.opts.map((o, i) => `<button data-g="${i}">${esc(o)}</button>`).join('')}</div>`;
-    st.querySelectorAll('[data-g]').forEach(g => g.onclick = async () => { st.querySelectorAll('[data-g]').forEach(x => x.disabled = true); g.classList.add('sel');
-      const guess = +g.dataset.g, r = await answer(mine), b = r && r.before; let pts, html;
-      if (!b || !b.n) { pts = FIRST_IN_POINTS; html = firstNote(); }
-      else { const [a0, a1] = b.split, top = a0 === a1 ? -1 : a0 > a1 ? 0 : 1; pts = top === -1 || top === guess ? 1000 : 250;
-        html = `<div class="split">${c.opts.map((o, i) => `<div class="${top === i ? 'win' : ''}"><b>${Math.round(100 * b.split[i] / b.n)}%</b><span>${esc(o)}</span></div>`).join('')}</div>
-          <span class="verdict ${pts === 1000 ? 'good' : ''}">${top === -1 ? 'DEAD EVEN' : pts === 1000 ? 'YOU KNOW YOUR CLUB' : 'NOPE'}</span>`; }
-      next(pts); st.innerHTML = `<div class="reveal">${html}<div class="pts">+${fmt(pts)}<small> / 1,000</small></div></div>${nextBtn()}`; wireNext(); vibe([20, 30, 40]); });
+  const two = c.opts.length === 2 ? ' two' : '';
+  st.innerHTML = `<div class="lbl">FIRST, YOUR PICK · NOBODY SEES IT</div><div class="pick${two}">${c.opts.map((o, i) => `<button data-i="${i}">${esc(o)}</button>`).join('')}</div>`;
+  st.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { const mine = +b.dataset.i; vibe(15);
+    st.innerHTML = `<button class="said" id="chg">YOU PICKED ${esc(c.opts[mine].toUpperCase())} · CHANGE</button><div class="lbl">NOW GUESS: WHAT DID MOST OF ${NAME()} PICK?</div>
+      <div class="pick${two}">${c.opts.map((o, i) => `<button data-g="${i}">${esc(o)}</button>`).join('')}</div>`;
+    $('#chg').onclick = () => roundPOP(c);
+    st.querySelectorAll('[data-g]').forEach(g => g.onclick = () => { const guess = +g.dataset.g; st.querySelectorAll('[data-g]').forEach(x => { x.disabled = true; x.classList.toggle('sel', x === g); });
+      const fake = document.createElement('button'); fake.className = 'btn dock'; st.appendChild(fake);
+      lockIn(fake, { answer:mine, guess }, r => {
+        if (!r.released || !r.result) return lockedFlash(st, `You picked <b>${esc(c.opts[mine])}</b> · you guessed <b>${esc(c.opts[guess])}</b>`);
+        const res = r.result, best = Math.max(...res.counts), right = res.counts[guess] === best && best > 0;
+        showPoints(st, `<div class="lbl">WE ASKED ${res.n} OF ${NAME()}</div>${popRows(c, res, guess)}<span class="verdict ${right ? 'good' : ''}">${right ? 'YOU KNOW YOUR CLUB' : 'NOPE'}</span>`, r.points);
+      });
+    });
   });
 }
-function roundNAME(c){
-  const mine = [];
-  app.innerHTML = `<section class="screen">${hud()}${card(c, true)}<div id="st"></div></section>`;
-  const st = $('#st');
-  const draw = () => {
-    st.innerHTML = `<div class="lbl">TYPE UP TO 3 ANSWERS · POINTS FOR EACH ONE YOUR CLUBMATES ALSO SAID</div>
-      <form class="namein" id="nf" autocomplete="off"><input id="ni" maxlength="40" placeholder="Type an answer" ${mine.length >= 3 ? 'disabled' : ''}><button type="submit">ADD</button></form>
-      <div class="chips">${mine.map(m => `<span>${esc(m)}</span>`).join('')}</div>
-      <button class="btn dock" id="lock" ${mine.length ? '' : 'disabled'}>${mine.length ? 'LOCK IN MY ANSWERS' : 'ADD AN ANSWER FIRST'}</button>`;
-    $('#nf').onsubmit = e => { e.preventDefault(); const v = $('#ni').value.trim(); if (!v || mine.length >= 3) return; mine.push(v); vibe(10); draw(); const ni = $('#ni'); if (ni && !ni.disabled) ni.focus(); };
-    $('#lock').onclick = async () => { $('#lock').disabled = true; const r = await answer(mine), b = r && r.before; let pts, html;
-      const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\b(the|a|an|my|your|our)\b/g, ' ').replace(/\s+/g, ' ').trim().replace(/(\w{3,})s\b/g, '$1');
-      if (!b || !b.n) { pts = FIRST_IN_POINTS; html = firstNote(); }
-      else { const hits = typeof b.hits === 'number' ? b.hits : 0; pts = Math.min(1000, hits * NAME_HIT_POINTS);
-        const mineK = mine.map(norm);
-        html = (b.top && b.top.length ? `<div class="lbl">${esc(G.name.toUpperCase())}'S TOP ANSWERS SO FAR</div><div class="tops">${b.top.slice(0, 4).map(t => `<div class="${mineK.includes(t.k) ? 'hit' : ''}"><span>${esc(t.t)}</span><b>${t.n}</b></div>`).join('')}</div>` : `<div class="note">Not enough matching answers to show a board yet. <b>${b.n}</b> clubmates answered.</div>`)
-          + `<span class="verdict ${hits ? 'good' : ''}">${hits ? `${hits} MATCHED THE CLUB` : 'ORIGINAL THINKER'}</span>`; }
-      next(pts); st.innerHTML = `<div class="reveal">${html}<div class="pts">+${fmt(pts)}<small> / 1,000</small></div></div>${nextBtn()}`; wireNext(); vibe([20, 30, 40]); };
-  };
-  draw();
-}
+const popRows = (c, res, guess) => { const best = Math.max(...res.counts);
+  return `<div class="tops">${c.opts.map((o, i) => ({ o, i, n:res.counts[i] })).sort((a, b) => b.n - a.n).map(x => `<div class="${x.n === best && best ? 'hit' : ''}"><span>${esc(x.o)}${x.i === guess ? ' <em class="you">YOUR GUESS</em>' : ''}</span><b>${x.n} · ${res.n ? Math.round(100 * x.n / res.n) : 0}%</b></div>`).join('')}</div>`; };
 function roundTRIVIA(c){
   app.innerHTML = `<section class="screen">${hud()}${card(c, true)}<div id="st"></div></section>`;
   const st = $('#st');
   st.innerHTML = `<div class="pick">${c.opts.map((o, i) => `<button data-i="${i}">${esc(o)}</button>`).join('')}</div>`;
-  st.querySelectorAll('button').forEach(b => b.onclick = async () => { st.querySelectorAll('button').forEach(x => x.disabled = true); b.classList.add('sel'); vibe(15);
-    const mine = +b.dataset.i, r = await answer(mine), right = c.right, ok = mine === right, pts = ok ? 1000 : 0, bf = r && r.before;
-    const club = bf && bf.n >= 3 ? `<div class="note"><b>${Math.round(100 * bf.right / bf.n)}%</b> of ${esc(G.name)} got this right</div>` : '';
-    next(pts);
-    st.innerHTML = `<div class="reveal"><div class="tops">${c.opts.map((o, i) => `<div class="${i === right ? 'hit' : ''}"><span>${esc(o)}</span><b>${i === right ? '✓' : i === mine ? '✗' : ''}</b></div>`).join('')}</div>
-      <span class="verdict ${ok ? 'good' : ''}">${ok ? 'CORRECT' : 'NOT QUITE'}</span>${club}<div class="pts">+${fmt(pts)}<small> / 1,000</small></div></div>${nextBtn()}`; wireNext(); vibe([20, 30, 40]); });
+  st.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { st.querySelectorAll('[data-i]').forEach(x => { x.disabled = true; x.classList.toggle('sel', x === b); }); vibe(15);
+    const mine = +b.dataset.i, fake = document.createElement('button'); fake.className = 'btn dock'; st.appendChild(fake);
+    lockIn(fake, { answer:mine }, r => {
+      const right = r.right, ok = mine === right; S.trivia = ok;
+      const club = r.result && r.result.n ? `<div class="note"><b>${r.result.right} of ${r.result.n}</b> in ${esc(G.name)} got it right</div>` : '';
+      const html = `<div class="tops">${c.opts.map((o, i) => `<div class="${i === right ? 'hit' : ''}"><span>${esc(o)}</span><b>${i === right ? '✓' : i === mine ? '✗' : ''}</b></div>`).join('')}</div><span class="verdict ${ok ? 'good' : ''}">${ok ? 'CORRECT' : 'NOT QUITE'}</span>${club}`;
+      if (r.released) return showPoints(st, html, r.points);
+      st.innerHTML = `<div class="reveal">${html}</div>${nextBtn()}`; wireNext(); vibe(ok ? [20, 30, 40] : 30);
+    });
+  });
 }
 async function finish(){
-  const total = S.pts.reduce((a, b) => a + b, 0); track('club-finish');
-  try { await api('POST', `/api/clubs/${G.slug}/score`, { playerId:PLAYER_ID, nick:nick(), score:total }); } catch (e) {}
-  results(false, total);
+  track('club-finish');
+  try { G = { ...G, ...(await api('GET', `/api/clubs/${G.slug}?playerId=${PLAYER_ID}${execKey() ? '&k=' + encodeURIComponent(execKey()) : ''}`)) }; } catch (e) {}
+  return G.released ? scorePage(true) : locked(true);
 }
 
-/* ================= RESULTS (members after playing, and execs) ================= */
-async function results(returning, justScored){
+/* ---------- after playing, before the results are out ---------- */
+function locked(just){
   window.scrollTo(0, 0);
-  const k = new URLSearchParams(location.search).get('k') || store.get('oc-clubkey-' + G.slug) || '';
-  let R; try { R = await api('GET', `/api/clubs/${G.slug}/results?playerId=${PLAYER_ID}${k ? '&k=' + encodeURIComponent(k) : ''}`); } catch (e) { R = { players:0, cards:[], board:[], myRank:0, ranked:0 }; }
-  const meRow = R.board.find(r => r.you), score = justScored ?? (meRow ? meRow.score : null), exec = !!R.admin;
-  if (exec && k) store.set('oc-clubkey-' + G.slug, k);
-  if (new URLSearchParams(location.search).has('results') || exec && returning) return report(R);
-  const top = R.board.slice(0, 3);
-  app.innerHTML = `<section class="screen">${head(esc(G.name.toUpperCase()))}
-    <div class="score"><span>YOUR SCORE</span><b>${score === null ? '–' : fmt(score)}</b><span>OUT OF ${fmt(G.cards.length * 1000)}</span>${R.myRank ? `<br><span class="rank">#${R.myRank} OF ${R.ranked} IN ${esc(G.name.toUpperCase())}</span>` : ''}</div>
-    ${top.length ? `<ol class="board">${top.map((r, i) => `<li class="${r.you ? 'me' : ''}"><span class="r">${i + 1}</span><span class="n">${esc(r.nick)}</span><span class="s">${fmt(r.score)}</span></li>`).join('')}</ol>` : ''}
-    <div class="oc"><b>THERE'S A NEW QUEEN'S GAME EVERY DAY</b><span>3 minutes · same five questions for all of Queen's</span><span>${esc(G.name)} gets its own daily league</span><span>Prizes from Kingston spots, dropping soon</span></div>
-    <div class="links"><button class="btn ghost" id="seeres">HOW THE CLUB ANSWERED</button><button class="btn ghost" id="send">SEND TO THE CLUB</button></div>
-    <button class="btn go dock" id="daily">PLAY TODAY'S QUEEN'S 5 WITH ${esc(G.name.toUpperCase())}</button></section>`;
-  $('#seeres').onclick = () => report(R);
-  $('#send').onclick = () => shareText(score === null ? `How well do you know ${G.name}? 2 minutes:` : `I got ${fmt(score)} on the ${G.name} game${R.myRank ? ` (#${R.myRank} so far)` : ''}. Beat me:`, clubUrl(G.slug));
-  $('#daily').onclick = async () => { track('club-to-daily'); $('#daily').disabled = true;
-    try { if (G.crew) await api('POST', `/api/crews/${G.crew}/join`, { playerId:PLAYER_ID, nick:nick() }); } catch (e) {}
-    location.href = `/daily.html?ref=club${API ? '&api=' + encodeURIComponent(API) : ''}`; };
+  app.innerHTML = `<section class="screen">${head(NAME())}${execBar()}
+    <div class="lockbox"><span class="stamp">PREDICTIONS LOCKED</span><h1>${NAME()}'S RESULTS <span>DROP SOON</span></h1>
+      <p class="sub">When your exec releases them, come back to this link for your score, your rank and how everyone really answered.</p>
+      <div class="note"><b>${G.played}</b> ${G.played === 1 ? 'has' : 'have'} played${S && S.trivia !== null && just ? ` · trivia: <b>${S.trivia ? 'you got it ✓' : 'missed it'}</b>` : ''}</div></div>
+    ${dailyCard()}
+    <div class="links"><button class="btn ghost" id="share">SEND THE GAME</button>${crewBtn()}</div>
+    <button class="btn go dock" id="daily">PLAY TODAY'S QUEEN'S 5</button></section>`;
+  wireExecBar(); wireCommon(`How well do you know ${G.name}? 2 minutes, results drop soon:`);
 }
-function report(R){
+const dailyCard = () => `<div class="oc"><b>THERE'S A NEW QUEEN'S GAME EVERY DAY</b><span>5 questions · 2 minutes · the same for all of Queen's</span></div>`;
+const crewKey = () => 'oc-clubcrew-' + G.slug;
+const crewBtn = () => !G.crew ? '' : store.get(crewKey()) ? `<button class="btn ghost" disabled>IN THE CREW ✓</button>` : `<button class="btn ghost" id="crew">JOIN ${NAME()}'S DAILY CREW</button>`;
+function wireCommon(shareMsg){
+  const sh = $('#share'); if (sh) sh.onclick = () => { track('club-share'); shareText(shareMsg, clubUrl(G.slug)); };
+  const cr = $('#crew'); if (cr) cr.onclick = async () => { cr.disabled = true;
+    try { await api('POST', `/api/crews/${G.crew}/join`, { playerId:PLAYER_ID, nick:nick() }); store.set(crewKey(), true); track('club-crew-join'); cr.textContent = 'IN THE CREW ✓'; toast('YOU\'RE IN THE CREW'); vibe([20, 30]); }
+    catch (e) { cr.disabled = false; toast('COULDN\'T JOIN, TRY AGAIN'); } };
+  const d = $('#daily'); if (d) d.onclick = () => { track('club-to-daily'); location.href = `/daily.html?ref=club${API ? '&api=' + encodeURIComponent(API) : ''}`; };
+}
+
+/* ---------- after the results are out ---------- */
+async function getResults(){
+  const k = execKey();
+  try { return await api('GET', `/api/clubs/${G.slug}/results?playerId=${PLAYER_ID}${k ? '&k=' + encodeURIComponent(k) : ''}`); } catch (e) { return null; }
+}
+const boardRows = rows => `<ol class="board">${rows.map(r => `<li class="${r.you ? 'me' : ''}"><span class="r">${r.rank}</span><span class="n">${esc(r.nick)}</span><span class="s">${fmt(r.score)}</span></li>`).join('')}</ol>`;
+async function scorePage(just){
   window.scrollTo(0, 0);
+  const R = await getResults(); if (!R || !R.released) return locked(just);
+  const me = R.me;
+  app.innerHTML = `<section class="screen">${head(NAME())}${execBar()}
+    <div class="score"><span>YOUR SCORE</span><b>${me ? fmt(me.score) : '–'}</b><span>OUT OF ${fmt(G.cards.length * 1000)}</span>${me ? `<br><span class="rank">#${me.rank} OF ${R.ranked} IN ${NAME()}</span>` : ''}</div>
+    ${R.board.length ? boardRows(R.board.slice(0, 3).concat(me && me.rank > 3 ? [{ ...me, nick:nick() || 'You', you:true }] : [])) : ''}
+    <div class="links"><button class="btn ghost" id="seeres">HOW THE CLUB ANSWERED</button><button class="btn ghost" id="share">CHALLENGE THE CLUB</button></div>
+    ${crewBtn().replace('btn ghost', 'btn ghost wide')}
+    <button class="btn go dock" id="daily">PLAY TODAY'S QUEEN'S 5</button></section>`;
+  wireExecBar(); wireCommon(me ? `I got ${fmt(me.score)} on the ${G.name} game (#${me.rank}). Beat me:` : `How well do you know ${G.name}?`);
+  $('#seeres').onclick = () => report(R);
+}
+async function report(R){
+  window.scrollTo(0, 0);
+  R = R || await getResults(); if (!R || !R.released) return G.exec ? execPage() : locked();
   const rows = G.cards.map((c, i) => { const t = R.cards[i] || { n:0 };
-    let body = `<span class="sub">${t.n} answered. Results show at 3+.</span>`;
-    if (t.shown) {
-      if (c.kind === 'yn') body = `<div class="bar"><i style="width:${Math.round(100 * t.yes / t.n)}%"></i><span>${Math.round(100 * t.yes / t.n)}% YES</span><em>${t.yes} OF ${t.n}</em></div>`;
-      if (c.kind === 'tot') body = `<div class="split">${c.opts.map((o, j) => `<div class="${t.split[j] >= t.split[1 - j] ? 'win' : ''}"><b>${Math.round(100 * t.split[j] / t.n)}%</b><span>${esc(o)}</span></div>`).join('')}</div>`;
-      if (c.kind === 'trivia') body = `<div class="bar"><i style="width:${Math.round(100 * t.right / t.n)}%"></i><span>${Math.round(100 * t.right / t.n)}% GOT IT</span><em>${t.right} OF ${t.n}</em></div>`;
-      if (c.kind === 'name') body = t.top && t.top.length ? `<div class="tops">${t.top.slice(0, 5).map(x => `<div><span>${esc(x.t)}</span><b>${x.n}</b></div>`).join('')}</div>` : `<span class="sub">${t.n} answered, no answer given twice yet.</span>`;
-    }
+    let body = `<span class="sub">Nobody answered this one.</span>`;
+    if (t.n && c.kind === 'yn') { const pct = Math.round(100 * t.yes / t.n); body = `<div class="bar${pct < 35 ? ' low' : ''}"><i style="width:${pct}%"></i><span>${pct}% YES</span><em>${t.yes} OF ${t.n}</em></div>`; }
+    if (t.n && c.kind === 'pop') body = popRows(c, t, -1);
+    if (t.n && c.kind === 'trivia') { const pct = Math.round(100 * t.right / t.n); body = `<div class="bar${pct < 35 ? ' low' : ''}"><i style="width:${pct}%"></i><span>${pct}% GOT IT</span><em>${t.right} OF ${t.n}</em></div><span class="sub">Answer: <b style="color:var(--text)">${esc(c.opts[R.trivia[i]])}</b></span>`; }
     return `<div class="res"><span class="rq">${i + 1}. ${esc(c.q)}</span>${body}</div>`; }).join('');
-  app.innerHTML = `<section class="screen">${head(R.admin ? 'EXEC RESULTS' : 'RESULTS')}
-    <div class="kick">${R.players} ${R.players === 1 ? 'MEMBER HAS' : 'MEMBERS HAVE'} PLAYED</div><h1>THE CLUB <span>HAS SPOKEN</span></h1>
+  app.innerHTML = `<section class="screen">${head(R.exec ? 'EXEC' : 'RESULTS')}
+    <div class="kick">WE ASKED ${R.players} ${NAME()} MEMBERS</div><h1>THE CLUB <span>HAS SPOKEN</span></h1>
     ${rows}
-    ${R.board.length ? `<div class="lbl">LEADERBOARD</div><ol class="board">${R.board.slice(0, 10).map((r, i) => `<li class="${r.you ? 'me' : ''}"><span class="r">${i + 1}</span><span class="n">${esc(r.nick)}</span><span class="s">${fmt(r.score)}</span></li>`).join('')}</ol>` : ''}
-    <div class="links"><button class="btn ghost" id="post">MAKE AN INSTAGRAM POST</button><button class="btn ghost" id="send2">SEND THE GAME</button></div>
-    ${R.admin ? '' : `<button class="btn go dock" id="daily2">PLAY TODAY'S QUEEN'S 5</button>`}
-    ${R.admin ? `<button class="btn dock" id="send3">SEND IT TO THE CLUB CHAT</button>` : ''}
-    <p class="foot">Made with Off Campus · <a href="/clubs">get a game for your club</a></p></section>`;
+    ${R.board.length ? `<div class="lbl">LEADERBOARD</div>${boardRows(R.board.slice(0, 10))}` : ''}
+    <div class="links"><button class="btn ghost" id="post">MAKE AN INSTAGRAM POST</button><button class="btn ghost" id="share">SEND IT TO THE CHAT</button></div>
+    ${R.exec ? `<button class="btn dock" id="sendres">SEND THE RESULTS TO THE CHAT</button>` : (G.me && G.me.done ? `<button class="btn go dock" id="daily">PLAY TODAY'S QUEEN'S 5</button>` : `<a class="btn dock" href="${pageUrl(G.slug)}">PLAY IT NOW</a>`)}
+    <p class="foot">Real answers from ${esc(G.name)} members who played · Made with Off Campus · <a href="/clubs">get a game for your club</a></p></section>`;
   $('#post').onclick = () => postImage(R);
-  $('#send2').onclick = () => shareText(`How well do you know ${G.name}? 2 minutes:`, clubUrl(G.slug));
-  const d2 = $('#daily2'); if (d2) d2.onclick = async () => { track('club-to-daily'); try { if (G.crew) await api('POST', `/api/crews/${G.crew}/join`, { playerId:PLAYER_ID, nick:nick() }); } catch (e) {} location.href = `/daily.html?ref=club${API ? '&api=' + encodeURIComponent(API) : ''}`; };
-  const s3 = $('#send3'); if (s3) s3.onclick = () => shareText(`ok ${G.name}: 5 questions about us, 2 min. see who knows the club best:`, clubUrl(G.slug));
+  wireCommon(resultsMsg(G.name));
+  const sr = $('#sendres'); if (sr) sr.onclick = () => { track('club-send-results'); shareText(resultsMsg(G.name), clubUrl(G.slug)); };
+}
+
+/* ---------- the exec's page: release the results ---------- */
+async function execPage(){
+  window.scrollTo(0, 0);
+  if (!G.exec) return intro();
+  const R = await getResults(); if (!R) { toast('NO CONNECTION'); return; }
+  if (R.released) return report(R);
+  G.played = R.played;
+  const ready = R.played >= R.releaseMin;
+  app.innerHTML = `<section class="screen">${head('EXEC')}
+    <div class="kick">${NAME()} · YOUR CLUB GAME</div>
+    <div class="score"><span>MEMBERS WHO HAVE PLAYED</span><b>${R.played}</b>${ready ? '' : `<span>${R.releaseMin - R.played} MORE TO GO BEFORE YOU CAN RELEASE</span>`}</div>
+    <ul class="what"><li>Answers lock for good</li><li>Everyone's score and the club leaderboard go live</li><li>You get a message to send and a post for your Instagram</li><li>Anyone who hasn't played can still play and get a score</li></ul>
+    <div class="links"><button class="btn ghost" id="share">SEND THE GAME AGAIN</button><a class="btn ghost" href="${pageUrl(G.slug)}">${G.me && G.me.done ? 'MY GAME' : 'PLAY IT YOURSELF'}</a></div>
+    <button class="btn red dock" id="release" ${ready ? '' : 'disabled'}>${ready ? 'RELEASE THE RESULTS' : `RELEASE AT ${R.releaseMin} PLAYERS`}</button></section>`;
+  wireCommon(gameMsg(G.name));
+  const rb = $('#release'); let armed = false, timer;
+  rb.onclick = async () => {
+    if (!armed) { armed = true; vibe(15); rb.textContent = 'TAP AGAIN TO RELEASE'; rb.classList.add('armed'); timer = setTimeout(() => { armed = false; rb.textContent = 'RELEASE THE RESULTS'; rb.classList.remove('armed'); }, 3500); return; }
+    clearTimeout(timer); rb.disabled = true; rb.textContent = 'RELEASING…';
+    try { await api('POST', `/api/clubs/${G.slug}/release`, { k:execKey() }); track('club-release'); G.released = true; released(); }
+    catch (e) { rb.disabled = false; armed = false; rb.textContent = 'RELEASE THE RESULTS'; toast(/not enough/.test(e.message) ? `NEEDS ${R.releaseMin} PLAYERS FIRST` : 'COULDN\'T RELEASE, TRY AGAIN'); }
+  };
+}
+function released(){
+  window.scrollTo(0, 0); vibe([30, 40, 60]);
+  app.innerHTML = `<section class="screen">${head('EXEC')}
+    <div class="lockbox"><span class="stamp go">RESULTS ARE OUT</span><h1>NOW TELL <span>${NAME()}</span></h1>
+      <p class="sub">Everyone's score and the leaderboard are live on the same link. Send it so they come see, and anyone who hasn't played can still compete.</p></div>
+    <div class="links"><button class="btn ghost" id="post">MAKE AN INSTAGRAM POST</button><button class="btn ghost" id="seeres">SEE THE RESULTS</button></div>
+    <button class="btn dock" id="sendres">SEND THE RESULTS TO THE CHAT</button></section>`;
+  $('#sendres').onclick = () => { track('club-send-results'); shareText(resultsMsg(G.name), clubUrl(G.slug)); };
+  $('#seeres').onclick = () => report();
+  $('#post').onclick = async () => { const R = await getResults(); if (R) postImage(R); };
 }
 
 /* ================= INSTAGRAM RESULTS POST (1080 x 1350) ================= */
@@ -439,21 +529,21 @@ async function postImage(R){
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   x.fillStyle = css('--night'); x.fillRect(0, 0, W, H);
   const g = x.createRadialGradient(W, 0, 0, W, 0, 900); g.addColorStop(0, 'rgba(255,200,61,.30)'); g.addColorStop(1, 'rgba(255,200,61,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-  x.textAlign = 'left'; x.fillStyle = css('--mint'); x.font = '700 30px "IBM Plex Mono"'; x.fillText(G.name.toUpperCase().slice(0, 40), 80, 130);
+  x.textAlign = 'left'; x.fillStyle = css('--mint'); x.font = '700 30px "IBM Plex Mono"'; x.fillText(`WE ASKED ${R.players} ${G.name.toUpperCase()} MEMBERS`.slice(0, 52), 80, 130);
   x.fillStyle = css('--text'); x.font = '110px "Bowlby One"'; x.fillText('THE CLUB', 80, 260); x.fillStyle = css('--gold'); x.fillText('HAS SPOKEN.', 80, 380);
   const wrap = (t, X, Y, maxW, lh) => { const words = String(t).split(' '); let line = '', y = Y; for (const w of words) { const test = line ? line + ' ' + w : w; if (x.measureText(test).width > maxW && line) { x.fillText(line, X, y); line = w; y += lh; } else line = test; } x.fillText(line, X, y); return y; };
-  let y = 470; let n = 0;
-  const order = G.cards.map((c, i) => [c, i]).sort((a, b) => ['yn', 'tot', 'name', 'trivia'].indexOf(a[0].kind) - ['yn', 'tot', 'name', 'trivia'].indexOf(b[0].kind));
-  order.forEach(([c, i]) => { const t = R.cards[i]; if (!t || !t.shown || n >= 3) return; let big = '', small = '';
-    if (c.kind === 'yn') { big = Math.round(100 * t.yes / t.n) + '%'; small = 'said yes: ' + c.q; }
-    else if (c.kind === 'tot') { const w = t.split[0] >= t.split[1] ? 0 : 1; big = Math.round(100 * t.split[w] / t.n) + '%'; small = 'picked ' + c.opts[w] + ' over ' + c.opts[1 - w]; }
-    else if (c.kind === 'trivia') { big = Math.round(100 * t.right / t.n) + '%'; small = 'got it right: ' + c.q; }
-    else if (t.top && t.top.length) { big = '#1'; small = '"' + t.top[0].t + '": ' + c.q; } else return;
+  let y = 470, n = 0;
+  const all = G.cards.map((c, i) => [c, i]), byKind = k => all.filter(x => x[0].kind === k), yn = byKind('yn');
+  const order = [...yn.slice(0, 1), ...byKind('pop').slice(0, 1), ...yn.slice(1), ...byKind('pop').slice(1), ...byKind('trivia')];
+  order.forEach(([c, i]) => { const t = R.cards[i]; if (!t || !t.n || n >= 3) return; let big = '', small = '', foot = '';
+    if (c.kind === 'yn') { big = Math.round(100 * t.yes / t.n) + '%'; small = 'said yes: ' + c.q; foot = `${t.yes} of ${t.n}`; }
+    else if (c.kind === 'pop') { const w = t.counts.indexOf(Math.max(...t.counts)); big = Math.round(100 * t.counts[w] / t.n) + '%'; small = `picked ${c.opts[w]}: ${c.q}`; foot = `${t.counts[w]} of ${t.n}`; }
+    else { big = Math.round(100 * t.right / t.n) + '%'; small = 'got it right: ' + c.q; foot = `${t.right} of ${t.n}`; }
     n++; x.fillStyle = css('--night-2'); x.beginPath(); x.roundRect ? x.roundRect(80, y, W - 160, 210, 28) : x.rect(80, y, W - 160, 210); x.fill();
-    x.fillStyle = css('--gold'); x.font = '96px "Bowlby One"'; x.fillText(big, 120, y + 125);
-    x.fillStyle = css('--text'); x.font = '700 30px "IBM Plex Mono"'; wrap(small, 400, y + 75, W - 520, 40); y += 240; });
-  if (!n) { x.fillStyle = css('--muted'); x.font = '700 34px "IBM Plex Mono"'; x.fillText('Results show once 3+ members play.', 80, 520); }
-  x.fillStyle = css('--muted'); x.font = '700 28px "IBM Plex Mono"'; x.fillText(`${R.players} members played · real answers`, 80, H - 140);
+    x.fillStyle = css('--gold'); x.font = '92px "Bowlby One"'; x.fillText(big, 116, y + 118);
+    x.fillStyle = css('--muted'); x.font = '700 26px "IBM Plex Mono"'; x.fillText(foot, 120, y + 170);
+    x.fillStyle = css('--text'); x.font = '700 30px "IBM Plex Mono"'; wrap(small, 410, y + 75, W - 530, 40); y += 240; });
+  x.fillStyle = css('--muted'); x.font = '700 28px "IBM Plex Mono"'; x.fillText('Real answers from members who played', 80, H - 140);
   x.fillStyle = css('--gold'); x.font = '40px "Bowlby One"'; x.fillText('OFFCAMPUSONTARIO.CA/CLUBS', 80, H - 80);
   const blob = await new Promise(r => cv.toBlob(r, 'image/png')), file = new File([blob], 'club-results.png', { type:'image/png' });
   try { if (navigator.canShare && navigator.canShare({ files:[file] })) { await navigator.share({ files:[file] }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }

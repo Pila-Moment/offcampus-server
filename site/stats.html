@@ -25,12 +25,19 @@ h2{margin:24px 0 10px;font-size:11px;letter-spacing:.18em;color:var(--mint)}
 .links a{display:block;margin-top:10px;padding:14px;border-radius:14px;background:var(--night2);color:var(--text);text-decoration:none}
 .links a b{color:var(--gold)}
 .err{color:var(--red)}
+.clubs{display:flex;flex-direction:column;gap:8px}
+.club{padding:12px 14px;border-radius:14px;background:var(--night2)}
+.club b{display:block;font-size:15px}.club b em{font-style:normal;font-size:10px;letter-spacing:.12em;color:var(--good);margin-left:6px}
+.funnel{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;text-align:center}
+.funnel div{padding:6px 2px;border-radius:10px;background:var(--night)}.funnel i{display:block;font:900 22px/1 system-ui,sans-serif;font-style:normal}.funnel span{font-size:9.5px;letter-spacing:.06em;color:var(--muted)}
 </style><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"></head><body>
 <h1>OFF CAMPUS <span>STATS</span></h1>
 <div class="sub" id="when">Loading…</div>
 <div class="grid" id="grid"></div>
 <h2>PLAYERS, LAST 7 DAYS</h2>
 <div class="bars" id="bars"></div>
+<h2>CLUB GAMES → THE DAILY</h2>
+<div class="clubs" id="clubs"><div class="sub">No club games yet.</div></div>
 <h2>MORE</h2>
 <div class="links">
   <a href="https://offcampusontario.goatcounter.com" target="_blank" rel="noopener"><b>GoatCounter</b> · visits, where they came from (?ref=), starts, finishes, shares, crew invites</a>
@@ -49,6 +56,8 @@ async function load(){
       <div class="tile"><small>CREWS</small><b>${fmt(s.crews)}</b></div>`;
     const days = (s.last7Days || []).slice().reverse(), max = Math.max(1, ...days.map(d => d.players));
     document.getElementById('bars').innerHTML = days.map(d => `<div class="bar ${d.day === s.day ? 'today' : ''}"><b>${d.players}</b><i style="height:${Math.round(90 * d.players / max)}%"></i><span>#${d.day}</span></div>`).join('');
+    const cl = (s.clubs || []).filter(c => c.started).sort((a, b) => b.started - a.started);
+    if (cl.length) document.getElementById('clubs').innerHTML = cl.map(c => `<div class="club"><b>${c.name.replace(/[<>&]/g, '')}${c.released ? '<em>RESULTS OUT</em>' : ''}</b><div class="funnel"><div><i>${c.started}</i><span>STARTED</span></div><div><i>${c.finished}</i><span>FINISHED</span></div><div><i>${c.playedDaily}</i><span>PLAYED DAILY</span></div><div><i>${c.joinedCrew}</i><span>JOINED CREW</span></div></div></div>`).join('');
   } catch (e) { document.getElementById('when').innerHTML = '<span class="err">Couldn\'t load the stats. Try again in a minute.</span>'; }
 }
 load();
