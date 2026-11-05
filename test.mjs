@@ -72,4 +72,33 @@ ok(li.playerId === A && li.nick === 'Josh' && li.streak.days === 1 && li.streak.
 for (let k = 0; k < 5; k++) await call('POST', '/api/login', { nick:'Josh', pin:'9999' }, later);
 ok((await call('POST', '/api/login', { nick:'Josh', pin:'4821' }, later)).status === 429, 'login: locked after 5 wrong tries');
 ok(!JSON.stringify(li).includes('pinHash') && !JSON.stringify(li).includes('salt'), 'login: never sends the pin back');
+// ---------- club games ----------
+const cards = [ { kind:'yn', q:'Have you ever skipped a run for brunch?' }, { kind:'tot', q:'Pick one', opts:['Sunrise run', 'Sunset run'] },
+  { kind:'name', q:'Name something every runner says' }, { kind:'trivia', q:'Where do we meet?', opts:['The ARC', 'Stauffer', 'City Hall'], right:0 }, { kind:'bad', q:'x' } ];
+ok((await call('POST', '/api/clubs', { playerId:A, nick:'Josh', name:'Run', cards:cards.slice(0, 2) })).status === 400, 'club: needs 3+ questions');
+const mk = (await call('POST', '/api/clubs', { playerId:A, nick:'Josh', name:"Queen's Run Club!", type:'sports', cards })).body;
+ok(mk.slug === 'queen-s-run-club' && mk.key && /^[A-Z0-9]{6}$/.test(mk.crew), 'club: made with a slug, admin key and crew');
+ok((await call('POST', '/api/clubs', { playerId:B, name:"Queen's Run Club", cards })).body.slug === 'queen-s-run-club-2', 'club: second club with the same name gets its own link');
+const g = (await call('GET', `/api/clubs/${mk.slug}?playerId=${A}`)).body; ok(g.cards.length === 4 && g.name === "Queen's Run Club!" && g.me === null, 'club: game loads (bad card dropped)');
+const players = ['p','q','r','s'].map(x => x.repeat(16));
+let first = (await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:players[0], nick:'P', card:0, answer:true })).body;
+ok(first.before.n === 0, 'club answer: first player sees nobody before them');
+for (const [k, id] of players.entries()) {
+  await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:id, nick:'N' + k, card:0, answer:k < 3 });
+  await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:id, card:1, answer:k % 2 });
+  await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:id, card:2, answer:k < 3 ? ['  "Just 3K" ', 'easy pace'] : ['wait for my garmin'] });
+  await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:id, card:3, answer:k === 3 ? 2 : 0 });
+  await call('POST', `/api/clubs/${mk.slug}/score`, { playerId:id, nick:'N' + k, score:1000 + k * 500 });
+}
+const late = (await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:'z'.repeat(16), card:2, answer:['just 3k', 'pizza'] })).body;
+ok(late.before.hits === 1 && !('keys' in late.before), 'club answer: typed answers score against clubmates without leaking them');
+const again = (await call('POST', `/api/clubs/${mk.slug}/answer`, { playerId:players[0], card:0, answer:false })).body;
+ok(again.already === true && again.before.n === 4 && again.before.yes === 3, 'club answer: first answer counts, results come back');
+const res = (await call('GET', `/api/clubs/${mk.slug}/results?playerId=${players[3]}&k=${mk.key}`)).body;
+ok(res.players === 5 && res.cards[0].yes === 3 && res.cards[1].split[0] === 2 && res.cards[3].right === 3, 'club results: yes/no, this or that, trivia');
+ok(res.cards[2].top.length === 2 && res.cards[2].top[0].n === 4 && !res.cards[2].top.some(x => /garmin/i.test(x.t)), 'club results: typed answers only show when 2+ gave them');
+ok(res.board[0].nick === 'N3' && res.board[0].you === true && res.myRank === 1 && res.admin === true, 'club results: leaderboard and admin key');
+ok(!JSON.stringify(res).includes(players[0]), 'club results: no player ids');
+ok((await call('GET', '/api/clubs/nope-club')).status === 404, 'club: unknown club');
+const crewOfClub = (await call('GET', `/api/crews/${mk.crew}`)).body; ok(crewOfClub.name === "Queen's Run Club!" && crewOfClub.size === 1, 'club: its crew exists for the daily league');
 console.log('all tests passed');

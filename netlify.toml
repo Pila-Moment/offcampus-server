@@ -3,3 +3,9 @@
   publish = "site"
   command = "echo 'no build step'"
   functions = "netlify/functions"
+
+# Club games: offcampusontario.ca/club/<name> opens the club page
+[[redirects]]
+  from = "/club/*"
+  to = "/club.html"
+  status = 200

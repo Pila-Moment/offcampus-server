@@ -52,6 +52,7 @@ footer b{color:var(--text)}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,10px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
+.ints{border:0;margin:0;padding:0;display:grid;gap:8px}.ints legend{font-size:11px;font-weight:700;letter-spacing:.16em;margin-bottom:6px}.ck{display:flex!important;flex-direction:row!important;gap:10px;align-items:flex-start;font-size:13px;line-height:1.4;font-weight:600;letter-spacing:0!important;text-transform:none}.ck input{width:20px!important;height:20px!important;min-height:0!important;margin:2px 0 0;flex:0 0 auto;accent-color:#3BD67A}.ck b{font-weight:800}
 html{overflow-x:clip}
 .wrap{max-width:1120px;gap:0;padding-block:0 28px}
 section{padding:clamp(34px,6vh,64px) 0}
@@ -368,6 +369,12 @@ form .btn{width:100%;border:0;cursor:pointer}
       <label>YOUR NAME<input name="name" required autocomplete="name"></label>
       <label>EMAIL OR INSTAGRAM<input name="contact" required></label>
       <label>WHAT YOU MIGHT OFFER<select name="offer"><option>My existing student discount</option><option>Something free with purchase</option><option>A slow-hour deal</option><option>A big prize a few times a week</option><option>Not sure yet, help me pick</option></select></label>
+      <fieldset class="ints"><legend>ALSO INTERESTED IN</legend>
+        <label class="ck"><input type="checkbox" name="interest" value="Crew deal"><span><b>A crew deal</b> · a group offer a house unlocks together (bookings, big orders)</span></label>
+        <label class="ck"><input type="checkbox" name="interest" value="Sponsored question"><span><b>A sponsored question</b> · your question in the daily game, plus what Queen's students really answered</span></label>
+        <label class="ck"><input type="checkbox" name="interest" value="Club night"><span><b>A club night</b> · sponsor a Queen's club's game night or challenge</span></label>
+        <label class="ck"><input type="checkbox" name="interest" value="Parents offer"><span><b>A parents offer</b> · winners send it home and parents pay the rest (cleaning, meal prep, storage)</span></label>
+      </fieldset>
       <label>ANYTHING ELSE<textarea name="message"></textarea></label>
       <button class="btn" type="submit">CLAIM A FOUNDING SPOT</button>
     </form>
