@@ -96,6 +96,16 @@ footer b{color:var(--text)}
 .forbrands b{display:block;font-family:var(--display);font-weight:400;font-size:clamp(16px,2vw,20px)}
 .forbrands span{font-size:12px;font-weight:600;color:var(--muted)}
 .forbrands em{flex:0 0 auto;font-style:normal;padding:10px 14px;border-radius:12px;background:var(--text);color:var(--ink);font-family:var(--display);font-size:14px}
+.live{display:flex;flex-wrap:wrap;gap:8px}
+.live[hidden]{display:none}
+.live div{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:3px;padding:10px 14px;border-radius:14px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--gold)}
+.live small{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--gold)}
+.live b{font-family:var(--display);font-weight:400;font-size:clamp(16px,2vw,20px);line-height:1.15}
+.live span{font-size:12px;font-weight:600;color:var(--muted)}
+.suggest{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--night-2);text-decoration:none;color:var(--text)}
+.suggest b{font-family:var(--display);font-weight:400;font-size:clamp(15px,2vw,19px)}
+.suggest span{font-size:12px;font-weight:600;color:var(--muted)}
+.suggest em{flex:0 0 auto;font-style:normal;padding:9px 12px;border-radius:12px;background:var(--mint);color:var(--ink);font-family:var(--display);font-size:13px}
 @media (max-width:860px){
   .menu{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
   .menu .t-daily{grid-column:1 / -1;grid-row:auto;min-height:0;padding-top:48px}
@@ -112,17 +122,19 @@ footer b{color:var(--text)}
 <div class="bgfx" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div></div>
 <main class="wrap">
 <div class="bar"><div class="logo">OFF <span>CAMPUS</span></div><span class="school"><i></i>QUEEN'S</span></div>
-<h1 class="tag">KNOW YOUR SCHOOL? <span>COMPETE FOR FREE PRIZES.</span></h1>
+<h1 class="tag">KNOW YOUR SCHOOL? <span>PROVE IT.</span></h1>
 <nav class="menu" aria-label="Pick one">
   <a class="tile t-daily" href="daily.html"><div class="k"><span>QUEEN'S DAILY</span><em>NEW EVERY DAY</em></div>
-    <h2>TODAY'S <span>FIVE</span></h2><p>Five quick rounds about Queen's. <b>Score 2,500 to unlock the prize spin.</b> New five in <b data-cd>--</b>.</p><span class="play">PLAY TODAY'S 5</span></a>
+    <h2>TODAY'S <span>FIVE</span></h2><p>Five quick rounds about Queen's. <b>Beat your friends and your crew.</b> New five in <b data-cd>--</b>.</p><span class="play">PLAY TODAY'S 5</span></a>
   <a class="tile t-party" href="party.html"><div class="k"><span>WITH YOUR FRIENDS</span><em>3 GAMES</em></div>
     <h2>PARTY GAMES</h2><p>For the pregame. Plug the laptop into the TV and play together.</p><span class="go" aria-hidden="true">&rarr;</span></a>
-  <a class="tile t-prize" href="prizes.html"><div class="k"><span>PRESEASON</span><em>DROPPING SOON</em></div>
-    <h2>PRIZES <span>SOON</span></h2><p>Free stuff from Kingston spots, plus a weekly jackpot.</p><span class="go" aria-hidden="true">&rarr;</span></a>
+  <a class="tile t-prize" href="clubs.html"><div class="k"><span>FOR CLUBS</span><em>FREE</em></div>
+    <h2>CLUB <span>GAMES</span></h2><p>Your club's own game. Guess how everyone answered.</p><span class="go" aria-hidden="true">&rarr;</span></a>
 </nav>
-<a class="forbrands" href="brands.html"><div><b>OWN A SPOT IN KINGSTON?</b><span>Put your business on the spinner. First month free.</span></div><em>FOR BRANDS</em></a>
-<footer><span><b>Free to play.</b> No purchase necessary. Prizes from Kingston spots drop soon. <a href="clubs.html" style="color:var(--mint)">Run a club? Get your club its own game &rarr;</a></span><span>Off Campus · Kingston · Not affiliated with Queen's University</span></footer>
+<div class="live" id="live" hidden></div>
+<a class="suggest" href="daily.html?suggest"><div><b>GOT A QUESTION FOR QUEEN'S?</b><br><span>Suggest it. The best ones make the daily, with your @ on them.</span></div><em>SUGGEST</em></a>
+<a class="forbrands" href="brands.html"><div><b>OWN A SPOT IN KINGSTON?</b><span>Get your business in front of Queen's students.</span></div><em>FOR BRANDS</em></a>
+<footer><span><b>Free to play.</b> No sign-up, no app. <a href="clubs.html" style="color:var(--mint)">Run a club? Get your club its own game &rarr;</a></span><span>Off Campus · Kingston · Not affiliated with Queen's University</span></footer>
 </main>
 <script>
 (function(){
@@ -134,6 +146,19 @@ footer b{color:var(--text)}
     els.forEach(function(el){ el.textContent = t; });
   }
   tick(); setInterval(tick, 15000);
+})();
+</script>
+<script>
+(function(){
+  var t = new URLSearchParams(location.search).get('api'), API = t && /^http:\/\/localhost:\d+$/.test(t) ? t : '';
+  if (!API && !/(^|\.)offcampusontario\.ca$|\.netlify\.app$/.test(location.hostname)) return;
+  var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
+  fetch(API + '/api/home').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    if (!d) return; var h = '';
+    if (d.crewOfWeek) h += '<div><small>CREW OF THE WEEK</small><b>' + esc(d.crewOfWeek.name) + '</b><span>' + d.crewOfWeek.players + ' playing · averaging ' + d.crewOfWeek.avg.toLocaleString('en-CA') + ' a day</span></div>';
+    if (d.yesterday) h += '<div><small>YESTERDAY AT QUEEN\'S</small><b>' + Math.round(100 * d.yesterday.yes / d.yesterday.n) + '% said yes</b><span>' + esc(d.yesterday.q) + ' · ' + d.yesterday.yes + ' of ' + d.yesterday.n + ' players</span></div>';
+    if (h) { var el = document.getElementById('live'); el.innerHTML = h; el.hidden = false; }
+  }).catch(function(){});
 })();
 </script>
 
