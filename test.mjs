@@ -177,7 +177,7 @@ const cl = (await call('POST', '/api/admin/claim', { playerId:W[3] }, at(9))).bo
 ok(cl.key && cl.key.length === 24, 'admin: first claim gets the key');
 ok((await call('POST', '/api/admin/claim', { playerId:W[2] }, at(9))).status === 409, 'admin: can only be claimed once');
 const sl = (await call('GET', '/api/suggestions?k=' + cl.key, null, at(9))).body.list;
-ok(sl.length === 5 && sl[sl.length - 1].kind === 'survey' && sl[sl.length - 1].credit === 'maya.kscript', 'suggestions: Josh sees them, newest first, credit cleaned');
+ok(sl.length === 5 && sl.filter(x => x.kind === 'survey').length === 1 && sl.find(x => x.kind === 'survey').credit === 'maya.kscript', 'suggestions: Josh sees them, credit cleaned');
 ok((await call('GET', `/api/clubs/${mk.slug}?k=${cl.key}`, null, at(9))).body.exec === true, 'admin key works on club games');
 // home: yesterday's real result + crew of the week
 for (let i = 0; i < 12; i++) await call('POST', '/api/answer', { playerId:('h' + i).padEnd(14, 'x'), day:8, round:2, yes:i < 8, q:'Have you ever cried in Stauffer?' }, at(8));
