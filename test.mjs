@@ -1,5 +1,5 @@
 // Tests the Crews API with an in-memory store standing in for Netlify Blobs. Run: npm test
-import { handle, torontoDay } from './lib/crews.mjs';
+import { handle, torontoDay, dowOf, mondayOf } from './lib/crews.mjs';
 
 const mem = new Map();
 const store = {
@@ -135,4 +135,54 @@ await call('POST', `/api/crews/${mk.crew}/join`, { playerId:P[1], nick:'N1' });
 await call('POST', '/api/score', { playerId:P[1], day, total:2000, pts:[400, 400, 400, 400, 400] });
 const cst = (await call("GET", "/api/stats")).body.clubs.find(c => c.slug === mk.slug);
 ok(cst.started === 7 && cst.finished === 6 && cst.released && cst.joinedCrew === 1 && cst.playedDaily === 1, "stats: club players into the daily and crew (" + JSON.stringify(cst) + ')');
+
+// ---------- weeks, stakes, sources, suggestions, admin, home ----------
+const at = d => Date.parse('2026-11-03T17:00:00Z') + (d - 1) * 864e5;   // noon Toronto on day d
+ok(dowOf(1) === 2 && dowOf(7) === 1 && mondayOf(7) === 7 && mondayOf(13) === 7 && mondayOf(6) === 0, 'weeks run Monday to Sunday (day 7 = Mon Nov 9)');
+const W = ['w1', 'w2', 'w3', 'w4'].map(x => x.repeat(8));
+const wc = (await call('POST', '/api/crews', { playerId:W[0], nick:'Maya', name:'517' }, at(7))).body.code;
+for (const [i, n] of [[1, 'Sam'], [2, 'Jo']]) await call('POST', `/api/crews/${wc}/join`, { playerId:W[i], nick:n }, at(7));
+const scW = async (id, d, t, src) => call('POST', '/api/score', { playerId:id, day:d, total:t, pts:[t / 5, t / 5, t / 5, t / 5, t / 5], src }, at(d));
+await scW(W[0], 7, 3000, 'insta'); await scW(W[1], 7, 2000, 'crew'); await scW(W[2], 7, 1000, 'insta');
+await scW(W[0], 8, 3000); await scW(W[1], 8, 4500);
+await scW(W[0], 9, 3000);
+const wk = (await call('GET', `/api/crews/${wc}/week?playerId=${W[1]}`, null, at(9))).body;
+ok(wk.from === 7 && wk.to === 13 && wk.members[0].nick === 'Maya' && wk.members[0].total === 9000 && wk.members[1].total === 6500 && wk.members[1].you, 'week view: totals Monday to today');
+ok(wk.stake === null && wk.lastWeek === null && wk.daysLeft === 4, 'week view: no stake yet, no last week');
+ok((await call('POST', `/api/crews/${wc}/stake`, { playerId:W[3], win:'x', lose:'y' }, at(9))).status === 403, 'stake: members only');
+ok((await call('POST', `/api/crews/${wc}/stake`, { playerId:W[2], win:'', lose:'' }, at(9))).status === 400, 'stake: needs something');
+const st1 = (await call('POST', `/api/crews/${wc}/stake`, { playerId:W[2], win:'Picks the movie', lose:'Cleans the kitchen' }, at(9))).body;
+ok(st1.stake.win === 'Picks the movie' && st1.stake.lose === 'Cleans the kitchen' && !JSON.stringify(st1).includes(W[2]), 'stake: set for the week, no player ids sent');
+const meMon = (await call('GET', `/api/me?recap=1&playerId=${W[2]}`, null, at(14))).body.crews.find(c => c.code === wc);
+ok(meMon.lastWeek && meMon.lastWeek.winners[0].nick === 'Maya' && meMon.lastWeek.losers[0].nick === 'Jo' && meMon.lastWeek.losers[0].you && meMon.lastWeek.stake.lose === 'Cleans the kitchen', 'Monday recap: last week\'s winner, loser and stake');
+const meTue = (await call('GET', `/api/me?recap=1&playerId=${W[2]}`, null, at(15))).body.crews.find(c => c.code === wc);
+ok(!meTue.lastWeek, 'recap: last week only shows on Monday');
+ok((await call('GET', `/api/crews/${wc}/week`, null, at(14))).body.stake.lose === 'Cleans the kitchen', 'stake carries over to the next week until changed');
+// sources and coming back
+const stS = (await call('GET', '/api/stats', null, at(9))).body;
+const insta = stS.sources.find(x => x.src === 'insta');
+ok(insta && insta.players === 2 && insta.d1.of === 2 && insta.d1.back === 1 && insta.d7.of === 0, 'stats: players by source and next-day return (' + JSON.stringify(insta) + ')');
+ok(stS.sources.some(x => x.src === 'crew'), 'stats: crew source counted');
+const today9 = stS.playersToday;
+await call('POST', '/api/hideme', { playerId:W[0] }, at(9));
+const stH = (await call('GET', '/api/stats', null, at(9))).body;
+ok(stH.playersToday === today9 - 1 && stH.sources.find(x => x.src === 'insta').players === 1 && stH.hiddenBrowsers === 1, 'stats: hidden browser left out');
+// admin + suggestions
+ok((await call('POST', '/api/suggest', { playerId:W[1], kind:'receipts', q:'short' }, at(9))).status === 400, 'suggest: needs a real question');
+ok((await call('POST', '/api/suggest', { playerId:W[1], kind:'survey', q:'Name a place you cry on campus', credit:'@maya.k<script>' }, at(9))).status === 200, 'suggest: saved');
+for (let i = 0; i < 4; i++) await call('POST', '/api/suggest', { playerId:W[1], kind:'receipts', q:'Have you ever slept in Stauffer #' + i }, at(9));
+ok((await call('POST', '/api/suggest', { playerId:W[1], kind:'receipts', q:'Have you ever slept in Douglas' }, at(9))).status === 429, 'suggest: 5 a day per player');
+ok((await call('GET', '/api/suggestions?k=nope', null, at(9))).status === 403, 'suggestions: admin only');
+const cl = (await call('POST', '/api/admin/claim', { playerId:W[3] }, at(9))).body;
+ok(cl.key && cl.key.length === 24, 'admin: first claim gets the key');
+ok((await call('POST', '/api/admin/claim', { playerId:W[2] }, at(9))).status === 409, 'admin: can only be claimed once');
+const sl = (await call('GET', '/api/suggestions?k=' + cl.key, null, at(9))).body.list;
+ok(sl.length === 5 && sl[sl.length - 1].kind === 'survey' && sl[sl.length - 1].credit === 'maya.kscript', 'suggestions: Josh sees them, newest first, credit cleaned');
+ok((await call('GET', `/api/clubs/${mk.slug}?k=${cl.key}`, null, at(9))).body.exec === true, 'admin key works on club games');
+// home: yesterday's real result + crew of the week
+for (let i = 0; i < 12; i++) await call('POST', '/api/answer', { playerId:('h' + i).padEnd(14, 'x'), day:8, round:2, yes:i < 8, q:'Have you ever cried in Stauffer?' }, at(8));
+await call('POST', '/api/crews/' + wc + '/join', { playerId:W[3], nick:'Lee' }, at(9));
+const hm = (await call('GET', '/api/home', null, at(9))).body;
+ok(hm.yesterday && hm.yesterday.n === 12 && hm.yesterday.yes === 8 && /cried in Stauffer/.test(hm.yesterday.q), 'home: yesterday\'s real result');
+ok(hm.crewOfWeek && hm.crewOfWeek.name === '517' && hm.crewOfWeek.players === 3, 'home: crew of the week');
 console.log('all tests passed');

@@ -26,6 +26,17 @@ h2{margin:24px 0 10px;font-size:11px;letter-spacing:.18em;color:var(--mint)}
 .links a b{color:var(--gold)}
 .err{color:var(--red)}
 .clubs{display:flex;flex-direction:column;gap:8px}
+.src{width:100%;border-collapse:collapse;font-size:13px}
+.src th{text-align:right;font-size:9.5px;letter-spacing:.1em;color:var(--muted);padding:4px 6px}
+.src th:first-child,.src td:first-child{text-align:left}
+.src td{text-align:right;padding:9px 6px;border-top:1px solid var(--night2);font-variant-numeric:tabular-nums}
+.src td b{font-size:15px}.src td em{display:block;font-style:normal;font-size:10px;color:var(--muted)}
+.me{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:var(--night2)}
+.me p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.me button{min-height:48px;border:0;border-radius:12px;background:var(--good);color:var(--night);font:900 14px system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}
+.sug{display:flex;flex-direction:column;gap:6px}
+.sug div{padding:10px 12px;border-radius:12px;background:var(--night2);font-size:14px;line-height:1.4}
+.sug small{display:block;margin-bottom:2px;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--muted)}
 .club{padding:12px 14px;border-radius:14px;background:var(--night2)}
 .club b{display:block;font-size:15px}.club b em{font-style:normal;font-size:10px;letter-spacing:.12em;color:var(--good);margin-left:6px}
 .funnel{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;text-align:center}
@@ -36,17 +47,44 @@ h2{margin:24px 0 10px;font-size:11px;letter-spacing:.18em;color:var(--mint)}
 <div class="grid" id="grid"></div>
 <h2>PLAYERS, LAST 7 DAYS</h2>
 <div class="bars" id="bars"></div>
+<h2>WHERE PLAYERS CAME FROM</h2>
+<table class="src" id="src"><tr><td class="sub">No players with a source yet.</td></tr></table>
 <h2>CLUB GAMES → THE DAILY</h2>
 <div class="clubs" id="clubs"><div class="sub">No club games yet.</div></div>
+<h2>QUESTION SUGGESTIONS</h2>
+<div class="sug" id="sug"><div class="sub">Only you can see these.</div></div>
+<h2>THIS IS YOU</h2>
+<div class="me" id="me"><p>Tap this once on every phone and browser you use. Those browsers stop counting as players, and this one unlocks the suggestions list.</p><button id="hideme" type="button">I'M JOSH: LEAVE ME OUT</button></div>
 <h2>MORE</h2>
 <div class="links">
   <a href="https://offcampusontario.goatcounter.com" target="_blank" rel="noopener"><b>GoatCounter</b> · visits, where they came from (?ref=), starts, finishes, shares, crew invites</a>
 </div>
 <script>
 const fmt = n => Number(n || 0).toLocaleString('en-CA');
+const API = (() => { const t = new URLSearchParams(location.search).get('api'); return t && /^http:\/\/localhost:\d+$/.test(t) ? t : ''; })();
+const ls = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+const playerId = () => { let id = ls.get('oc-pid'); if (!id || !/^[a-z0-9]{12,40}$/.test(id)) { const a = new Uint8Array(15); crypto.getRandomValues(a); id = Array.from(a, b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join(''); ls.set('oc-pid', id); } return id; };
+const post = (p, body) => fetch(API + p, { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify(body) }).then(r => r.json().then(j => ({ ok:r.ok, status:r.status, j })));
+const pctOf = (a, b) => b ? Math.round(100 * a / b) + '%' : '–';
+async function loadSuggestions(){
+  const k = ls.get('oc-admin'); if (!k) return;
+  try { const r = await fetch(API + '/api/suggestions?k=' + encodeURIComponent(k), { cache:'no-store' }); if (!r.ok) return; const { list } = await r.json();
+    document.getElementById('sug').innerHTML = list.length ? list.map(x => `<div><small>${x.kind === 'survey' ? 'SURVEY' : 'RECEIPTS'} · DAY ${x.day}${x.credit ? ' · @' + esc(x.credit) : ''}</small>${esc(x.q)}</div>`).join('') : '<div class="sub">No suggestions yet.</div>';
+  } catch (e) {}
+}
+document.getElementById('hideme').onclick = async () => {
+  const b = document.getElementById('hideme'); b.disabled = true; b.textContent = 'SAVING…'; const id = playerId();
+  try {
+    if (!ls.get('oc-admin')) { const c = await post('/api/admin/claim', { playerId:id }); if (c.ok) ls.set('oc-admin', c.j.key); }
+    await post('/api/hideme', { playerId:id }); ls.set('oc-hidden', 1);
+    b.textContent = ls.get('oc-admin') ? 'DONE: LEFT OUT + SUGGESTIONS UNLOCKED' : 'DONE: THIS BROWSER IS LEFT OUT'; load(); loadSuggestions();
+  } catch (e) { b.disabled = false; b.textContent = "I'M JOSH: LEAVE ME OUT"; }
+};
+if (ls.get('oc-hidden')) { const b = document.getElementById('hideme'); b.textContent = 'THIS BROWSER IS LEFT OUT ✓'; }
 async function load(){
   try {
-    const r = await fetch('/api/stats', { cache:'no-store' }); const s = await r.json();
+    const r = await fetch(API + '/api/stats', { cache:'no-store' }); const s = await r.json();
     const back = s.playersYesterday ? Math.round(100 * s.cameBackToday / s.playersYesterday) : 0;
     document.getElementById('when').textContent = `Queen's Daily No. ${String(s.day).padStart(3, '0')} · updated ${new Date().toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit' })} · pull down to refresh`;
     document.getElementById('grid').innerHTML = `
@@ -56,10 +94,12 @@ async function load(){
       <div class="tile"><small>CREWS</small><b>${fmt(s.crews)}</b></div>`;
     const days = (s.last7Days || []).slice().reverse(), max = Math.max(1, ...days.map(d => d.players));
     document.getElementById('bars').innerHTML = days.map(d => `<div class="bar ${d.day === s.day ? 'today' : ''}"><b>${d.players}</b><i style="height:${Math.round(90 * d.players / max)}%"></i><span>#${d.day}</span></div>`).join('');
+    const src = s.sources || [];
+    if (src.length) document.getElementById('src').innerHTML = `<tr><th>SOURCE</th><th>PLAYERS</th><th>BACK NEXT DAY</th><th>BACK IN 7 DAYS</th></tr>` + src.map(x => `<tr><td><b>${esc(x.src)}</b></td><td><b>${fmt(x.players)}</b></td><td><b>${pctOf(x.d1.back, x.d1.of)}</b><em>${x.d1.back} of ${x.d1.of}</em></td><td><b>${pctOf(x.d7.back, x.d7.of)}</b><em>${x.d7.of ? x.d7.back + ' of ' + x.d7.of : 'after a week'}</em></td></tr>`).join('');
     const cl = (s.clubs || []).filter(c => c.started).sort((a, b) => b.started - a.started);
     if (cl.length) document.getElementById('clubs').innerHTML = cl.map(c => `<div class="club"><b>${c.name.replace(/[<>&]/g, '')}${c.released ? '<em>RESULTS OUT</em>' : ''}</b><div class="funnel"><div><i>${c.started}</i><span>STARTED</span></div><div><i>${c.finished}</i><span>FINISHED</span></div><div><i>${c.playedDaily}</i><span>PLAYED DAILY</span></div><div><i>${c.joinedCrew}</i><span>JOINED CREW</span></div></div></div>`).join('');
   } catch (e) { document.getElementById('when').innerHTML = '<span class="err">Couldn\'t load the stats. Try again in a minute.</span>'; }
 }
-load();
+load(); loadSuggestions();
 </script>
 </body></html>
