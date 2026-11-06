@@ -1,0 +1,55 @@
+/* top tabs */
+.tabs{display:flex;gap:6px;align-items:stretch}
+.tabs a{flex:1;display:grid;place-items:center;min-height:46px;padding:0 6px;border-radius:12px;background:var(--night-2);box-shadow:inset 0 0 0 1.5px var(--night-3);color:var(--muted);text-decoration:none;font-family:var(--display);font-size:clamp(12px,3.4vw,15px);letter-spacing:.03em;text-align:center;line-height:1}
+.tabs a.home{flex:0 0 46px;color:var(--gold)}
+.tabs a.on{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 var(--gold-deep)}
+.goal{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb, var(--gold) 14%, var(--night-2));box-shadow:inset 0 0 0 2px var(--gold)}
+.goal b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--gold);line-height:1}
+.goal span{font-size:13px;font-weight:600;line-height:1.35}
+.goal em{font-style:normal;color:var(--gold)}
+.lineup{counter-reset:ln}
+.lineup li{counter-increment:ln}
+.lineup li::before{content:counter(ln);font-family:var(--display);color:var(--muted);width:14px;flex:0 0 auto}
+/* unlock bar */
+.unlock{position:relative;height:24px;border-radius:12px;background:var(--night-2);overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--night-3)}
+.unlock i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg, var(--gold-deep), var(--gold));transition:width .8s var(--ease-out)}
+.unlock span{position:relative;display:block;text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.12em;line-height:24px;color:var(--text);text-shadow:0 1px 2px var(--ink)}
+.unlock.done i{background:var(--good)}
+.unlock.done span{color:var(--ink);text-shadow:none}
+.how{text-align:center;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+/* survey while the keyboard is open */
+body.typing .unlock,body.typing .sfound{display:none}
+body.typing .qcard{padding:8px 12px}
+body.typing .qcard .asked{display:none}
+body.typing .qcard p{font-size:18px}
+body.typing .tile{height:38px}
+body.typing .tile .bk span{font-size:13px}
+body.typing .screen{gap:8px}
+/* pin reveal */
+.yrow{display:flex;align-items:center;gap:8px}
+.yrow .step{width:50px;height:56px;background:var(--ink);color:var(--amber);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--amber) 40%, transparent)}
+.yrow .nix{flex:1}
+.pinrev{display:flex;flex-direction:column;gap:10px}
+.yrev{text-align:center;padding:14px 12px 12px;border-radius:14px;background:var(--ink);box-shadow:0 5px 0 var(--pin)}
+.yrev small{display:block;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--mint)}
+.yrev b{display:block;font-family:var(--tall);font-weight:900;font-size:76px;line-height:1;color:var(--amber);text-shadow:0 0 18px var(--pin);font-variant-numeric:tabular-nums}
+.yrev span{font-size:13px;font-weight:600;color:var(--stone)}
+.pincard .now{font-weight:700}
+.mk{position:relative}
+.mk span{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:1px;padding:2px 6px;border-radius:5px;background:var(--ink);color:var(--stone);font-family:var(--display);font-size:10px;letter-spacing:.06em;white-space:nowrap;line-height:1.3}
+.mk.here span{left:8px;background:var(--amber);color:var(--ink)}
+/* results */
+.gate{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--low);text-align:center}
+.gate b{font-family:var(--display);font-weight:400;font-size:22px;color:var(--low)}
+.gate span{font-size:12.5px;font-weight:600;color:var(--muted)}
+.gate.ok{box-shadow:inset 0 0 0 2px var(--good)}
+.gate.ok b{color:var(--good)}
+.today{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;border-radius:16px;background:var(--night-2)}
+.today h3{grid-column:1 / -1;margin:0;font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+.today div{padding:8px 10px;border-radius:10px;background:var(--night)}
+.today small{display:block;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+.today b{font-family:var(--display);font-weight:400;font-size:20px;font-variant-numeric:tabular-nums}
+.prize-head .kick{font-size:11px}
+.visit{min-height:48px;border-radius:12px;font-family:var(--display);font-size:15px;letter-spacing:.03em;background:var(--ink);color:var(--paper)}
+.post b{font-family:var(--display);font-weight:400}
+.after .btn.ghost{color:var(--text)}

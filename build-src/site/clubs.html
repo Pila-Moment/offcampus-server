@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Club Games | Off Campus</title>
+<meta name="description" content="Your club's own game. 5 questions, 2 minutes, real answers from your members. Free for Queen's clubs.">
+<meta property="og:title" content="Your club's own game · Off Campus"><meta property="og:description" content="5 questions about your club. Members play in 2 minutes, you get their real answers. Free for Queen's clubs."><meta property="og:url" content="https://offcampusontario.ca/clubs">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+:root{--night:#07060F;--night-2:#120F24;--night-3:#1C1836;--text:#F6F1E8;--muted:#A49FC0;--gold:#FFC83D;--gold-deep:#B97F05;--red:#FF3B4A;--mint:#7FE0C4;--paper:#F6F3EA;--ink:#111111;--good:#3BD67A;--tile:#2246E6;
+  --display:"Bowlby One","Arial Black",Impact,sans-serif;--tall:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--mono:"IBM Plex Mono",Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--night);color:var(--text);font:600 15px/1.5 var(--mono)}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 30% at 90% 0%, color-mix(in srgb, var(--gold) 24%, transparent), transparent 70%),radial-gradient(45% 35% at 0% 100%, color-mix(in srgb, var(--tile) 32%, transparent), transparent 70%)}
+a{color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:max(16px, env(safe-area-inset-top)) 16px 120px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:var(--display);font-size:18px;text-decoration:none}.logo span{color:var(--gold)}
+.top .tag{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+.hero{display:grid;gap:26px;margin-top:34px;align-items:center}
+@media (min-width:820px){.hero{grid-template-columns:1.1fr .9fr}}
+.kick{font-size:12px;font-weight:700;letter-spacing:.22em;color:var(--mint)}
+h1{margin:12px 0 0;font-family:var(--display);font-weight:400;font-size:clamp(44px,12vw,82px);line-height:.9}
+h1 span{color:var(--gold)}
+.lead{margin:16px 0 0;font-size:16px;line-height:1.55;color:var(--muted)}.lead b{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:62px;padding:0 26px;border-radius:16px;background:var(--good);color:var(--ink);font-family:var(--display);font-size:20px;text-decoration:none;box-shadow:0 6px 0 #1E8A4A}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #1E8A4A}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:22px}
+.cta-row small{font-size:12px;color:var(--muted)}
+/* phone mock */
+.phone{justify-self:center;width:min(340px,100%);padding:16px;border-radius:34px;background:var(--night-2);box-shadow:0 0 0 3px var(--night-3), 0 30px 60px rgba(0,0,0,.5)}
+.phone .hud{display:flex;justify-content:space-between;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}.phone .hud b{color:var(--gold);font-family:var(--display);font-size:16px;letter-spacing:0}
+.mcard{padding:14px;border-radius:16px;background:var(--paper);color:var(--ink)}
+.mcard small{font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#7a6f5c}
+.mcard p{margin:6px 0 0;font-family:var(--tall);font-weight:900;font-size:28px;line-height:1;text-transform:uppercase}
+.mlbl{margin:12px 0 6px;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--muted)}
+.mbar{position:relative;height:42px;border-radius:10px;background:var(--night);box-shadow:inset 0 0 0 2px var(--paper);overflow:hidden}
+.mbar i{position:absolute;inset:0 38% 0 0;background:var(--gold)}.mbar span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--display);color:var(--ink);font-size:18px}
+.mbar em{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;font-weight:700;color:var(--muted)}
+.mstamp{display:inline-block;margin:12px 0 0;padding:5px 12px;background:var(--good);color:var(--ink);font-family:var(--display);font-size:16px;transform:rotate(-3deg)}
+.mpts{float:right;margin-top:14px;font-family:var(--display);font-size:26px;color:var(--gold)}
+.mboard{margin-top:14px;display:grid;gap:5px;clear:both}.mboard div{display:flex;justify-content:space-between;padding:7px 10px;border-radius:9px;background:var(--night);font-size:12px;font-weight:700}.mboard div:first-child{box-shadow:inset 0 0 0 2px var(--gold)}
+.ex{margin-top:10px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--muted)}
+/* sections */
+h2{margin:70px 0 18px;font-family:var(--display);font-weight:400;font-size:clamp(28px,7vw,42px);line-height:1}
+h2 span{color:var(--gold)}
+.steps{display:grid;gap:12px}@media (min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+.step{padding:18px;border-radius:20px;background:var(--night-2)}
+.step b{display:block;font-family:var(--display);font-weight:400;font-size:40px;color:var(--gold);line-height:1}
+.step h3{margin:10px 0 6px;font-family:var(--display);font-weight:400;font-size:20px}
+.step p{margin:0;font-size:13.5px;color:var(--muted)}
+.gets{display:grid;gap:10px}@media (min-width:760px){.gets{grid-template-columns:1fr 1fr}}
+.get{display:flex;gap:14px;padding:16px;border-radius:18px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--night-3)}
+.get i{flex:0 0 44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--mint);color:var(--ink);font-style:normal;font-family:var(--display);font-size:20px}
+.get h3{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:18px}
+.get p{margin:0;font-size:13.5px;color:var(--muted)}
+.types{display:flex;flex-wrap:wrap;gap:8px}.types span{padding:9px 14px;border-radius:999px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--night-3);font-size:13px;font-weight:700}
+.faq{display:grid;gap:10px}
+.faq details{padding:16px 18px;border-radius:16px;background:var(--night-2)}
+.faq summary{cursor:pointer;font-weight:700;list-style:none}.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:" +";color:var(--mint)}
+.faq p{margin:10px 0 0;color:var(--muted);font-size:14px}
+.end{margin-top:70px;padding:28px 22px;border-radius:26px;background:var(--night-2);box-shadow:0 0 0 3px var(--gold);text-align:center}
+.end h2{margin:0 0 10px}.end p{margin:0 0 18px;color:var(--muted)}
+.foot{margin-top:28px;text-align:center;font-size:12px;color:var(--muted)}.foot a{color:var(--mint)}
+.dock{position:fixed;left:16px;right:16px;bottom:max(14px, env(safe-area-inset-bottom));z-index:10;display:flex;justify-content:center}
+.dock .btn{width:100%;max-width:520px}
+@media (min-width:820px){.dock{display:none}}
+</style></head><body>
+<div class="wrap">
+  <div class="top"><a class="logo" href="/">OFF <span>CAMPUS</span></a><span class="tag">FOR QUEEN'S CLUBS</span></div>
+
+  <section class="hero">
+    <div>
+      <div class="kick">FREE FOR QUEEN'S CLUBS</div>
+      <h1>YOUR CLUB'S <span>OWN GAME.</span></h1>
+      <p class="lead"><b>5 questions about your club.</b> Members answer on their phones and guess how everyone else answered. When you're ready, you <b>release the results</b>: real answers, scores and a club leaderboard.</p>
+      <div class="cta-row"><a class="btn" href="/club.html?new">MAKE YOUR CLUB'S GAME</a><small>Takes 3 minutes. We write the questions, you pick.</small></div>
+    </div>
+    <div class="phone" aria-label="Example of the club game">
+      <div class="hud"><span>QUEEN'S RUN CLUB</span><b>2,350</b></div>
+      <div class="mcard"><small>YES OR NO · 2 OF 5</small><p>Have you ever skipped a run and lied about why?</p></div>
+      <div class="mlbl">WE ASKED 21 OF RUN CLUB</div>
+      <div class="mbar"><i></i><span>62% YES</span><em>13 OF 21</em></div>
+      <span class="mstamp">SO CLOSE</span><span class="mpts">+900</span>
+      <div class="mboard"><div><span>1 · Maya</span><span>4,210</span></div><div><span>2 · Jordan</span><span>3,880</span></div><div><span>3 · You</span><span>3,640</span></div></div>
+      <div class="ex">EXAMPLE · MADE-UP CLUB RESULTS</div>
+    </div>
+  </section>
+
+  <h2>HOW IT <span>WORKS</span></h2>
+  <div class="steps">
+    <div class="step"><b>1</b><h3>Pick 5 questions</h3><p>Tell us a bit about your club. We write the questions, you tick the ones you like and edit anything.</p></div>
+    <div class="step"><b>2</b><h3>Drop the link in your chat</h3><p>No app, no sign-up. Members tap the link, answer, and guess how the club answered. 2 minutes.</p></div>
+    <div class="step"><b>3</b><h3>Release the results</h3><p>Whenever you want (once 5 have played). Everyone gets their score, the leaderboard goes live, and you get a results post for your club's Instagram.</p></div>
+  </div>
+
+  <h2>WHAT YOUR CLUB <span>GETS</span></h2>
+  <div class="gets">
+    <div class="get"><i>%</i><div><h3>Real answers from your members</h3><p>Like a survey, except people actually finish it. "We asked 21 of Run Club: 13 have skipped a run and lied about why."</p></div></div>
+    <div class="get"><i>#1</i><div><h3>A club leaderboard</h3><p>Who knows the club best. It goes live the moment you release the results.</p></div></div>
+    <div class="get"><i>IG</i><div><h3>A post for your Instagram</h3><p>One tap makes a "The club has spoken" results image for your club's page. Free content.</p></div></div>
+    <div class="get"><i>▶</i><div><h3>Something for your next social</h3><p>Put it on the screen at a meeting or social and play it together.</p></div></div>
+  </div>
+
+  <h2>WORKS FOR <span>ANY CLUB</span></h2>
+  <div class="types"><span>Sports & fitness</span><span>Outdoors & trips</span><span>Gaming</span><span>Dance & performing</span><span>Cultural</span><span>Business & pro</span><span>Faculty societies</span><span>Houses & floors</span></div>
+
+  <h2>QUESTIONS</h2>
+  <div class="faq">
+    <details><summary>Is it actually free?</summary><p>Yes. No cost for clubs, now or later.</p></details>
+    <details><summary>Are answers anonymous?</summary><p>Yes. Nobody sees who said what, not even you. Everyone only sees totals ("13 of 21 said yes"), and nothing shows until you release the results. Names only appear on the leaderboard, next to scores.</p></details>
+    <details><summary>What kind of questions?</summary><p>Funny and a little spicy, never cruel. Yes-or-no questions where you guess the club's %, "most popular" picks where you guess the club's top answer, and club trivia. No names, nothing about bodies or anything private.</p></details>
+    <details><summary>When do the results come out?</summary><p>When you say. Your page shows how many have played and a RELEASE button (it unlocks at 5 players). After you release, anyone who hasn't played can still play and get a score straight away.</p></details>
+    <details><summary>Do members need an app or account?</summary><p>No. It's a link. They type a name for the leaderboard and play once.</p></details>
+    <details><summary>Who's Off Campus?</summary><p>We make games for Queen's students, including a new 3-minute Queen's game every day. <a href="/daily.html" style="color:var(--mint)">Try today's</a>.</p></details>
+  </div>
+
+  <div class="end"><h2>READY IN <span>3 MINUTES</span></h2><p>Make it now and drop it in your club's chat tonight.</p><a class="btn" href="/club.html?new">MAKE YOUR CLUB'S GAME</a></div>
+  <p class="foot">Questions? DM <a href="https://instagram.com/offcampuskingston">@offcampuskingston</a> on Instagram.</p>
+</div>
+<div class="dock"><a class="btn" href="/club.html?new">MAKE YOUR CLUB'S GAME</a></div>
+</body></html>
