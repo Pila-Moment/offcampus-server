@@ -4,7 +4,7 @@ import { handle, torontoDay, dowOf, mondayOf, DAY_MAX, honestTotal } from './lib
 const mem = new Map();
 const store = {
   async get(k){ return mem.has(k) ? JSON.parse(mem.get(k)) : null; },
-  async setJSON(k, v){ mem.set(k, JSON.stringify(v)); },
+  async setJSON(k, v, o = {}){ if (o.onlyIfNew && mem.has(k)) return { modified:false }; mem.set(k, JSON.stringify(v)); return { modified:true }; },
   async list({ prefix }){ return { blobs: [...mem.keys()].filter(k => k.startsWith(prefix)).map(key => ({ key })) }; },
 };
 const call = async (method, path, body, now) => { const r = await handle(new Request('https://offcampusontario.ca' + path, { method, body: body ? JSON.stringify(body) : undefined }), store, now); return { status: r.status, body: await r.json() }; };

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "The Off Campus site (site/) and its Crews API (netlify/functions)",
   "scripts": {
-    "test": "node test.mjs && node test-datastore.mjs && node test-houses.mjs && node test-frozen.mjs"
+    "test": "node test.mjs && node test-datastore.mjs && node test-houses.mjs && node test-frozen.mjs && node test-concurrency.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "11.1.4"

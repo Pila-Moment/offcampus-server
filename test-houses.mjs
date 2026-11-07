@@ -4,7 +4,7 @@ import { handle } from './lib/crews.mjs';
 const mem = new Map();
 const store = {
   async get(k){ return mem.has(k) ? JSON.parse(mem.get(k)) : null; },
-  async setJSON(k, v){ mem.set(k, JSON.stringify(v)); },
+  async setJSON(k, v, o = {}){ if (o.onlyIfNew && mem.has(k)) return { modified:false }; mem.set(k, JSON.stringify(v)); return { modified:true }; },
   async list({ prefix }){ return { blobs:[...mem.keys()].filter(k => k.startsWith(prefix)).map(key => ({ key })) }; },
 };
 const at = d => Date.parse('2026-11-03T17:00:00Z') + (d - 1) * 864e5;   // noon Toronto on day d (day 7 = Monday Nov 9)

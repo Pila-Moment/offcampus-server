@@ -9,7 +9,7 @@ const stores = new Map(), opened = [];
 const memStore = () => { const mem = new Map(); return {
   mem,
   async get(k){ return mem.has(k) ? JSON.parse(mem.get(k)) : null; },
-  async setJSON(k, v){ mem.set(k, JSON.stringify(v)); },
+  async setJSON(k, v, o = {}){ if (o.onlyIfNew && mem.has(k)) return { modified:false }; mem.set(k, JSON.stringify(v)); return { modified:true }; },
   async list({ prefix } = {}){ return { blobs:[...mem.keys()].filter(k => !prefix || k.startsWith(prefix)).map(key => ({ key })) }; },
 }; };
 const getStoreFn = ({ name }) => { opened.push(name); if (!stores.has(name)) stores.set(name, memStore()); return stores.get(name); };
