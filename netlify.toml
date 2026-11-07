@@ -9,3 +9,9 @@
   from = "/club/*"
   to = "/club.html"
   status = 200
+
+# The prize page is retired until real prizes exist (PR 1). Old links go to the home page.
+[[redirects]]
+  from = "/prizes.html"
+  to = "/"
+  status = 302

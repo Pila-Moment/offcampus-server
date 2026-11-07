@@ -1,5 +1,5 @@
 // Tests the Crews API with an in-memory store standing in for Netlify Blobs. Run: npm test
-import { handle, torontoDay, dowOf, mondayOf } from './lib/crews.mjs';
+import { handle, torontoDay, dowOf, mondayOf, DAY_MAX, honestTotal } from './lib/crews.mjs';
 
 const mem = new Map();
 const store = {
@@ -19,8 +19,14 @@ const code = made.body.code;
 ok((await call('POST', `/api/crews/${code}/join`, { playerId: B, nick: 'Maya' })).body.size === 2, 'join crew');
 await call('POST', `/api/crews/${code}/join`, { playerId: B, nick: 'Maya' });
 ok((await call('GET', `/api/crews/${code}`)).body.size === 2, 'joining twice does not duplicate');
-ok((await call('POST', '/api/score', { playerId: A, day, total: 3450, pts: [900, 650, 800, 600, 500] })).status === 200, 'post score');
-ok((await call('POST', '/api/score', { playerId: A, day, total: 5000, pts: [1000, 1000, 1000, 1000, 1000] })).body.total === 3450, 'first score of the day is kept');
+// Honest scores: Receipts (rounds 1 and 3) are answer-only, so only Showdown, Showdown and Pin count: 650 + 600 + 500 = 1,750 out of 3,000.
+ok(DAY_MAX === 3000, 'a day is out of 3,000');
+const sA = await call('POST', '/api/score', { playerId: A, day, total: 3450, pts: [900, 650, 800, 600, 500] });
+ok(sA.status === 200 && sA.body.total === 1750 && sA.body.max === 3000, 'old page sending Receipts points: they are ignored, total worked out on the server');
+ok((await call('POST', '/api/score', { playerId: A, day, total: 5000, pts: [1000, 1000, 1000, 1000, 1000] })).body.total === 1750, 'first score of the day is kept');
+ok((await call('POST', '/api/score', { playerId: C, day, pts: [null, 1000, null, 1000, 1000] })).body.total === 3000, 'new page: Receipts sent as null, a perfect day is 3,000');
+ok((await call('POST', '/api/score', { playerId: 'c'.repeat(15) + 'x', day, total: 3000, pts: [null, null, null, 1000, 1000] })).status === 400, 'a scored round cannot be left empty');
+ok((await call('POST', '/api/score', { playerId: 'c'.repeat(15) + 'y', day, total: 99999, pts: [null, 900, null, 900, 900] })).body.total === 2700, 'the total sent by the page is never trusted');
 ok((await call('POST', '/api/score', { playerId: B, day, total: 9000, pts: [1000, 1000, 1000, 1000, 5000] })).status === 400, 'reject impossible score');
 ok((await call('POST', '/api/score', { playerId: B, day: day + 3, total: 100, pts: [20, 20, 20, 20, 20] })).status === 409, 'reject wrong day');
 await call('POST', '/api/score', { playerId: B, day, total: 3600, pts: [900, 900, 800, 500, 500] });
@@ -33,7 +39,7 @@ ok((await call('POST', '/api/crews/ZZZZZZ/join', { playerId: C, nick: 'x' })).st
 ok((await call('POST', '/api/crews', { playerId: 'bad', name: 'x' })).status === 400, 'bad player id');
 const evil = await call('POST', '/api/crews', { playerId: C, nick: '<b>x</b>', name: '<script>' });
 ok(evil.status === 400 || !/[<>]/.test(evil.body.name || ''), 'strips < >');
-ok((await call('GET', '/api/stats')).body.playersToday === 2, 'stats');
+ok((await call('GET', '/api/stats')).body.playersToday === 4, 'stats');
 // tomorrow: Maya plays again, so her streak is 2; Josh hasn't played yet, so his streak still shows 1
 const later = Date.now() + 864e5, day2 = torontoDay(later);
 await call('POST', '/api/score', { playerId: B, day: day2, total: 100, pts: [20, 20, 20, 20, 20] }, later);
@@ -41,26 +47,28 @@ const b2 = (await call('GET', `/api/crews/${code}`, null, later)).body;
 ok(b2.members.find(m => m.nick === 'Maya').streak === 2 && b2.members.find(m => m.nick === 'Josh').streak === 1 && b2.played === 1, 'streaks carry over to the next day');
 const lg = (await call('GET', `/api/crews/${code}/league?playerId=${B}`, null, later)).body;
 ok(lg.members.length === 2 && lg.members[0].nick === 'Maya' && lg.members[0].wins === 1 && lg.members[0].played === 2 && lg.members[0].you === true, 'league: wins and days played');
-ok(lg.members.find(m => m.nick === 'Josh').avg === 3450 && lg.best.pin && lg.best.pin.nick === 'Josh' && lg.best.showdown.nick === 'Josh' && lg.members.find(m => m.nick === 'Maya').showdown === 360, 'league: averages and best at each game');
+ok(lg.members.find(m => m.nick === 'Josh').avg === 1750 && !('receipts' in lg.best) && !('receipts' in lg.members[0]) && lg.best.pin && lg.best.pin.nick === 'Josh' && lg.best.showdown.nick === 'Josh' && lg.members.find(m => m.nick === 'Maya').showdown === 360, 'league: averages and best at each game');
 ok(!JSON.stringify(lg).includes(A) && !JSON.stringify(lg).includes(B), 'league hides player ids');
 ok((await call('GET', '/api/crews/ZZZZZZ/league')).status === 404, 'league: unknown crew');
 const st = (await call('GET', '/api/stats', null, later)).body;
-ok(st.playersToday === 1 && st.playersYesterday === 2 && st.cameBackToday === 1 && st.last7Days.length >= 2, 'stats: came back the next day ' + JSON.stringify(st));
-// real answers: first answer per round counts, Queen's split hidden under 5, crew split hidden under 5
+ok(st.playersToday === 1 && st.playersYesterday === 4 && st.cameBackToday === 1 && st.last7Days.length >= 2, 'stats: came back the next day ' + JSON.stringify(st));
+// real answers: first answer per round counts, and no YES/NO split is ever sent back while the question is open (campus or crew)
 const day3 = torontoDay(later); const ids = 'defgh'.split('').map(ch => ch.repeat(16));
 for (const id of ids) await call('POST', `/api/crews/${code}/join`, { playerId:id, nick:'P' + id[0] }, later);
 let ra = (await call('POST', '/api/answer', { playerId:A, day:day3, round:0, yes:true }, later)).body;
-ok(ra.queens.hidden === true && ra.queens.n === 1 && ra.crews[0].hidden === true, 'answers: hidden while there are few');
+ok(ra.queens.hidden === true && ra.queens.n === 1 && ra.crews.length === 0 && !('yes' in ra.queens), 'answers: only the count comes back');
 await call('POST', '/api/answer', { playerId:A, day:day3, round:0, yes:false }, later);
 for (const [k, id] of ids.entries()) ra = (await call('POST', '/api/answer', { playerId:id, day:day3, round:0, yes:k < 2 }, later)).body;
-ok(ra.queens.n === 6 && ra.queens.yes === 3 && !ra.queens.hidden, "answers: real Queen's split once there are 5+ (and only the first answer counts)");
-ok(ra.crews[0].n === 6 && ra.crews[0].yes === 3 && ra.crews[0].name === 'Princess St Crew', 'answers: crew split once 5+ in the crew answered');
+ok(ra.queens.n === 6 && !('yes' in ra.queens) && ra.queens.hidden === true, 'answers: 6 answers (the first answer counts), still no split');
+ok(ra.crews.length === 0 && !/"yes"/.test(JSON.stringify(ra)), 'answers: no crew split for a crew where everyone answered (it would give away the newest vote)');
+for (const path of [`/api/crews/${code}?playerId=${A}`, `/api/crews/${code}/league?playerId=${A}`, `/api/crews/${code}/week?playerId=${A}`, `/api/me?playerId=${A}&recap=1`, '/api/stats', '/api/home'])
+  ok(!/"yes"|"Y"|"N"/.test(JSON.stringify((await call('GET', path, null, later)).body)), `no answers or splits in ${path.split('?')[0]}`);
 ok((await call('POST', '/api/answer', { playerId:A, day:day3, round:1, texts:['  scroll <b>tiktok</b> ', 'nap'] }, later)).status === 200, 'answers: typed showdown answers saved');
 ok((await call('POST', '/api/answer', { playerId:A, day:day3 + 1, round:0, yes:true }, later)).status === 409, 'answers: wrong day rejected');
 ok((await call('POST', '/api/answer', { playerId:A, day:day3, round:0 }, later)).status === 400, 'answers: needs yes or no');
 // recap: yesterday's crew results
 const rc = (await call('GET', `/api/me?playerId=${A}&recap=1`, null, later)).body.crews[0].yesterday;
-ok(rc.played === 2 && rc.top.nick === 'Maya' && rc.second.nick === 'Josh' && rc.myRank === 2 && rc.myTotal === 3450, 'recap: yesterday winner, my rank');
+ok(rc.played === 2 && rc.top.nick === 'Maya' && rc.second.nick === 'Josh' && rc.myRank === 2 && rc.myTotal === 1750 && rc.top.total === 1900, 'recap: yesterday winner, my rank');
 // save your spot + log in elsewhere
 ok((await call('POST', '/api/pin', { playerId:A, nick:'Josh', pin:'12a4' }, later)).status === 400, 'pin: must be 4 numbers');
 ok((await call('POST', '/api/pin', { playerId:A, nick:'Josh', pin:'4821' }, later)).status === 200, 'pin: saved');
@@ -68,7 +76,7 @@ ok((await call('POST', '/api/pin', { playerId:B, nick:'josh', pin:'1111' }, late
 ok((await call('GET', `/api/me?playerId=${A}`, null, later)).body.saved === true, 'pin: me says saved');
 ok((await call('POST', '/api/login', { nick:'JOSH', pin:'0000' }, later)).status === 401, 'login: wrong pin');
 const li = (await call('POST', '/api/login', { nick:' josh ', pin:'4821' }, later)).body;
-ok(li.playerId === A && li.nick === 'Josh' && li.streak.days === 1 && li.streak.best === 3450 && li.today === null, 'login: right pin gives back the player and streak');
+ok(li.playerId === A && li.nick === 'Josh' && li.streak.days === 1 && li.streak.best === 1750 && li.today === null, 'login: right pin gives back the player and streak');
 for (let k = 0; k < 5; k++) await call('POST', '/api/login', { nick:'Josh', pin:'9999' }, later);
 ok((await call('POST', '/api/login', { nick:'Josh', pin:'4821' }, later)).status === 429, 'login: locked after 5 wrong tries');
 ok(!JSON.stringify(li).includes('pinHash') && !JSON.stringify(li).includes('salt'), 'login: never sends the pin back');
@@ -147,7 +155,7 @@ await scW(W[0], 7, 3000, 'insta'); await scW(W[1], 7, 2000, 'crew'); await scW(W
 await scW(W[0], 8, 3000); await scW(W[1], 8, 4500);
 await scW(W[0], 9, 3000);
 const wk = (await call('GET', `/api/crews/${wc}/week?playerId=${W[1]}`, null, at(9))).body;
-ok(wk.from === 7 && wk.to === 13 && wk.members[0].nick === 'Maya' && wk.members[0].total === 9000 && wk.members[1].total === 6500 && wk.members[1].you, 'week view: totals Monday to today');
+ok(wk.from === 7 && wk.to === 13 && wk.members[0].nick === 'Maya' && wk.members[0].total === 5400 && wk.members[1].total === 3900 && wk.members[1].you, 'week view: totals Monday to today');
 ok(wk.stake === null && wk.lastWeek === null && wk.daysLeft === 4, 'week view: no stake yet, no last week');
 ok((await call('POST', `/api/crews/${wc}/stake`, { playerId:W[3], win:'x', lose:'y' }, at(9))).status === 403, 'stake: members only');
 ok((await call('POST', `/api/crews/${wc}/stake`, { playerId:W[2], win:'', lose:'' }, at(9))).status === 400, 'stake: needs something');
@@ -180,9 +188,19 @@ const sl = (await call('GET', '/api/suggestions?k=' + cl.key, null, at(9))).body
 ok(sl.length === 5 && sl.filter(x => x.kind === 'survey').length === 1 && sl.find(x => x.kind === 'survey').credit === 'maya.kscript', 'suggestions: Josh sees them, credit cleaned');
 ok((await call('GET', `/api/clubs/${mk.slug}?k=${cl.key}`, null, at(9))).body.exec === true, 'admin key works on club games');
 // home: yesterday's real result + crew of the week
-for (let i = 0; i < 12; i++) await call('POST', '/api/answer', { playerId:('h' + i).padEnd(14, 'x'), day:8, round:2, yes:i < 8, q:'Have you ever cried in Stauffer?' }, at(8));
+// a closed question only shows on the home page once 30+ answered
+for (let i = 0; i < 29; i++) await call('POST', '/api/answer', { playerId:('h' + i).padEnd(14, 'x'), day:8, round:2, yes:i < 8, q:'Have you ever cried in Stauffer?' }, at(8));
+ok((await call('GET', '/api/home', null, at(9) - 6 * 60e3)).body.yesterday === null, 'home: 29 answers is not enough');
+await call('POST', '/api/answer', { playerId:'h29'.padEnd(14, 'x'), day:8, round:2, yes:true, q:'Have you ever cried in Stauffer?' }, at(8));
 await call('POST', '/api/crews/' + wc + '/join', { playerId:W[3], nick:'Lee' }, at(9));
 const hm = (await call('GET', '/api/home', null, at(9))).body;
-ok(hm.yesterday && hm.yesterday.n === 12 && hm.yesterday.yes === 8 && /cried in Stauffer/.test(hm.yesterday.q), 'home: yesterday\'s real result');
+ok(hm.yesterday && hm.yesterday.n === 30 && hm.yesterday.yes === 9 && hm.closed.length === 1 && hm.max === 3000 && /cried in Stauffer/.test(hm.yesterday.q), 'home: yesterday\'s real result');
 ok(hm.crewOfWeek && hm.crewOfWeek.name === '517' && hm.crewOfWeek.players === 3, 'home: crew of the week');
+// an old record (out of 5,000, from before honest scores) is read the honest way and never rewritten
+const O = 'o'.repeat(16), oldRec = { total:4100, pts:[900, 800, 900, 700, 800], at:1 };
+await store.setJSON(`score/${day}/${O}`, oldRec); await store.setJSON('player/' + O, { nick:'Old', crews:[], at:1, hist:{ [day]:{ t:4100, p:oldRec.pts } } });
+const oc = (await call('POST', '/api/crews', { playerId:O, nick:'Old', name:'Old House' })).body;
+ok(oc.members[0].total === 2300 && oc.members[0].pts[0] === null && oc.members[0].pts[2] === null && oc.members[0].pts[4] === 800, 'old 5,000-point record shows as 2,300 out of 3,000 (Receipts points dropped)');
+ok(JSON.stringify(await store.get(`score/${day}/${O}`)) === JSON.stringify(oldRec) && (await store.get('player/' + O)).hist[day].t === 4100, 'the old record itself is untouched');
+ok(honestTotal([900, 800, 900, 700, 800]) === 2300 && honestTotal([null, 1000, null, 1000, 1000]) === 3000, 'honest total');
 console.log('all tests passed');
