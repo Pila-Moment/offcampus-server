@@ -192,8 +192,9 @@ HOME_JS = '''<script>
   var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
   fetch(API + '/api/home').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
     if (!d) return; var h = '';
-    if (d.crewOfWeek) h += '<div><small>CREW OF THE WEEK</small><b>' + esc(d.crewOfWeek.name) + '</b><span>' + d.crewOfWeek.players + ' playing · averaging ' + d.crewOfWeek.avg.toLocaleString('en-CA') + ' a day</span></div>';
-    if (d.yesterday) h += '<div><small>YESTERDAY AT QUEEN\\'S</small><b>' + Math.round(100 * d.yesterday.yes / d.yesterday.n) + '% said yes</b><span>' + esc(d.yesterday.q) + ' · ' + d.yesterday.yes + ' of ' + d.yesterday.n + ' players</span></div>';
+    if (d.crewOfWeek) h += '<div><small>CREW OF THE WEEK</small><b>' + esc(d.crewOfWeek.name) + '</b><span>' + d.crewOfWeek.players + ' playing · averaging ' + d.crewOfWeek.avg.toLocaleString('en-CA') + (d.max ? ' of ' + d.max.toLocaleString('en-CA') : '') + ' a day</span></div>';
+    (d.closed || (d.yesterday ? [d.yesterday] : [])).forEach(function(y){   // closed questions only, 30+ real answers
+      h += '<div><small>YESTERDAY · REAL ANSWERS</small><b>' + Math.round(100 * y.yes / y.n) + '% said yes</b><span>' + esc(y.q) + ' · ' + y.yes + ' of ' + y.n + ' Off Campus players who answered</span></div>'; });
     if (h) { var el = document.getElementById('live'); el.innerHTML = h; el.hidden = false; }
   }).catch(function(){});
 })();

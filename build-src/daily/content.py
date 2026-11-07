@@ -223,7 +223,8 @@ def send_of(r):
     return None
 clean = lambda b: { 'type':'survey', 'q':b['q'], 'a':[{ 't':x['t'], 'p':x['p'], 'k':x['k'] } for x in b['a']] }
 def day(r1, b1, r2, b2, p):
-    R = lambda r: dict({ 'type':'receipts', 'q':r[0], 'pct':r[1] }, **({ 'send':send_of(r) } if send_of(r) else {}))
+    # The % in RECEIPTS above was written by us, not answered by anyone, so it is never sent to the page (Receipts rounds are answer-only).
+    R = lambda r: dict({ 'type':'receipts', 'q':r[0] }, **({ 'send':send_of(r) } if send_of(r) else {}))
     return { 'rounds':[ R(r1), clean(b1), R(r2), clean(b2),
         { 'type':'pin', 'photo':{ k: p[k] for k in ['img','year','lat','lng','title','blurb','credit','license','source'] } } ] }
 plan = {0: (RECEIPTS[0], first[0], RECEIPTS[1], first[1], photos['cavalry1916'])}   # day 1 already happened: keep it exactly
