@@ -1865,6 +1865,7 @@ function loginSheet(){
 }
 
 function suggestSheet(){
+  if (GUEST) { toast('BRAND DEMO: SUGGESTIONS ARE OFF'); return; }   // the demo never writes anything to the server
   if (!CREWS_API) { toast('OPEN THIS ON OFFCAMPUSONTARIO.CA'); return; }
   let kind = 'receipts';
   const ph = { receipts:'Have you ever…?', survey:'Name something…' };
@@ -2010,7 +2011,7 @@ function wireShare(total, pts, types, stamp){
 }
 const statsRow = st => `<div class="statline"><span>STREAK <b>${st.n || 0}</b></span><span>BEST <b>${st.best ? fmt(st.best) : '–'}</b></span><span>DAYS PLAYED <b>${st.days || 0}</b></span></div>`;
 const TOMORROW_Q = (() => { const d = DAYS[(DAY_INDEX + 1) % DAYS.length]; const r = d && d.rounds.find(x => x.type === 'receipts'); return r && DAY_INDEX + 1 < DAYS.length ? r.q : ''; })();
-const tailHTML = () => `<div class="row3"><button class="btn ghost" id="see">SEE IMAGE</button><button class="btn ghost" id="sugg" type="button">SUGGEST</button><a class="btn ghost" id="follow" href="${IG_URL}" target="_blank" rel="noopener">INSTAGRAM</a></div>
+const tailHTML = () => `<div class="row3"><button class="btn ghost" id="see">SEE IMAGE</button>${GUEST ? '' : '<button class="btn ghost" id="sugg" type="button">SUGGEST</button>'}<a class="btn ghost" id="follow" href="${IG_URL}" target="_blank" rel="noopener">INSTAGRAM</a></div>
     <div class="cd">${TOMORROW_Q && !GUEST ? `<span class="tmrw"><em>TOMORROW</em> ${esc(TOMORROW_Q)}</span>` : ''}NEXT FIVE IN <b id="cd">${nextDropText()}</b></div>`;
 function startCountdown(){ const cdT = setInterval(() => { const e = $('#cd'); if (!e) return clearInterval(cdT); e.textContent = nextDropText(); }, 1000); }
 async function results(){
@@ -2066,7 +2067,7 @@ function doneScreen(rec){
   wireShare(rec.total, rec.pts, rec.types, stamp);
   joinCard($('#joinbox'));
   postScore(rec).then(() => renderCrews($('#crewsbox'), rec.total));
-  if (QS.has('suggest')) setTimeout(suggestSheet, 400);
+  if (QS.has('suggest') && !GUEST) setTimeout(suggestSheet, 400);
 }
 
 /* ================= PRESEASON PRIZE TEASER =================

@@ -152,5 +152,9 @@ rep('<div class="post"><b>DOUBLE IT:</b> post your prize on your story', '<div c
 rep('<button class="btn" id="red">TAP TO REDEEM IN FRONT OF STAFF</button>', '<button class="btn" id="red">${GUEST ? \'DEMO: HOW STAFF WOULD REDEEM IT\' : \'TAP TO REDEEM IN FRONT OF STAFF\'}</button>')
 
 rep("tag Off Campus and ${esc(jackpot ? 'Night Shift' : brand.name)}, and we double it.", "tag Off Campus and ${esc(jackpot ? 'Night Shift' : brand.name)}, and ${GUEST ? 'it could be doubled' : 'we double it'}.")
+# brand demo: no suggestions (they'd POST to /api/suggest), from any button or link
+rep('<button class="btn ghost" id="sugg" type="button">SUGGEST</button>', '${GUEST ? \'\' : \'<button class="btn ghost" id="sugg" type="button">SUGGEST</button>\'}')
+rep("function suggestSheet(){\n", "function suggestSheet(){\n  if (GUEST) { toast('BRAND DEMO: SUGGESTIONS ARE OFF'); return; }   // the demo never writes anything to the server\n")
+rep("  if (QS.has('suggest')) setTimeout(suggestSheet, 400);", "  if (QS.has('suggest') && !GUEST) setTimeout(suggestSheet, 400);")
 open('src.html', 'w').write(s)
 print('splice14 ok')

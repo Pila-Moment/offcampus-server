@@ -400,7 +400,7 @@ b_js = '''<script>
 </script>'''
 
 page_html = ('<!doctype html>\n<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-  '<title>Off Campus for Kingston Businesses</title>\n<meta name="description" content="Get Queen\'s students through your door. Off Campus is the free daily game for Queen\'s students, with prizes from Kingston spots. Founding partners: first month free.">\n'
+  '<title>Off Campus for Kingston Businesses</title>\n<meta name="description" content="An early concept for Kingston businesses: your student deal inside a free daily game Queen\'s students play. Nothing here is live or guaranteed yet.">\n'
   '<meta property="og:title" content="Off Campus for Kingston Businesses">\n<meta property="og:description" content="An early concept for Kingston businesses: your student deal inside a game Queen\'s students play.">\n'
   f'{FONTS}\n<style>{BASE_CSS}{b_css}</style>\n</head><body>\n{BG}\n<main class="wrap">\n{b_body}\n'
   '<footer><span><b>Off Campus</b> · Kingston, Ontario · Not affiliated with Queen\'s University</span><span>The spots on the game demo are made-up examples.</span></footer>\n</main>\n'
