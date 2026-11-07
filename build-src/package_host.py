@@ -52,11 +52,16 @@ for f in glob.glob(H+'/*.html'):
     tags += '<meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'
     t = t.replace('</head>', tags + '</head>', 1) if '</head>' in t else tags + t
     open(f, 'w').write(t)
+# Visit counter (GoatCounter). It only loads on the real site, so deploy previews and local tests never add to the real numbers.
 GC='<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>'
+GC_LIVE_ONLY='<script>if(/^(www\\.)?offcampusontario\\.ca$/.test(location.hostname)){var gc=document.createElement("script");gc.async=true;gc.src="https://gc.zgo.at/count.js";gc.setAttribute("data-goatcounter","https://offcampusontario.goatcounter.com/count");document.head.appendChild(gc);}</script>'
 for f in glob.glob(H+'/*.html'):
     s=open(f).read()
-    if 'goatcounter' in s or f.endswith('link.html') or f.endswith('stats.html'): continue
-    open(f,'w').write(s.replace('</body></html>', GC+'\n</body></html>',1))
+    if f.endswith('link.html') or f.endswith('stats.html'): continue
+    if GC in s: s=s.replace(GC, GC_LIVE_ONLY)                      # pages that carry their own counter tag
+    elif 'goatcounter' in s: continue                               # club.html: has its own track() but no counter tag (unchanged)
+    else: s=s.replace('</body></html>', GC_LIVE_ONLY+'\n</body></html>',1)
+    open(f,'w').write(s)
 z=SP+'/offcampus-site.zip'
 if os.path.exists(z): os.remove(z)
 subprocess.run(['zip','-qr',z,'.'],cwd=H,check=True)
