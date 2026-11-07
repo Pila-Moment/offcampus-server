@@ -1,4 +1,6 @@
-# Frozen Receipts: design and scoring plan (FOR REVIEW: nothing here is active)
+# Frozen Receipts: design and scoring plan
+
+**Status: built behind a switch that is OFF.** Nothing below collects data or changes any score until Josh approves turning it on.
 
 **Goal:** Receipts score again, but only against real, frozen answers from Off Campus players. No made-up numbers, no live splits, and nobody's answer can be worked out.
 
@@ -68,3 +70,54 @@
 3. **Crews:** OK to switch crews WEEK and LEAGUE from point totals to average %? **Recommended: yes, in the same release that turns v3 on.**
 4. **Points per % off:** keep 25 per percentage point (a guess 40 points off scores 0)? **Recommended: keep it.**
 5. **Wording:** "X of N Off Campus players who answered", confirmed as the wording for every reveal.
+
+
+## Built (behind the switch), Nov 7
+
+- **The switch:** `OC_FROZEN_RECEIPTS=1` (a Netlify setting). It's **not set anywhere**, so production and previews behave exactly as before.
+  - With it off, `/api/rq/*` returns 404, every score is a normal 3,000-point day, and the Daily never asks.
+  - To try it on a preview later, Josh would set it for **Deploy Previews only**.
+- **Agreed design decisions:**
+  - 4,000-point days when there's a frozen target, otherwise 3,000.
+  - An optional OPEN QUESTIONS card (up to 3, unscored).
+  - Crew WEEK and LEAGUE in average % with days played shown.
+  - 25 points lost per percentage point off.
+  - Reveal text: "X of N Off Campus responses said YES."
+- **Server, `lib/receipts.mjs`:**
+  - Questions have stable ids from `lib/rq-bank.mjs`, which is made by `build-src/daily/content.py` (69 questions, each with its first day and version).
+  - Answers, the frozen result, the day's target, "used" and "public" markers, and guesses are each written once with **only-if-new** writes (Netlify Blobs `onlyIfNew`). So simultaneous answers or retries can't overwrite the first one, and everyone gets the same target that day.
+  - The frozen result is always the **first 30 answers** (by time, then player), even if more arrive at the same moment.
+- **Never a seen result:**
+  - The home page shows a frozen result only after its guessing day is over, and marks it public.
+  - A question that was public (or that the old home rule could have shown, 30+ answers on its own day) is **never** picked as a target.
+  - The home cache key changes with the switch (`cache/home-v3`).
+- **Version-aware scores:** crew TODAY, WEEK, LEAGUE, wins, streaks, Monday recaps, crew of the week and the House League all read each day against its own max (v1/v2 = 3,000, v3 = its own).
+  - WEEK and LEAGUE show average %, with days played.
+  - Wins still compare raw points on the same day (same max).
+- **Phone, `build-src/daily/splice16.py`:**
+  - Round 1 saves to the 14-day question: "N of 30 answers in".
+  - Round 3 on a target day is the guess. The server scores it, and only then the meter fills and "21 of 34 Off Campus responses said YES" appears.
+  - If the guess can't be sent: "COULDN'T SEND YOUR GUESS", TRY AGAIN or SKIP, and never a made-up reveal.
+  - After the Daily: OPEN QUESTIONS (up to 3).
+  - Score card, share text and the come-back screen use that day's max (4,000).
+
+## Evidence
+- **`test-frozen.mjs` (in `npm test`), on synthetic questions and players:**
+  - Collecting, duplicates, and 6 copies of one answer arriving together (counted once).
+  - 29 answers doesn't freeze. The 30th freezes it exactly once, and later answers never change it.
+  - It isn't a target on the day it froze. At 3:59am there's no target; at 4:01am the target is the same for everyone.
+  - No public endpoint (`/api/home`, `/api/stats`, `/api/rq/open`, `/api/me`, `/api/health`) shows the target's result before the guess.
+  - Server-scored guess; a retry keeps the first guess; three guesses arriving together keep one; another day's guess is refused.
+  - The v3 score uses the server's guess points (out of 4,000).
+  - Shown on the home page after its day, and never a target twice.
+  - A result that was public under the old rule is never a target.
+  - 40 answers at once: 40 saved, frozen at exactly 30.
+  - Expiry on day 15 with 29 answers, never shown anywhere.
+  - Open questions: 3, text only.
+  - A mixed 3,000/4,000 week end to end (crew TODAY, WEEK, LEAGUE, wins, streaks, Monday recap, crew of the week, House League).
+- **On the phone:** a local server with the switch on and one synthetic frozen question (`apisrv3.mjs` in the build scratchpad).
+
+## Before switching on (Josh's call)
+- **Approve 14-day answer collection.** Answers are stored against a browser id, and only counts are ever shown.
+- **Add real questions** for the bank's upcoming days. Questions that repeat in the 35-day plan are asked once per person.
+- **Turn it on for a preview first,** with `OC_FROZEN_RECEIPTS=1` for Deploy Previews only.
