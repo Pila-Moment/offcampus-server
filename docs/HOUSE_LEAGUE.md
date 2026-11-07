@@ -39,6 +39,18 @@
   - Edit or leave the house.
 - **Invite links** stay on the site they were opened from, so a preview's invites stay on that preview.
 
+## Milestone 2 (polish)
+- **Starting a house:**
+  - Tap-to-use name ideas, and the crest pops as you type.
+  - Creating the house shows a "HOUSE FOUNDED" moment that leads straight to an invite page: three seats, a big house code, COPY LINK, and INVITE MY ROOMMATES.
+- **Invite page:** shows the seats ("You'd be player 2"), and the message says how many more players the house needs.
+- **Celebrations, each shown once:** getting into the league, moving up the ranks, and winning House of the Week.
+- **Rivalry:** a head-to-head card with the house above or below: bars, both %, and "X POINTS TO PASS".
+- **Returning tomorrow:** once you've played, a countdown to the next five plus a gentle "NUDGE THE HOUSE" message, with no names called out.
+- **After the Daily:** "TODAY COUNTED FOR…" shows **only when the server confirms today's score**. Otherwise it says "NOT COUNTED FOR [HOUSE] YET" with TRY AGAIN. The line under it gives the rank, the gap and "new five at 4am".
+- **Switching houses:** "This week's scores stay with [OLD] until Monday. From Monday they count for [NEW]."
+- **Scoring:** every day's score now saves its version and maximum (`v`, `max`). The House League reads each day as a % of its own max. See `docs/FROZEN_RECEIPTS_PLAN.md`.
+
 ## Known limits
 - **Scores aren't verified:** Showdown and Pin points are still worked out on the phone, and identity is the browser. Fine for a no-prize league; not for a prize competition. There are **no prizes, sponsors or rewards** in the House League.
 - **The standings are worked out on every visit,** which is fine for a pilot (tens of houses), not for thousands.

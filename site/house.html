@@ -126,6 +126,42 @@ p.sub{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 @keyframes up{from{transform:translateY(40px);opacity:0}}
 .lightbox{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(5,4,12,.88)}
 .lightbox img{max-width:100%;max-height:80vh;border-radius:14px}
+/* ---------- polish ---------- */
+.ideas{display:flex;flex-wrap:wrap;gap:6px}
+.ideas button{min-height:36px;padding:0 12px;border-radius:999px;background:var(--night-2);box-shadow:inset 0 0 0 1.5px var(--night-3);font-size:11.5px;font-weight:700}
+.ideas button:active{background:var(--hc);color:var(--ink)}
+.preview .crest.bump{animation:pop .45s var(--ease-pop)}
+.cele{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;background:radial-gradient(60% 45% at 50% 40%, color-mix(in srgb, var(--hc) 40%, transparent), transparent 70%), rgba(5,4,12,.92);text-align:center;animation:fade .3s ease-out}
+.cele .crest{--s:120px;animation:drop .8s var(--ease-pop) both}
+@keyframes drop{0%{transform:translateY(-60vh) rotate(-12deg)}70%{transform:translateY(8px) rotate(2deg)}100%{transform:none}}
+.cele .k{font-size:11px;font-weight:700;letter-spacing:.24em;color:var(--hc);animation:in .5s .5s var(--ease-out) both}
+.cele h2{font-size:clamp(34px,11vw,52px);line-height:.92;animation:in .5s .6s var(--ease-out) both}
+.cele p{margin:0;max-width:30ch;font-size:13px;color:var(--muted);line-height:1.45;animation:in .5s .7s var(--ease-out) both}
+.cele .btn{max-width:420px;margin-top:8px;animation:in .5s .8s var(--ease-out) both}
+.cele .link{animation:in .5s .9s var(--ease-out) both}
+.conf{position:fixed;top:-20px;z-index:46;width:9px;height:14px;border-radius:2px;pointer-events:none}
+.bigcode{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:16px;background:var(--cream);color:var(--ink)}
+.bigcode b{font-family:var(--display);font-size:clamp(28px,9vw,40px);letter-spacing:.14em}
+.bigcode button{min-height:44px;padding:0 14px;border-radius:12px;background:var(--ink);color:var(--cream);font-family:var(--display);font-size:14px}
+.seats{display:flex;gap:8px}
+.seats span{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;background:var(--night-2);font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--muted)}
+.seats span i{display:block;width:30px;height:34px;background:var(--night-3);clip-path:polygon(50% 0, 100% 38%, 100% 100%, 0 100%, 0 38%)}
+.seats span.on{color:var(--text)}
+.seats span.on i{background:var(--hc);animation:pop .5s var(--ease-pop) both}
+.seats span.next{box-shadow:inset 0 0 0 2px var(--hc);color:var(--hc)}
+.vs{grid-column:1 / -1;display:grid;gap:8px;margin-top:10px;padding:12px;border-radius:14px;background:var(--night)}
+.vs .vr{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.vs .crest{--s:30px}
+.vs .bar{height:12px;border-radius:6px;background:var(--night-3);overflow:hidden}
+.vs .bar i{display:block;height:100%;border-radius:6px;background:var(--c);transform-origin:left;animation:fill .9s var(--ease-out) both}
+.vs .vp{min-width:54px;text-align:right;font-family:var(--display);font-size:15px;font-variant-numeric:tabular-nums}
+.vs .vn{grid-column:2 / 4;margin-top:-4px;font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vs .gap{font-family:var(--display);font-size:17px;line-height:1.1}
+.vs .gap span{color:var(--hc)}
+.tmr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:16px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--night-3)}
+.tmr small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+.tmr b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.tmr button{min-height:44px;padding:0 14px;border-radius:12px;background:var(--hc);color:var(--ink);font-family:var(--display);font-size:13px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"><meta property="og:title" content="Off Campus · Queen's House League"><meta property="og:description" content="Your house vs every house at Queen's. Play the Daily, your house's average counts."><meta property="og:url" content="https://offcampusontario.ca/house.html"><meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head><body>
@@ -170,6 +206,23 @@ async function share(text, url){
 }
 function sheet(html){ const d = document.createElement('div'); d.className = 'sheetbg'; d.innerHTML = `<div class="sheet">${html}</div>`; d.onclick = e => { if (e.target === d) d.remove(); }; document.body.appendChild(d); return d; }
 function countUp(el, to, ms, dec){ if (!el) return; const t0 = performance.now(); const f = now => { const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = dec ? (to * e).toFixed(1) + '%' : Math.round(to * e); if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); }
+
+/* ================= countdown, confetti, celebrations ================= */
+const toNextFive = () => { const parts = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Toronto', hour:'numeric', minute:'numeric', second:'numeric', hourCycle:'h23' }).formatToParts(new Date());
+  const g = t => +parts.find(x => x.type === t).value; let secs = 4 * 3600 - (g('hour') * 3600 + g('minute') * 60 + g('second')); if (secs <= 0) secs += 86400; return secs; };
+const hm = secs => `${Math.floor(secs / 3600)}H ${String(Math.floor(secs % 3600 / 60)).padStart(2, '0')}M`;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function confetti(){ if (REDUCED) return; const cols = ['--gold', '--mint', '--red', '--pink', '--blue', '--hc'].map(v => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#FFC83D');
+  for (let i = 0; i < 70; i++) { const d = document.createElement('i'); d.className = 'conf'; d.style.left = Math.random() * 100 + 'vw'; d.style.background = cols[i % cols.length]; document.body.appendChild(d);
+    d.animate([{ transform:'translate(0,0) rotate(0)' }, { transform:`translate(${(Math.random() - .5) * 180}px, ${innerHeight + 60}px) rotate(${Math.random() * 900}deg)` }], { duration:1500 + Math.random() * 1500, easing:'cubic-bezier(.2,.6,.4,1)', delay:Math.random() * 350 }).onfinish = () => d.remove(); } }
+function celebrate({ color, mono, kick, title, text, cta, onCta, later }){
+  setHC(color); const d = document.createElement('div'); d.className = 'cele';
+  d.innerHTML = `${crest(color, mono)}<span class="k">${kick}</span><h2>${title}</h2><p>${text}</p>${cta ? `<button class="btn" id="cc" type="button">${cta}</button>` : ''}<button class="link" id="cl" type="button">${later || 'CLOSE'}</button>`;
+  document.body.appendChild(d); confetti(); vibe([30, 40, 90]);
+  const close = () => d.remove(); d.querySelector('#cl').onclick = close;
+  if (cta) d.querySelector('#cc').onclick = async () => { await onCta(); close(); };
+}
+const seenKey = (code, mon) => `oc-hseen-${code}-${mon}`;
 
 /* ================= load ================= */
 let LG = null, ME = null;
@@ -216,27 +269,55 @@ function create(){
     <div class="kick">START A HOUSE</div><h1>NAME YOUR <span>HOUSE.</span></h1>
     <div class="preview" id="pv"></div>
     <label class="field"><span>HOUSE NAME</span><input id="hn" maxlength="24" placeholder="The Earl Street Boys" autocomplete="off"><small>A nickname, not your address.</small></label>
+    <div class="ideas" id="ideas">${['The Dish Pit', 'Couch Kings', 'Top Floor', 'The Fridge Raiders', 'Late Night Kitchen', 'The Back Porch'].map(x => `<button type="button">${x}</button>`).join('')}</div>
     <div class="field"><span>HOUSE COLOUR</span><div class="swatches" id="sw">${COLORS.map(c => `<button type="button" data-c="${c}" style="--c:${cvar(c)}" aria-label="${c}"></button>`).join('')}</div></div>
     <label class="field"><span>HOUSE MOTTO (OPTIONAL)</span><input id="hm" maxlength="40" placeholder="Never home before 2am" autocomplete="off"></label>
     ${S.nick ? '' : '<label class="field"><span>YOUR NAME ON THE HOUSE BOARD</span><input id="nn" maxlength="16" placeholder="Josh" autocomplete="off"><small>Only your house sees this.</small></label>'}
     <button class="link" id="bk" type="button">BACK</button>
     <button class="btn dock" id="go" disabled>CREATE THE HOUSE</button>
   </section>`;
-  const draw = () => { setHC(S.color); $('#pv').innerHTML = `${crest(S.color, mono(S.name || 'House'), 60)}<div><div class="nm">${esc(S.name || 'Your house')}</div><div class="mt">${esc(S.motto || 'Your motto goes here')}</div></div>`;
+  let lastMono = '';
+  const draw = () => { setHC(S.color); const mo = mono(S.name || 'House'); $('#pv').innerHTML = `${crest(S.color, mono(S.name || 'House'), 60)}<div><div class="nm">${esc(S.name || 'Your house')}</div><div class="mt">${esc(S.motto || 'Your motto goes here')}</div></div>`;
+    if (mo !== lastMono || draw.col !== S.color) { const c = $('#pv .crest'); if (c && lastMono) c.classList.add('bump'); lastMono = mo; draw.col = S.color; }
     document.querySelectorAll('#sw button').forEach(b => b.classList.toggle('on', b.dataset.c === S.color));
     $('#go').disabled = S.name.trim().length < 2 || (!nick() && !(($('#nn') || {}).value || '').trim()); };
   $('#hn').oninput = e => { S.name = e.target.value; draw(); }; $('#hm').oninput = e => { S.motto = e.target.value; draw(); };
   if ($('#nn')) $('#nn').oninput = draw;
+  $('#ideas').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.name = b.textContent; $('#hn').value = S.name; vibe(8); draw(); };
   $('#sw').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.color = b.dataset.c; vibe(8); draw(); };
   $('#bk').onclick = () => intro();
   $('#go').onclick = async () => {
     const nn = $('#nn') ? $('#nn').value.trim() : nick(); if (nn) store.set('oc-nick', nn);
     const b = $('#go'); b.disabled = true; b.textContent = 'CREATING…';
     try { const h = await api('POST', '/api/houses', { playerId:PLAYER_ID, nick:nn, name:S.name.trim(), motto:S.motto.trim(), color:S.color }); track('house-create'); vibe([20, 40, 60]);
-      ME = await api('GET', '/api/me?playerId=' + PLAYER_ID); LG = await api('GET', '/api/league?playerId=' + PLAYER_ID); hq(h.code, { fresh:true }); }
+      ME = await api('GET', '/api/me?playerId=' + PLAYER_ID); LG = await api('GET', '/api/league?playerId=' + PLAYER_ID); founded(h); }
     catch (err) { b.disabled = false; b.textContent = 'CREATE THE HOUSE'; toast(String(err.message || 'COULDN\'T CREATE IT').toUpperCase()); }
   };
   draw(); setTimeout(() => $('#hn').focus(), 300);
+}
+
+/* ================= just founded: invite first ================= */
+function founded(h){
+  try { store.set(seenKey(h.code, LG.week.from), { q:false, rank:null }); } catch (e) {}
+  celebrate({ color:h.color, mono:h.mono, kick:'HOUSE FOUNDED', title:esc(h.name.toUpperCase()), text:`You need ${MIN_PLAYERS} players this week to get into the league. Send it to your roommates now.`, cta:'INVITE MY ROOMMATES', later:'LATER',
+    onCta:() => { track('house-invite'); return share(inviteMsg(h, 1), inviteUrl(h.code)); } });
+  invitePage(h);
+}
+const inviteMsg = (h, players) => players >= 1 ? `${h.name} needs ${Math.max(1, MIN_PLAYERS - players)} more ${MIN_PLAYERS - players === 1 ? 'player' : 'players'} this week to get into the Queen's House League. Tap to join, then play today's five (3 min):` : `We started ${h.name} in the Queen's House League. We need ${MIN_PLAYERS} of us to play this week to get in. Tap to join, then play today's five (3 min):`;
+function invitePage(h){
+  const mine = LG.mine && LG.mine.code === h.code ? LG.mine : null, n = mine ? mine.players : 0, size = h.size || 1;
+  app.innerHTML = `<section class="screen">${tabs()}
+    <div class="kick">STEP 2 · GET YOUR ROOMMATES IN</div>
+    <div class="hero">${crest(h.color, h.mono)}<div><div class="nm">${esc(h.name)}</div><div class="mt">${size} ${size === 1 ? 'PLAYER' : 'PLAYERS'} SO FAR</div></div></div>
+    <div class="seats">${Array.from({ length:MIN_PLAYERS }, (_, i) => `<span class="${i < size ? 'on' : i === size ? 'next' : ''}"><i></i>${i < size ? (i === 0 ? 'YOU' : 'IN') : i === size ? 'NEXT' : 'OPEN'}</span>`).join('')}</div>
+    <p class="sub">Everyone in the house plays the Daily. Once ${MIN_PLAYERS} of you have played this week, ${esc(h.name)} is in the league.</p>
+    <div class="bigcode"><div><div class="kick" style="color:var(--ink)">HOUSE CODE</div><b>${h.code}</b></div><button type="button" id="cp">COPY LINK</button></div>
+    <button class="link" id="go2" type="button">GO TO MY HOUSE</button>
+    <button class="btn dock" id="inv2" type="button">INVITE MY ROOMMATES</button>
+  </section>`;
+  $('#inv2').onclick = async () => { vibe(10); track('house-invite'); await share(inviteMsg(h, n), inviteUrl(h.code)); };
+  $('#cp').onclick = async () => { try { await navigator.clipboard.writeText(inviteUrl(h.code)); toast('LINK COPIED'); } catch (e) { toast(h.code); } };
+  $('#go2').onclick = () => hq(h.code);
 }
 
 /* ================= join from an invite ================= */
@@ -249,8 +330,9 @@ async function joinScreen(code){
   app.innerHTML = `<section class="screen">${tabs()}
     <div class="kick">YOU'RE INVITED</div>
     <div class="hero">${crest(h.color, h.mono)}<div><div class="nm">${esc(h.name)}</div><div class="mt">${h.motto ? esc(h.motto) + ' · ' : ''}${h.size} ${h.size === 1 ? 'PLAYER' : 'PLAYERS'}</div></div></div>
-    <p class="sub">Join and your Daily scores count for ${esc(h.name)} in the Queen's House League. No account, no sign-up.</p>
-    ${cur ? `<div class="note">You're in <b>${esc(cur.name)}</b> right now. Joining moves you. If you've already played for ${esc(cur.name)} this week, you'll count for ${esc(h.name)} from Monday.</div>` : ''}
+    <div class="seats">${Array.from({ length:Math.max(MIN_PLAYERS, Math.min(h.size + 1, 6)) }, (_, i) => `<span class="${i < h.size ? 'on' : i === h.size ? 'next' : ''}"><i></i>${i < h.size ? 'IN' : i === h.size ? 'YOU' : 'OPEN'}</span>`).join('')}</div>
+    <p class="sub">${h.size < MIN_PLAYERS ? `${esc(h.name)} needs ${MIN_PLAYERS} players to get into the Queen's House League. You'd be player ${h.size + 1}.` : `Join and your Daily scores count for ${esc(h.name)} in the Queen's House League.`} No account, no sign-up.</p>
+    ${cur ? `<div class="note">You're in <b>${esc(cur.name)}</b> right now. Joining moves you to ${esc(h.name)}. If you've already played for ${esc(cur.name)} this week, those scores stay with ${esc(cur.name)} until Monday, and from Monday you count for ${esc(h.name)}.</div>` : ''}
     ${nick() ? '' : '<label class="field"><span>YOUR NAME ON THE HOUSE BOARD</span><input id="nn" maxlength="16" placeholder="Your name" autocomplete="off"><small>Only your house sees this.</small></label>'}
     <button class="link" id="no" type="button">NOT NOW</button>
     <button class="btn dock" id="jn">JOIN ${esc(h.name.toUpperCase())}</button>
@@ -278,7 +360,7 @@ async function hq(code, opts = {}){
     ? `<div class="status"><div class="rk"><small>#</small><span id="rk">${mine.rank}</span></div>
         <div class="l1">${mine.rank === 1 ? 'TOP OF THE LEAGUE' : `OF ${ranked} RANKED ${ranked === 1 ? 'HOUSE' : 'HOUSES'}`}</div>
         <div class="l2">House average <b id="hp">${pct(mine.pct)}</b> · ${mine.players} players · ${mine.days} Dailies</div>
-        ${LG.rival ? `<div class="rival">${LG.rival.dir === 'chase' ? `<b>${LG.rival.gap.toFixed(1)} points</b> behind ${esc(LG.rival.name)} (#${LG.rival.rank}). A strong day from anyone in the house closes it.` : `<b>${LG.rival.gap.toFixed(1)} points</b> ahead of ${esc(LG.rival.name)} (#${LG.rival.rank}). Keep playing to hold it.`}</div>` : ''}</div>`
+        ${LG.rival ? vsHTML(h, mine, LG.rival) : ''}</div>`
     : `<div class="status" style="display:block"><div class="need"><span>${mine ? mine.players : 0} OF ${MIN_PLAYERS}</span> PLAYERS THIS WEEK</div>
         <div class="slots">${Array.from({ length:MIN_PLAYERS }, (_, i) => `<i class="${i < (mine ? mine.players : 0) ? 'on' : ''}" style="animation-delay:${i * 120}ms"></i>`).join('')}</div>
         <div class="l2">${MIN_PLAYERS - (mine ? mine.players : 0) === 1 ? 'One more player' : `${MIN_PLAYERS - (mine ? mine.players : 0)} more players`} from your house need to play a Daily this week to enter the league.</div></div>`;
@@ -286,7 +368,7 @@ async function hq(code, opts = {}){
   app.innerHTML = `<section class="screen">${tabs()}
     ${opts.fresh ? `<div class="kick">HOUSE CREATED · NOW GET YOUR ROOMMATES IN</div>` : opts.joined ? `<div class="kick">YOU'RE IN</div>` : `<div class="kick">QUEEN'S HOUSE LEAGUE · ${weekLabel(LG.week)}</div>`}
     <div class="hero">${crest(h.color, h.mono)}<div><div class="nm">${esc(h.name)}</div><div class="mt">${h.motto ? esc(h.motto) + ' · ' : ''}${h.size} ${h.size === 1 ? 'PLAYER' : 'PLAYERS'} · CODE ${h.code}</div></div></div>
-    ${h.countsElsewhere || opts.later ? `<div class="note">You already played for another house this week, so your scores count for <b>${esc(h.name)}</b> from Monday.</div>` : ''}
+    ${h.countsElsewhere || opts.later ? `<div class="note">You already played for <b>${esc(h.countsFor || 'another house')}</b> this week, so this week's scores stay with them until Monday. From Monday they count for <b>${esc(h.name)}</b>.</div>` : ''}
     ${status}
     <div class="row2"><button class="btn ghost" id="inv" type="button">INVITE A ROOMMATE</button><button class="btn ghost" id="shr" type="button">SHARE OUR SPOT</button></div>
     <div class="sect"><b>THE HOUSE · THIS WEEK</b><span>${LG.week.daysLeft ? `${LG.week.daysLeft} ${LG.week.daysLeft === 1 ? 'DAY' : 'DAYS'} LEFT` : 'LAST DAY'}</span></div>
@@ -304,16 +386,44 @@ async function hq(code, opts = {}){
       <li>Ties: more players, then more Dailies played.</li>
       <li>Bragging rights only. There are no prizes in the House League.</li></ul></details>
     <div class="mini"><button id="ed" type="button">EDIT HOUSE</button><button id="lv" type="button">LEAVE HOUSE</button></div>
-    ${playedToday ? `<a class="btn dock" href="${page('/daily.html')}">SEE TODAY'S DAILY</a>` : `<a class="btn go dock" href="${page('/daily.html')}" id="play">PLAY TODAY'S FIVE</a>`}
+    ${playedToday ? `<div class="tmr"><div><small>YOU'VE PLAYED TODAY · NEXT FIVE IN</small><b id="cd">${hm(toNextFive())}</b></div>${h.members.length > 1 && h.members.some(m => !m.today) ? '<button type="button" id="ndg">NUDGE THE HOUSE</button>' : ''}</div>` : ''}
+    ${playedToday ? `<button class="btn dock" id="inv3" type="button">INVITE A ROOMMATE</button>` : `<a class="btn go dock" href="${page('/daily.html')}" id="play">PLAY TODAY'S FIVE</a>`}
   </section>`;
   if (mine && mine.qualified) { countUp($('#rk'), mine.rank, 700); countUp($('#hp'), mine.pct, 900, true); }
-  const invMsg = `Join ${h.name} in the Queen's House League. Play the Daily and your score counts for the house:`;
+  const invMsg = mine && mine.qualified ? `${h.name} is #${mine.rank} in the Queen's House League. Join the house and play today's five (3 min) to push us up:` : inviteMsg(h, mine ? mine.players : 0);
   $('#inv').onclick = async () => { vibe(10); track('house-invite'); await share(invMsg, inviteUrl(h.code)); };
+  const i3 = $('#inv3'); if (i3) i3.onclick = $('#inv').onclick;
+  const ndg = $('#ndg'); if (ndg) ndg.onclick = async () => { vibe(10); track('house-nudge'); const done = h.members.filter(m => m.today).length;
+    await share(`${h.name}: ${done} of ${h.members.length} have played today. New five's up, your turn (3 min):`, `${SITE}/daily.html?ref=house`); };
+  const cdEl = $('#cd'); if (cdEl) { const t = setInterval(() => { if (!document.body.contains(cdEl)) return clearInterval(t); cdEl.textContent = hm(toNextFive()); }, 30000); }
+  checkMoments(h, mine);
   $('#shr').onclick = async () => { vibe(10); track('house-share'); await shareCard(h, mine); };
   $('#ed').onclick = () => editSheet(h);
   $('#lv').onclick = () => leaveSheet(h);
   wireBoard();
   if (opts.fresh || opts.joined) vibe([30, 40, 80]);
+}
+
+/* ================= head to head with the house next to you ================= */
+function vsHTML(h, mine, r){
+  const top = Math.max(mine.pct, r.pct + (r.dir === 'chase' ? 0 : r.gap), 1);
+  const rivalPct = r.dir === 'chase' ? mine.pct + r.gap : mine.pct - r.gap;
+  const row = (c, mo, p, nm, you) => `<div class="vr">${crest(c, mo)}<div class="bar"><i style="--c:${cvar(c)};width:${Math.max(4, 100 * p / Math.max(mine.pct, rivalPct, 1))}%"></i></div><span class="vp">${pct(p)}</span><span class="vn">${esc(nm)}${you ? ' · YOU' : ''}</span></div>`;
+  const rows = r.dir === 'chase' ? row(r.color, r.mono, rivalPct, `#${r.rank} ${r.name}`) + row(h.color, h.mono, mine.pct, `#${mine.rank} ${h.name}`, true) : row(h.color, h.mono, mine.pct, `#${mine.rank} ${h.name}`, true) + row(r.color, r.mono, rivalPct, `#${r.rank} ${r.name}`);
+  return `<div class="vs"><div class="gap">${r.dir === 'chase' ? `<span>${r.gap.toFixed(1)} POINTS</span> TO PASS ${esc(r.name.toUpperCase())}` : `<span>${r.gap.toFixed(1)} POINTS</span> AHEAD OF ${esc(r.name.toUpperCase())}`}</div>${rows}
+    <span class="l2">${r.dir === 'chase' ? 'Every good Daily from anyone in the house closes it.' : 'They can catch you. Keep playing to hold it.'}</span></div>`;
+}
+// Celebrate real changes once: getting into the league, moving up, winning last week.
+function checkMoments(h, mine){
+  if (document.querySelector('.cele')) return;
+  const k = seenKey(h.code, LG.week.from), was = store.get(k) || { q:false, rank:null };
+  const now = { q:!!(mine && mine.qualified), rank:mine && mine.qualified ? mine.rank : null };
+  const lw = LG.lastWeek, hk = lw ? `oc-hotw-${h.code}-${lw.from}` : null;
+  if (lw && lw.yours && lw.yours.rank === 1 && !store.get(hk)) { store.set(hk, 1); store.set(k, now);
+    return celebrate({ color:h.color, mono:h.mono, kick:`HOUSE OF THE WEEK · ${dateOf(lw.from)} – ${dateOf(lw.to)}`, title:esc(h.name.toUpperCase()), text:`${pct(lw.yours.pct)} house average with ${lw.yours.players} players. Best in the Queen's House League last week.`, cta:'SHARE THE WIN', onCta:() => shareCard(null, null, lw), later:'NICE' }); }
+  store.set(k, now);
+  if (now.q && !was.q) return celebrate({ color:h.color, mono:h.mono, kick:'YOU\'RE IN THE LEAGUE', title:`#${now.rank} OF ${LG.ranked.length}`, text:`${esc(h.name)} has ${mine.players} players this week. Now climb.`, cta:'SHARE OUR SPOT', onCta:() => shareCard(h, mine), later:'LET\'S GO' });
+  if (now.q && was.q && was.rank && now.rank < was.rank) return celebrate({ color:h.color, mono:h.mono, kick:'MOVING UP', title:`UP TO #${now.rank}`, text:`${esc(h.name)} passed ${was.rank - now.rank === 1 ? 'a house' : `${was.rank - now.rank} houses`} since you last looked.`, cta:'SHARE OUR SPOT', onCta:() => shareCard(h, mine), later:'KEEP GOING' });
 }
 
 /* ================= the league table ================= */
@@ -353,7 +463,7 @@ async function shareCard(h, mine, hotw){
   else { big = `${mine ? mine.players : 0}/${MIN_PLAYERS}`; line = `players in. ${MIN_PLAYERS} gets us in the league.`; }
   x.fillStyle = hotw ? css('--gold') : col; x.font = '300px "Bowlby One", Impact, sans-serif'; x.fillText(big, 540, 930);
   x.fillStyle = css('--text'); x.font = '700 42px "IBM Plex Mono", monospace'; x.fillText(line, 540, 1020);
-  x.fillStyle = css('--muted'); x.font = '700 36px "IBM Plex Mono", monospace'; x.fillText(hotw ? 'Think your house can take it?' : 'Think your house is better?', 540, 1150);
+  x.fillStyle = css('--muted'); x.font = '700 36px "IBM Plex Mono", monospace'; x.fillText(hotw ? 'Think your house can take it?' : `Think your house is better?${h ? '  ·  CODE ' + h.code : ''}`, 540, 1150);
   x.fillStyle = css('--gold'); x.font = '42px "Bowlby One", Impact, sans-serif'; x.fillText('OFFCAMPUSONTARIO.CA', 540, 1240);
   const url = h ? inviteUrl(h.code) : `${SITE}/house.html?ref=hotw`, text = hotw ? `${who.name} is the House of the Week in the Queen's House League. Think your house can take it?` : `${who.name} in the Queen's House League. Think your house is better?`;
   try { const blob = await new Promise(r => c.toBlob(r, 'image/png')), file = new File([blob], 'house-league.png', { type:'image/png' });

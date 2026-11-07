@@ -85,4 +85,18 @@ await call('POST', `/api/houses/${A.code}/leave`, { playerId:P(2) }, 14);
 ok((await call('GET', `/api/houses/${A.code}?playerId=${P(1)}`, null, 14)).b.size === 1 && (await call('GET', `/api/me?playerId=${P(2)}`, null, 14)).b.house === null, 'leave a house');
 ok((await call('GET', `/api/me?playerId=${P(1)}`, null, 14)).b.house.name === 'The Earl Street Boys', '/api/me says which house you are in');
 ok((await call('GET', '/api/houses/ZZZZZZ', null, 14)).s === 404, 'unknown house');
+// ---------- today's contribution is only claimed once the server has the score ----------
+const N = P(40), G = (await call('POST', '/api/houses', { playerId:N, name:'Proof House' }, 15)).b;
+let lg = (await call('GET', `/api/league?playerId=${N}`, null, 15)).b;
+ok(lg.mine.playedToday === false && lg.mine.todayCounted === false, 'before the score reaches the server: not counted');
+await play(N, 15, 500, 500, 500);
+lg = (await call('GET', `/api/league?playerId=${N}`, null, 15)).b;
+ok(lg.mine.playedToday && lg.mine.todayCounted, 'after the server saves it: counted');
+const sw2 = (await call('GET', `/api/league?playerId=${P(3)}`, null, 9)).b;
+ok(sw2.mine.countsFor === 'The Earl Street Boys' && sw2.mine.countsElsewhere, 'switcher: the league names the house you still count for');
+// ---------- every day keeps its own max (future v3 days are read with their own max) ----------
+const V = P(41); await store.setJSON('player/' + V, { nick:'Future', crews:[], at:1, hist:{ 15:{ t:4000, p:[800, 800, 800, 800, 800], v:3, max:5000 } } });
+const Hv = (await call('POST', '/api/houses', { playerId:V, name:'Future House' }, 15)).b;
+ok((await call('GET', `/api/houses/${Hv.code}?playerId=${V}`, null, 15)).b.members[0].pct === 80, 'a v3 day out of 5,000 counts as 80% (its own max), not out of 3,000');
+const rec = await store.get(`score/15/${N}`); ok(rec.v === 2 && rec.max === 3000 && (await store.get('player/' + N)).hist[15].max === 3000, 'new scores save their version and max');
 console.log('house league tests passed');
