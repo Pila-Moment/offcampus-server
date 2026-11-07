@@ -120,6 +120,8 @@ h2.h span{color:var(--gold)}
 .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .cat{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:16px;border-radius:16px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--night-3);font-family:var(--display);font-size:15px}
 .cat em{font-style:normal;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em;padding:4px 7px;border-radius:6px;background:var(--good);color:var(--ink)}
+.concept{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--night-2);box-shadow:inset 0 0 0 2px var(--gold);font-size:13px;font-weight:600;line-height:1.45;color:var(--text)}
+.concept b{color:var(--gold);letter-spacing:.08em}
 /* founding deal */
 .deal{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .deal .free{padding:24px;border-radius:22px;background:var(--good);color:var(--ink)}
@@ -177,27 +179,27 @@ reel_cards = BRANDS + BRANDS[:4] + [sample] + BRANDS[5:8]   # 16 cards; the 4th 
 reel_pool = ''.join(f'<div class="mc" style="background:{b["col"]}"><b>{b["mono"]}</b><span>{e(b["name"].upper())}</span></div>' for b in reel_cards)
 
 PERKS = [
-  ('star', '1', 'A spot on the daily spinner', 'Every student who unlocks a spin sees your <b>name, logo and offer</b> fly past, every single day.'),
-  ('', '2', 'Your own card on the Prizes page', 'What you give, plus buttons to <b>your website and Instagram</b>. Every click is counted for you.'),
-  ('', '3', 'A round all about you', 'Once a month the daily features you: a Survey Showdown board like <b>"Name a drink at your spot"</b>, or your storefront as the Drop the Pin photo, so students learn exactly where you are.'),
-  ('', '4', 'Winners post you', 'Winners who <b>post their prize and tag you</b> will get it doubled. Real students putting your spot on their story, in front of their friends.'),
-  ('', '5', 'Instagram and TikTok features', 'On <b>@offcampuskingston</b>: a launch post with every founding partner, a "Spot of the Week" feature, and winner shoutouts.'),
-  ('', '6', 'Ask Queen\'s anything', 'Thinking about a new item or new hours? We put your question in a round and send you <b>real answers from Queen\'s students</b>.'),
-  ('', '7', 'The January Cup', 'Queen\'s vs Western, the big event we\'re planning. Founding partners are on <b>the prizes and the promo</b>.'),
-  ('', '8', 'A counter card', 'A print-ready QR card for your counter. Customers play while they wait, and <b>come back to use what they win</b>.'),
-  ('', '9', 'A weekly report', 'How many students <b>landed on you, clicked, won a code and walked in</b>. Plain numbers, every week.'),
+  ('star', '1', 'A spot on the daily spinner', 'Students who unlock a spin would see your <b>name, logo and offer</b> fly past.'),
+  ('', '2', 'A card for your spot', 'What you give, plus buttons to <b>your website and Instagram</b>.'),
+  ('', '3', 'A round all about you', 'The daily could feature you: a Survey Showdown board like <b>"Name a drink at your spot"</b>, or your storefront as the Drop the Pin photo, so students learn exactly where you are.'),
+  ('', '4', 'Winners post you', 'Winners who <b>post their prize and tag you</b> could get it doubled. Real students putting your spot on their story, in front of their friends.'),
+  ('', '5', 'Instagram and TikTok features', 'Ideas for <b>@offcampuskingston</b>: a partner post, a "Spot of the Week" feature, and winner shoutouts.'),
+  ('', '6', 'Ask Queen\'s anything', 'Thinking about a new item or new hours? We could put your question in a round and share the <b>real answers</b> it gets.'),
+  ('', '7', 'A Queen\'s vs Western cup', 'An event idea, not scheduled. Partners would be on <b>the prizes and the promo</b>.'),
+  ('', '8', 'A counter card', 'A print-ready QR card for your counter. Customers could play while they wait, and <b>come back to use what they win</b>.'),
+  ('', '9', 'A report (not built yet)', 'The plan: how many students <b>landed on you, clicked, won a code and walked in</b>.'),
 ]
 perk_cols = ['var(--gold)', 'var(--mint)', 'var(--pin)', 'var(--hi)', 'var(--mint)', 'var(--amber)', 'var(--red)', 'var(--mint)', 'var(--gold)']
 perks = ''.join(f'<div class="perk {k}"><span class="ic" style="background:{perk_cols[i] if k != "star" else "var(--ink)"}">{n}</span><h3>{t}</h3><p>{d}</p></div>' for i, (k, n, t, d) in enumerate(PERKS))
 
 FAQ = [
-  ('What does it cost?', 'Your first month is free; you only cover the prizes students win. After that it\'s a flat monthly fee that we set together with founding partners, and founding partners keep the best rate. We never take a cut of your sales.'),
-  ('Do I need an app, a tablet or any tech?', 'No. Students will show the code on their phone. Your staff look at it, check the live clock is ticking (so it isn\'t a screenshot), and tap redeem. That\'s it.'),
-  ('What stops people from cheating?', 'Each code will work once, one per student, with a live clock so a screenshot won\'t pass. You\'ll also set a weekly cap, so you never give out more than you planned.'),
-  ('What if too many students show up?', 'You set how many codes go out each week and which days and hours they work. When they\'re gone, your spot rests until next week.'),
-  ('Will this just bring in bargain hunters who never come back?', 'That\'s the big problem with coupon sites, and why we built this differently. Students earn your offer by playing a game about their school, it\'s a daily game, so they can see you every day, and the best offers are "free with purchase" or slow-hour deals that bring in paying customers. Your weekly report shows how many come in.'),
-  ('Who plays?', 'Queen\'s students. The game is about Queen\'s, made for Queen\'s, and promoted through Queen\'s student channels. We launch at Queen\'s in January.'),
-  ('Can I change my offer or stop?', 'Anytime. No contract. Message us and it\'s changed the same day.'),
+  ('What does it cost?', 'Nothing is set yet. The idea is a free first month where you\'d only cover the prizes students win, then a flat monthly fee agreed with early partners. We wouldn\'t take a cut of your sales.'),
+  ('Do I need an app, a tablet or any tech?', 'The plan is no. Students would show the code on their phone. Your staff look at it, check the live clock is ticking (so it isn\'t a screenshot), and tap redeem. That\'s it.'),
+  ('What stops people from cheating?', 'The plan: each code works once, one per student, with a live clock so a screenshot won\'t pass, and you set a weekly cap so you never give out more than you planned. This isn\'t built yet.'),
+  ('What if too many students show up?', 'The plan is that you\'d set how many codes go out each week and which days and hours they work.'),
+  ('Will this just bring in bargain hunters who never come back?', 'That\'s the big problem with coupon sites, and why we\'re designing this differently. Students earn your offer by playing a game about their school, it\'s a daily game, so they can see you every day, and the best offers are "free with purchase" or slow-hour deals that bring in paying customers. We\'d want to show you how many come in.'),
+  ('Who plays?', 'Queen\'s students. The game is about Queen\'s, made for Queen\'s, and promoted through Queen\'s student channels. Right now it\'s a free daily game at Queen\'s. Prizes and partner deals aren\'t live.'),
+  ('Can I change my offer or stop?', 'Nothing is signed or live yet. If it goes ahead, the idea is no contract: change or stop anytime.'),
   ('Who\'s behind Off Campus?', 'Josh Crane, building games for Ontario university students, starting with Queen\'s. Message him directly on Instagram at @offcampuskingston.'),
 ]
 faq = ''.join(f'<details><summary>{q}</summary><p>{a}</p></details>' for q, a in FAQ)
@@ -210,12 +212,13 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
 <section class="hero">
   <div>
     <div class="mine" id="mine">MADE FOR YOUR SPOT</div>
-    <div class="kick">FOUNDING PARTNERS · LAUNCHING AT QUEEN'S IN JANUARY</div>
-    <h1>GIVE US YOUR STUDENT DEAL AND A FEW PRIZES. <span>WE'LL PUT YOUR SPOT IN FRONT OF QUEEN'S STUDENTS.</span></h1>
-    <p class="sub">All we need from you is the student deal you already offer (or any deal that's worth it to you), plus a few free prizes now and then. <b>That's it.</b></p>
-    <p class="sub">In return, Off Campus will put your business in front of Queen's students, inside a daily game they choose to play. They play, they win your deal, and they walk in to use it. <b>A flyer gets ignored and a coupon gets forgotten, but a prize someone <em>won</em> gets claimed.</b></p>
-    <div class="ctas"><a class="btn" href="#join">CLAIM A FOUNDING SPOT</a><a class="btn alt" id="try" href="daily.html">SEE YOUR SPOT IN THE GAME &rarr;</a></div>
-    <div class="trust"><span>First month free</span><span>No commission</span><span>No contract</span><span>No tech needed</span></div>
+    <div class="kick">EARLY CONCEPT · LOOKING FOR KINGSTON PARTNERS</div>
+    <h1>YOUR STUDENT DEAL, INSIDE A GAME QUEEN'S STUDENTS PLAY. <span>HERE'S WHAT WE'RE PROPOSING.</span></h1>
+    <p class="concept"><b>EARLY CONCEPT.</b> Everything on this page is a proposal. No prizes, partner deals, reports, events or launch dates are live, funded or guaranteed yet.</p>
+    <p class="sub">What we'd ask a partner for: the student deal you already offer (or any deal that's worth it to you), plus a few free prizes now and then.</p>
+    <p class="sub">The idea: your business shows up inside a daily game Queen's students already choose to play. They'd win your deal and walk in to use it. <b>A flyer gets ignored and a coupon gets forgotten, but a prize someone <em>won</em> gets claimed.</b></p>
+    <div class="ctas"><a class="btn" href="#join">TALK TO US ABOUT IT</a><a class="btn alt" id="try" href="daily.html">SEE A SAMPLE DEMO &rarr;</a></div>
+    <div class="trust"><span>Proposed:</span><span>first month free</span><span>no commission</span><span>no contract</span><span>no tech needed</span></div>
   </div>
   <div class="phone" aria-hidden="true"><div class="screen">
     <div class="s">SPIN 1 OF 2</div><div class="t">PICK YOUR SPOT</div>
@@ -252,20 +255,20 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
 </section>
 
 <section>
-  <div class="kick">HOW IT WORKS</div>
+  <div class="kick">HOW IT WOULD WORK</div>
   <h2 class="h">FOUR STEPS. <span>ZERO WORK FOR YOU.</span></h2>
   <ol class="steps4">
     <li><b>You pick an offer</b>Start with the student deal you already give. Add a bigger prize if you want to be seen more.</li>
-    <li><b>Students play the daily</b>Five rounds about Queen's. Score {UNLOCK} out of 5,000 and they unlock the prize spin.</li>
+    <li><b>Students play the daily</b>Five rounds about Queen's. If partners sign on, a high score would unlock a prize spin.</li>
     <li><b>They land on you</b>Spin one picks the spot, spin two reveals your prize. Your name front and centre.</li>
-    <li><b>They walk in</b>They show the code at your counter, staff tap redeem, done. You see it in your weekly report.</li>
+    <li><b>They walk in</b>They'd show the code at your counter, staff tap redeem, done.</li>
   </ol>
 </section>
 
 <section>
-  <div class="kick">EVERYTHING YOU GET</div>
-  <h2 class="h">MORE THAN A DISCOUNT. <span>WE MAKE YOU KNOWN.</span></h2>
-  <p class="sub">Getting students in the door is the start. Here's every way Off Campus puts your spot in front of Queen's.</p>
+  <div class="kick">WHAT WE'RE PROPOSING</div>
+  <h2 class="h">MORE THAN A DISCOUNT. <span>IF IT GOES TO PLAN.</span></h2>
+  <p class="sub">These are ideas, not commitments. Here's how a partner spot could work.</p>
   <div class="perks">{perks}</div>
 </section>
 
@@ -278,20 +281,20 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
     <div class="offer"><small>FILL QUIET HOURS</small><b>A slow-hour deal</b><p>Only works Monday to Wednesday, 2 to 5. Turn your emptiest hours into your busiest.</p><em>COSTS YOU: EMPTY SEATS</em></div>
     <div class="offer hot"><small>GETS POSTED</small><b>A big prize, a few a week</b><p>A free room for 4, two free entries, a free crewneck. You pick how many. This is what students screenshot and share.</p><em>COSTS YOU: YOU DECIDE</em></div>
   </div>
-  <p class="note"><b>Bigger prize, more spins.</b> Spots with better offers come up more often on the spinner and sit higher on the Prizes page. Everyone's competing for the same students, and the best offer wins the most of them.</p>
+  <p class="note"><b>Bigger prize, more spins.</b> Spots with better offers would come up more often on the spinner. Everyone's competing for the same students, and the best offer wins the most of them.</p>
 </section>
 
 <section>
-  <div class="x2"><span class="big">×2</span><div><b>POST IT, DOUBLE IT.</b><p>Every winner will get the same deal: post your prize on your story, tag the spot, and we double it. For the cost of one extra coffee, you get a Queen's student showing your spot to all their friends.</p></div></div>
+  <div class="x2"><span class="big">×2</span><div><b>POST IT, DOUBLE IT.</b><p>An idea we'd like to test: winners who post their prize on their story and tag the spot get it doubled. For the cost of one extra coffee, you'd get a Queen's student showing your spot to their friends.</p></div></div>
 </section>
 
 <section>
-  <div class="kick">YOU'RE IN CONTROL · BUILT FOR OUR JANUARY LAUNCH</div>
+  <div class="kick">PROPOSED CONTROLS · NOT BUILT YET</div>
   <h2 class="h">YOUR OFFER, <span>YOUR RULES.</span></h2>
   <ul class="ctrl">
     <li><span><b>Set a weekly cap</b>Never give out more than you planned.</span></li>
     <li><span><b>Pick days and hours</b>Only weekdays, only afternoons, whatever works.</span></li>
-    <li><span><b>One per student</b>Each code will work once, with a live clock so screenshots don't pass.</span></li>
+    <li><span><b>One per student</b>Each code would work once, with a live clock so screenshots don't pass.</span></li>
     <li><span><b>Nothing for staff to learn</b>Look at the phone, tap redeem. Ten seconds.</span></li>
     <li><span><b>Change it anytime</b>New offer, pause for exams, back in September. One message.</span></li>
     <li><span><b>No cut of your sales</b>No commission, no card fees, no contract.</span></li>
@@ -299,8 +302,8 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
 </section>
 
 <section>
-  <div class="kick">YOUR WEEKLY REPORT · STARTS AT LAUNCH</div>
-  <h2 class="h">EVERY CLICK, CODE AND VISIT, <span>COUNTED.</span></h2>
+  <div class="kick">PROPOSED REPORT · NOT BUILT YET</div>
+  <h2 class="h">WHAT A REPORT <span>COULD SHOW.</span></h2>
   <div class="dash"><div class="top"><div class="who"><i id="dMono" style="background:{sample["col"]}">{sample["mono"]}</i><div><b id="dName">{e(sample["name"])}</b><span>YOUR WEEK ON OFF CAMPUS</span></div></div><span class="tag">EXAMPLE NUMBERS</span></div>
     <div class="kpis">
       <div class="kpi hot"><small>Codes redeemed in store</small><b>74</b></div>
@@ -310,26 +313,26 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
       <div class="kpi"><small>Winners who posted you</small><b>21</b></div>
     </div>
     <div class="week" aria-label="Codes redeemed by day">{week}</div>
-    <p class="foot">Codes redeemed by day. Example of the report you'd get every week.</p></div>
+    <p class="foot">Made-up example numbers, to show what a report could look like.</p></div>
 </section>
 
 <section>
   <div class="kick">ONE SPOT PER CATEGORY</div>
-  <h2 class="h">ONE COFFEE SHOP. ONE GYM. ONE BAR. <span>FIRST COME, FIRST SERVED.</span></h2>
-  <p class="sub">To make every spot worth it, founding partners get their category to themselves at launch. Once a category is taken, the next business in it waits for an opening.</p>
+  <h2 class="h">ONE COFFEE SHOP. ONE GYM. ONE BAR. <span>THE IDEA.</span></h2>
+  <p class="sub">One idea to make every spot worth it: early partners would get their category to themselves.</p>
   <div class="cats">{cats}</div>
 </section>
 
 <section>
-  <div class="kick">THE FOUNDING PARTNER DEAL</div>
-  <h2 class="h">GET IN BEFORE <span>JANUARY.</span></h2>
+  <div class="kick">WHAT AN EARLY PARTNER DEAL COULD BE</div>
+  <h2 class="h">A PROPOSAL, <span>NOT A PROMISE.</span></h2>
   <div class="deal">
-    <div class="free"><small>FOUNDING PARTNERS</small><b>FIRST MONTH FREE</b><p>You only cover the prizes students win. No contract, no commission, cancel anytime.</p></div>
+    <div class="free"><small>PROPOSED</small><b>FIRST MONTH FREE</b><p>You'd only cover the prizes students win. Nothing is set until we agree on it together.</p></div>
     <ul>
-      <li><span><b>Your category, locked</b> for launch.</span></li>
-      <li><span><b>Your logo on the launch posts</b> and the January Cup promo.</span></li>
-      <li><span><b>The founding rate, kept</b> after your free month.</span></li>
-      <li><span><b>First say on new features</b>: tell us what you need and we build it.</span></li>
+      <li><span><b>Your category to yourself</b> (proposed).</span></li>
+      <li><span><b>Your logo on our partner posts</b> (proposed).</span></li>
+      <li><span><b>An early-partner rate</b> (proposed).</span></li>
+      <li><span><b>A say in what we build next</b>.</span></li>
     </ul>
   </div>
 </section>
@@ -342,8 +345,8 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
 
 <section id="join">
   <div class="join">
-    <div><div class="kick">CLAIM A FOUNDING SPOT</div><h2>LET'S PUT YOUR SPOT <span>IN THE GAME.</span></h2>
-      <p class="sub">Tell us who you are and what you might offer. Josh will message you within a day to set it up. No commitment until you say yes.</p>
+    <div><div class="kick">INTERESTED?</div><h2>LET'S <span>TALK IT THROUGH.</span></h2>
+      <p class="sub">Tell us who you are and what you might offer. Josh will get back to you to talk it through. No commitment either way.</p>
       <p class="dm">Rather message? <a href="{ig}" target="_blank" rel="noopener">DM @offcampuskingston on Instagram</a></p>
       <p class="dm"><a id="try3" href="daily.html">Or try the game first &rarr;</a></p></div>
     <form name="founding-partner" method="POST" action="thanks.html" data-netlify="true" netlify-honeypot="company-site">
@@ -360,7 +363,7 @@ b_body = f'''<header class="bb"><a class="logo" href="./">OFF <span>CAMPUS</span
         <label class="ck"><input type="checkbox" name="interest" value="Parents offer"><span><b>A parents offer</b> · winners send it home and parents pay the rest (cleaning, meal prep, storage)</span></label>
       </fieldset>
       <label>ANYTHING ELSE<textarea name="message"></textarea></label>
-      <button class="btn" type="submit">CLAIM A FOUNDING SPOT</button>
+      <button class="btn" type="submit">SEND IT</button>
     </form>
   </div>
 </section>'''
@@ -397,8 +400,8 @@ b_js = '''<script>
 </script>'''
 
 page_html = ('<!doctype html>\n<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-  '<title>Off Campus for Kingston Businesses</title>\n<meta name="description" content="Get Queen\'s students through your door. Off Campus is the free daily game for Queen\'s students, with prizes from Kingston spots. Founding partners: first month free.">\n'
-  '<meta property="og:title" content="Off Campus for Kingston Businesses">\n<meta property="og:description" content="Turn Queen\'s students into regulars. First month free for founding partners.">\n'
+  '<title>Off Campus for Kingston Businesses</title>\n<meta name="description" content="An early concept for Kingston businesses: your student deal inside a free daily game Queen\'s students play. Nothing here is live or guaranteed yet.">\n'
+  '<meta property="og:title" content="Off Campus for Kingston Businesses">\n<meta property="og:description" content="An early concept for Kingston businesses: your student deal inside a game Queen\'s students play.">\n'
   f'{FONTS}\n<style>{BASE_CSS}{b_css}</style>\n</head><body>\n{BG}\n<main class="wrap">\n{b_body}\n'
   '<footer><span><b>Off Campus</b> · Kingston, Ontario · Not affiliated with Queen\'s University</span><span>The spots on the game demo are made-up examples.</span></footer>\n</main>\n'
   f'{b_js}\n</body></html>\n')
@@ -406,7 +409,7 @@ open(OUT + 'brands.html', 'w').write(page_html)
 
 # thank-you page after the form
 thanks = ('<!doctype html>\n<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Thanks | Off Campus</title>\n'
-  f'{FONTS}\n<style>{BASE_CSS}.box{{margin:12vh auto 0;max-width:560px;text-align:center;display:flex;flex-direction:column;gap:16px;padding:32px 22px;border-radius:24px;background:var(--night-2);box-shadow:0 0 0 3px var(--gold)}}.box h1{{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(36px,8vw,56px);line-height:.95}}.box h1 span{{color:var(--gold)}}.box p{{margin:0;font-size:15px;font-weight:600;line-height:1.55;color:var(--muted)}}</style>\n</head><body>\n{BG}\n<main class="wrap"><div class="box"><h1>YOU\'RE ON <span>THE LIST.</span></h1><p>Thanks! Josh will message you within a day to set up your founding spot.</p><a class="btn" href="daily.html">PLAY TODAY\'S FIVE WHILE YOU WAIT</a><a href="./" style="font-size:13px;font-weight:700;color:var(--muted)">Back to Off Campus</a></div></main>\n</body></html>\n')
+  f'{FONTS}\n<style>{BASE_CSS}.box{{margin:12vh auto 0;max-width:560px;text-align:center;display:flex;flex-direction:column;gap:16px;padding:32px 22px;border-radius:24px;background:var(--night-2);box-shadow:0 0 0 3px var(--gold)}}.box h1{{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(36px,8vw,56px);line-height:.95}}.box h1 span{{color:var(--gold)}}.box p{{margin:0;font-size:15px;font-weight:600;line-height:1.55;color:var(--muted)}}</style>\n</head><body>\n{BG}\n<main class="wrap"><div class="box"><h1>YOU\'RE ON <span>THE LIST.</span></h1><p>Thanks! Josh will get back to you to talk it through. Nothing is set until you both agree.</p><a class="btn" href="daily.html">PLAY TODAY\'S FIVE WHILE YOU WAIT</a><a href="./" style="font-size:13px;font-weight:700;color:var(--muted)">Back to Off Campus</a></div></main>\n</body></html>\n')
 open(OUT + 'thanks.html', 'w').write(thanks)
 
 # link maker for Josh: build a personal preview link for a business

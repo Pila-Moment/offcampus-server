@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Know your school? Compete for free prizes. The daily game for Queen's students, plus party games and prizes from Kingston spots.">
+<meta name="description" content="Know your school? Prove it. The daily game for Queen's students, plus party games and club games.">
 <meta property="og:title" content="Off Campus">
-<meta property="og:description" content="Know your school? Compete for free prizes. The daily game for Queen's students.">
+<meta property="og:description" content="Know your school? Prove it. Five new rounds about Queen's every day.">
 <meta property="og:url" content="https://offcampusontario.ca/">
 <title>Off Campus</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -67,6 +67,16 @@ footer b{color:var(--text)}
 .play{display:flex;align-items:center;justify-content:center;min-height:62px;margin-top:8px;border-radius:16px;background:var(--good);color:var(--ink);font-family:var(--display);font-size:clamp(20px,2.4vw,28px);letter-spacing:.03em;
   box-shadow:0 6px 0 #1E8A4A, 0 0 34px color-mix(in srgb, var(--good) 45%, transparent);animation:throb 1.4s ease-in-out infinite}
 @keyframes throb{50%{transform:scale(1.03)}}
+.hl{position:relative;display:flex;align-items:center;gap:14px;margin-top:clamp(12px,1.6vw,22px);padding:16px;border-radius:22px;background:linear-gradient(120deg, color-mix(in srgb, var(--mint) 22%, var(--night-2)), var(--night-2) 65%);box-shadow:0 0 0 3px var(--mint);color:var(--text);text-decoration:none;overflow:hidden}
+.hl .hlc{flex:0 0 auto;display:flex;align-items:flex-end;gap:5px}
+.hl .hlc i{display:block;width:26px;height:30px;background:var(--gold);clip-path:polygon(50% 0, 100% 38%, 100% 100%, 0 100%, 0 38%)}
+.hl .hlc i:nth-child(2){width:34px;height:40px;background:var(--mint)}
+.hl .hlc i:nth-child(3){background:var(--red)}
+.hl small{display:block;font-size:11px;font-weight:700;letter-spacing:.18em;color:var(--mint)}
+.hl b{display:block;margin-top:4px;font-family:var(--display);font-weight:400;font-size:clamp(22px,6vw,34px);line-height:.95}
+.hl b span{color:var(--gold)}
+.hl p{margin:6px 0 0;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.hl em{flex:0 0 44px;height:44px;margin-left:auto;display:grid;place-items:center;border-radius:12px;background:var(--mint);color:var(--ink);font-style:normal;font-family:var(--display);font-size:20px}
 .t-daily p{padding-right:0!important}
 .menu .t-party,.menu .t-prize{min-height:0}
 .menu .t-party h2,.menu .t-prize h2{font-size:clamp(28px,min(3.4vw,6vh),52px)}
@@ -125,12 +135,13 @@ footer b{color:var(--text)}
 <h1 class="tag">KNOW YOUR SCHOOL? <span>PROVE IT.</span></h1>
 <nav class="menu" aria-label="Pick one">
   <a class="tile t-daily" href="daily.html"><div class="k"><span>QUEEN'S DAILY</span><em>NEW EVERY DAY</em></div>
-    <h2>TODAY'S <span>FIVE</span></h2><p>Five quick rounds about Queen's. <b>Beat your friends and your crew.</b> New five in <b data-cd>--</b>.</p><span class="play">PLAY TODAY'S 5</span></a>
+    <h2>TODAY'S <span>FIVE</span></h2><p>Five quick rounds about Queen's. <b>Beat your friends. Play for your house.</b> New five in <b data-cd>--</b>.</p><span class="play">PLAY TODAY'S 5</span></a>
   <a class="tile t-party" href="party.html"><div class="k"><span>WITH YOUR FRIENDS</span><em>3 GAMES</em></div>
     <h2>PARTY GAMES</h2><p>For the pregame. Plug the laptop into the TV and play together.</p><span class="go" aria-hidden="true">&rarr;</span></a>
   <a class="tile t-prize" href="clubs.html"><div class="k"><span>FOR CLUBS</span><em>FREE</em></div>
     <h2>CLUB <span>GAMES</span></h2><p>Your club's own game. Guess how everyone answered.</p><span class="go" aria-hidden="true">&rarr;</span></a>
 </nav>
+<a class="hl" href="house.html"><span class="hlc" aria-hidden="true"><i></i><i></i><i></i></span><div><small>QUEEN'S HOUSE LEAGUE</small><b>YOUR HOUSE <span>VS EVERY HOUSE.</span></b><p>Everyone plays the Daily. Your house's average counts. Three players to enter.</p></div><em aria-hidden="true">&rarr;</em></a>
 <div class="live" id="live" hidden></div>
 <a class="suggest" href="daily.html?suggest"><div><b>GOT A QUESTION FOR QUEEN'S?</b><br><span>Suggest it. The best ones make the daily, with your @ on them.</span></div><em>SUGGEST</em></a>
 <a class="forbrands" href="brands.html"><div><b>OWN A SPOT IN KINGSTON?</b><span>Get your business in front of Queen's students.</span></div><em>FOR BRANDS</em></a>
@@ -155,12 +166,13 @@ footer b{color:var(--text)}
   var esc = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
   fetch(API + '/api/home').then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
     if (!d) return; var h = '';
-    if (d.crewOfWeek) h += '<div><small>CREW OF THE WEEK</small><b>' + esc(d.crewOfWeek.name) + '</b><span>' + d.crewOfWeek.players + ' playing · averaging ' + d.crewOfWeek.avg.toLocaleString('en-CA') + ' a day</span></div>';
-    if (d.yesterday) h += '<div><small>YESTERDAY AT QUEEN\'S</small><b>' + Math.round(100 * d.yesterday.yes / d.yesterday.n) + '% said yes</b><span>' + esc(d.yesterday.q) + ' · ' + d.yesterday.yes + ' of ' + d.yesterday.n + ' players</span></div>';
+    if (d.crewOfWeek) h += '<div><small>CREW OF THE WEEK</small><b>' + esc(d.crewOfWeek.name) + '</b><span>' + d.crewOfWeek.players + ' playing · ' + (d.crewOfWeek.pct !== undefined ? d.crewOfWeek.pct.toFixed(1) + '% average' : '') + '</span></div>';
+    (d.closed || (d.yesterday ? [d.yesterday] : [])).forEach(function(y){   // closed questions only, 30+ real answers
+      h += '<div><small>YESTERDAY · REAL ANSWERS</small><b>' + Math.round(100 * y.yes / y.n) + '% said yes</b><span>' + esc(y.q) + ' · ' + y.yes + ' of ' + y.n + ' Off Campus players who answered</span></div>'; });
     if (h) { var el = document.getElementById('live'); el.innerHTML = h; el.hidden = false; }
   }).catch(function(){});
 })();
 </script>
 
-<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script>if(/^(www\.)?offcampusontario\.ca$/.test(location.hostname)){var gc=document.createElement("script");gc.async=true;gc.src="https://gc.zgo.at/count.js";gc.setAttribute("data-goatcounter","https://offcampusontario.goatcounter.com/count");document.head.appendChild(gc);}</script>
 </body></html>

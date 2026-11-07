@@ -222,8 +222,13 @@ def send_of(r):
         if k.lower() in r[0].lower(): return v
     return None
 clean = lambda b: { 'type':'survey', 'q':b['q'], 'a':[{ 't':x['t'], 'p':x['p'], 'k':x['k'] } for x in b['a']] }
+import hashlib
+# Stable question ids (frozen Receipts): the id comes from the wording, so reordering the list never changes it.
+# Rewording a question makes a new id; qv is its version.
+def qid_of(text): return 'rq_' + hashlib.sha1(' '.join(text.lower().split()).encode()).hexdigest()[:10]
 def day(r1, b1, r2, b2, p):
-    R = lambda r: dict({ 'type':'receipts', 'q':r[0], 'pct':r[1] }, **({ 'send':send_of(r) } if send_of(r) else {}))
+    # The % in RECEIPTS above was written by us, not answered by anyone, so it is never sent to the page (Receipts rounds are answer-only).
+    R = lambda r: dict({ 'type':'receipts', 'q':r[0], 'qid':qid_of(r[0]), 'qv':1 }, **({ 'send':send_of(r) } if send_of(r) else {}))
     return { 'rounds':[ R(r1), clean(b1), R(r2), clean(b2),
         { 'type':'pin', 'photo':{ k: p[k] for k in ['img','year','lat','lng','title','blurb','credit','license','source'] } } ] }
 plan = {0: (RECEIPTS[0], first[0], RECEIPTS[1], first[1], photos['cavalry1916'])}   # day 1 already happened: keep it exactly
@@ -243,5 +248,13 @@ for d in range(N):
 days = [day(*plan[d]) for d in range(N)]
 used = [d['rounds'][1]['q'] for d in days] + [d['rounds'][3]['q'] for d in days]
 assert len(set(used)) == len(used), 'repeat board'
+# The server's copy of every Receipts question: id, version, wording, the day it's first asked, and its round.
+bank, seen = [], {}
+for i, d in enumerate(days):
+    for k in (0, 2):
+        q = d['rounds'][k]
+        if q['qid'] in seen: seen[q['qid']]['repeats'].append(i + 1); continue   # asked again later: same id, never asked twice to one person
+        seen[q['qid']] = { 'id':q['qid'], 'v':1, 'text':q['q'], 'firstDay':i + 1, 'round':k, 'repeats':[] }; bank.append(seen[q['qid']])
+open(SP + '/rq-bank.mjs', 'w').write('// Made by build-src/daily/content.py. Every Receipts question: stable id, version, wording, first day and round.\nexport default ' + json.dumps(bank, ensure_ascii=False, indent=0) + ';\n')
 open(SP + '/daily/parts/days.js', 'w').write('const DAYS = ' + json.dumps(days, ensure_ascii=False) + ';\n')
 print('days', len(days), 'boards', len(used), 'tame', len(tame), 'spicy', len(spicy))

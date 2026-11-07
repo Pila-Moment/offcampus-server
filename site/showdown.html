@@ -877,7 +877,7 @@ function titleScreen(){
       <li><b>3</b>Clear the board before 3 strikes, or the other team steals every point.</li>
     </ol>
     <button class="btn red" id="playBtn">PLAY</button>
-    <p class="fine">We asked 100 Queen's students. Can you guess what they said?</p>
+    <p class="fine">Our own board of top answers, made up by Off Campus. Can you guess them?</p>
   </section>`;
   wireSound();
   $('#playBtn').onclick = () => { SFX.unlock(); SFX.whoosh(); vibe(20); setupScreen(); };
@@ -940,7 +940,7 @@ function renderGame(){
       ${[0,1].map(t => `<div class="team t${t}" id="team${t}"><span class="tag">PLAYING</span><span class="tname">${esc(S.teams[t].name)}</span><span class="tscore" id="score${t}">${S.teams[t].score}</span></div>`).join('')}
     </header>
     <div class="roundline"><span class="rlabel">ROUND ${S.round + 1}/${ROUNDS} <i class="house">100 SURVEYED</i></span><span class="strikes" id="strikes" hidden><i></i><i></i><i></i></span><span class="ocr"><a class="sound ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span></div>
-    <section class="qcard"><div class="asked">WE ASKED 100 QUEEN'S STUDENTS</div><p id="qtext"></p></section>
+    <section class="qcard"><div class="asked">OFF CAMPUS BOARD · NOT A SURVEY</div><p id="qtext"></p></section>
     <div class="marquee" id="marquee"><div class="board" id="board" style="grid-template-rows:repeat(${Math.ceil(S.board.a.length / 2)},1fr)">${tiles}</div></div>
     <section class="deck" id="deck" aria-live="polite"></section>
   </div>`;
@@ -1077,7 +1077,7 @@ function lockDeck(){ clockStop(); const d = $('#deck'); if (d) d.querySelectorAl
 async function suspense(text, secs, withCrash){
   const m = $('#marquee'); if (!m) return;
   const b = document.createElement('div'); b.className = 'bubble';
-  b.innerHTML = `<small>${S.phase === 'steal' ? 'FOR ALL THE POINTS' : 'SURVEY SAYS…'}</small><b>${esc(text)}</b>`;
+  b.innerHTML = `<small>${S.phase === 'steal' ? 'FOR ALL THE POINTS' : 'THE BOARD SAYS…'}</small><b>${esc(text)}</b>`;
   m.appendChild(b); m.classList.add('hot');
   SFX.roll(secs, withCrash);
   await wait(reduced ? 200 : secs * 1000);
@@ -1273,5 +1273,5 @@ titleScreen();
 })();
 </script>
 
-<script data-goatcounter="https://offcampusontario.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+<script>if(/^(www\.)?offcampusontario\.ca$/.test(location.hostname)){var gc=document.createElement("script");gc.async=true;gc.src="https://gc.zgo.at/count.js";gc.setAttribute("data-goatcounter","https://offcampusontario.goatcounter.com/count");document.head.appendChild(gc);}</script>
 </body></html>
