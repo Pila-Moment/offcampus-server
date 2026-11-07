@@ -1187,6 +1187,21 @@ button.gate{width:100%;border:0;font:inherit;color:inherit;cursor:pointer;-webki
 .gband{position:fixed;top:0;left:0;right:0;z-index:60;padding:5px 8px;background:var(--stamp);color:var(--paper);font:700 10.5px var(--mono);letter-spacing:.12em;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 body.gdemo{padding-top:24px}
 .bnote{margin:0;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted);text-align:center}
+.hstrip{display:flex;align-items:center;gap:10px;min-height:58px;padding:8px 10px 8px 12px;border-radius:16px;background:var(--night-2);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--c, var(--gold)) 70%, transparent);color:var(--text);text-decoration:none;animation:hsin .5s var(--ease-pop) both}
+@keyframes hsin{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.hstrip .hc{position:relative;flex:0 0 34px;height:37px;display:grid;place-items:end center;padding-bottom:5px;color:var(--ink);font-family:var(--display);font-size:13px;line-height:1}
+.hstrip .hc::before{content:"";position:absolute;inset:0;background:var(--c, var(--gold));clip-path:polygon(50% 0, 100% 38%, 100% 100%, 0 100%, 0 38%)}
+.hstrip .hc b{position:relative;font-weight:400}
+.hstrip .ht{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;color:inherit;text-decoration:none}
+.hstrip .ht b{font-family:var(--display);font-weight:400;font-size:14px;line-height:1.05;overflow-wrap:anywhere}
+.hstrip .ht small{font-size:11px;font-weight:600;line-height:1.3;color:var(--muted)}
+.hstrip i,.hstrip button{flex:0 0 auto;min-height:44px;padding:0 12px;border-radius:12px;background:var(--c, var(--gold));color:var(--ink);font-style:normal;font-family:var(--display);font-size:13px;display:grid;place-items:center}
+@media (max-height:900px){.hstrip{min-height:48px;padding:2px 6px 2px 10px}.hstrip .ht small{display:none}.hstrip .hc{flex-basis:28px;height:30px;font-size:11px}#housebox:has(.hstrip) ~ .cd .tmrw{display:none}}
+@media (max-height:700px){#housebox:has(.hstrip) ~ #crewsbox .crew .cmeta{display:none}}
+#housebox:empty,#housechip:empty{display:none}
+.hchip{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border-radius:12px;background:var(--night-2);box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--c, var(--gold)) 60%, transparent);color:var(--text);text-decoration:none;font-size:11.5px;font-weight:700;letter-spacing:.06em}
+.hchip em{font-style:normal;color:var(--c, var(--gold))}
+.hchip span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .linkbtn{display:inline;min-height:0;padding:6px 2px;color:var(--mint);font:700 11px var(--mono);letter-spacing:.06em;text-decoration:underline}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -1379,7 +1394,7 @@ let S = null;
 function fresh(){ S = { i:-1, results:[], total:0 }; }
 const R = () => DAY.rounds[S.i];
 const KIND = { receipts:'RECEIPTS', survey:'SURVEY SHOWDOWN', pin:'DROP THE PIN' };
-const TABS = on => `<nav class="tabs" aria-label="Off Campus"><a class="home" href="./" aria-label="Off Campus home">OC</a><a href="daily.html" class="${on === 'daily' ? 'on' : ''}">DAILY</a><a href="party.html" class="${on === 'party' ? 'on' : ''}">PARTY GAMES</a><a href="clubs.html" class="${on === 'clubs' ? 'on' : ''}">CLUBS</a></nav>`;
+const TABS = on => `<nav class="tabs" aria-label="Off Campus"><a class="home" href="./" aria-label="Off Campus home">OC</a><a href="daily.html" class="${on === 'daily' ? 'on' : ''}">DAILY</a><a href="party.html" class="${on === 'party' ? 'on' : ''}">PARTY GAMES</a><a href="${housePage()}">HOUSES</a></nav>`;
 const unlockText = t => t >= UNLOCK ? 'PRIZE SPIN UNLOCKED' : `${fmt(UNLOCK - t)} MORE TO UNLOCK THE PRIZE SPIN`;
 function hud(){
   return `<div class="hud"><div class="rn"><small>${KIND[R().type]}</small>ROUND ${S.i + 1}/${DAY.rounds.length}</div>
@@ -1414,7 +1429,7 @@ function intro(){
     <p class="sub">Five rounds about ${esc(DAY.school)}, about three minutes. Everyone at ${esc(DAY.school)} gets the same five today.</p>
     ${PRIZES_LIVE || GUEST ? `<div class="goal"><b>${fmt(UNLOCK)}</b><span>${PRIZES_LIVE || GUEST ? `${GUEST ? `Demo: score ${fmt(UNLOCK)} out of ${fmt(DAY_MAX)} to see the <em>sample prize spin</em>.` : `Score ${fmt(UNLOCK)} out of ${fmt(DAY_MAX)} to unlock today's <em>free prize spin</em>.`}` : `Score ${fmt(UNLOCK)} out of ${fmt(DAY_MAX)} to unlock the prize spin.`}</span></div>` : ''}
     ${CHAL !== null && !GUEST ? `<div class="chal"><small>YOUR FRIEND GOT</small><b>${fmt(CHAL)}</b><span>Same five, today only.<br>Can you beat it?</span></div>` : ''}
-    <div id="joinbox"></div><div id="crewstrip"></div>
+    <div id="joinbox"></div><div id="housechip"></div><div id="crewstrip"></div>
     <div class="five" aria-label="Today's rounds">
       <div class="r"><b>1</b><span>RECEIPTS</span></div><div class="s"><b>2</b><span>SHOW­DOWN</span></div><div class="r"><b>3</b><span>RECEIPTS</span></div><div class="s"><b>4</b><span>SHOW­DOWN</span></div><div class="p"><b>5</b><span>DROP PIN</span></div></div>
     <p class="howto"><b>Receipts:</b> yes or no, private, no points. <b>Showdown:</b> give your answer, then name the top answers before 3 X's. <b>Drop the Pin:</b> where and when was this photo taken?</p>
@@ -1424,7 +1439,7 @@ function intro(){
   $('#go').onclick = () => { SFX.ok(); vibe(20); track('start'); next(); };
   const lg = $('#login'); if (lg) lg.onclick = () => { SFX.tap(); loginSheet(); };
   const isg = $('#isugg'); if (isg) isg.onclick = () => { SFX.tap(); suggestSheet(); };
-  if (!GUEST) { joinCard($('#joinbox')); crewStrip($('#crewstrip')); }
+  if (!GUEST) { joinCard($('#joinbox')); houseChip($('#housechip')); crewStrip($('#crewstrip')); }
   const sk = $('#skip'); if (sk) sk.onclick = () => { SFX.ok(); vibe(20); prize(); };
   if (QS.has('suggest') && !GUEST) setTimeout(suggestSheet, 400);
 }
@@ -1435,6 +1450,29 @@ function sendTexts(round, texts){ if (!CREWS_API || GUEST || !texts.length) retu
 function showReal(res){   // only ever shows how many answered, never a YES/NO split (a moving split gives away the newest vote)
   const el = $('#real'); if (!el || !res || !res.queens) return;
   el.innerHTML = `<span>ANSWERS SO FAR TODAY: <b>${fmt(res.queens.n)}</b></span>`; el.hidden = false;
+}
+
+/* ================= HOUSE LEAGUE ================= */
+const HOUSE_SITE = /(^|\.)offcampusontario\.ca$/.test(location.hostname) ? 'https://offcampusontario.ca' : location.origin;   // a preview's invites stay on that preview
+const housePage = q => 'house.html' + (q || '') + (CREWS_API && CREWS_API !== CREWS_URL ? (q ? '&' : '?') + 'api=' + encodeURIComponent(CREWS_API) : '');
+const hcol = c => `var(--${/^[a-z]+$/.test(c || '') ? c : 'gold'}, var(--gold))`;
+async function houseStrip(el){
+  if (!CREWS_API || GUEST || !el) return;
+  let L; try { L = await api('GET', '/api/league?playerId=' + PLAYER_ID); } catch (e) { return; }
+  const m = L.mine;
+  if (!m) { if (document.querySelector('#crewsbox .crew')) return;   // already in a crew: the HOUSES tab is enough
+    el.innerHTML = `<a class="hstrip" href="${housePage()}"><span class="hc"><b>+</b></span><span class="ht"><b>QUEEN'S HOUSE LEAGUE</b><small>Your house vs every house at Queen's. Start one with your roommates.</small></span><i>START</i></a>`; return; }
+  const line = m.countsElsewhere ? `You count for ${esc(m.name)} from Monday`
+    : m.qualified ? `#${m.rank} of ${L.ranked.length} this week · ${m.pct.toFixed(1)}% house average`
+    : `${m.players} of ${L.minPlayers} players this week · ${m.need} more to enter the league`;
+  el.innerHTML = `<div class="hstrip" style="--c:${hcol(m.color)}"><span class="hc"><b>${esc(m.mono)}</b></span><a class="ht" href="${housePage()}"><b>${m.countsElsewhere ? esc(m.name.toUpperCase()) : 'TODAY COUNTED FOR ' + esc(m.name.toUpperCase())}</b><small>${line} · SEE THE LEAGUE &rarr;</small></a><button type="button" id="hinv">INVITE</button></div>`;
+  $('#hinv').onclick = () => { SFX.tap(); track('house-invite'); shareText(`Join ${m.name} in the Queen's House League. Play the Daily and your score counts for the house:`, `${HOUSE_SITE}/house.html?join=${m.code}&ref=house`, 'COPIED, SEND IT TO YOUR ROOMMATES'); };
+}
+async function houseChip(el){
+  if (!CREWS_API || GUEST || !el) return;
+  let L; try { L = await api('GET', '/api/league?playerId=' + PLAYER_ID); } catch (e) { return; }
+  const m = L.mine; if (!m) return;
+  el.innerHTML = `<a class="hchip" href="${housePage()}" style="--c:${hcol(m.color)}"><em>HOUSE</em><span>${esc(m.name.toUpperCase())} · ${m.qualified ? `#${m.rank} THIS WEEK` : `${m.players} OF ${L.minPlayers} PLAYERS`}</span><em>&rarr;</em></a>`;
 }
 
 /* ================= SEND A QUESTION TO A FRIEND ================= */
@@ -1904,7 +1942,7 @@ function newCrewFormHTML(first){
 }
 const CREW_ROWS = innerHeight < 760 ? 3 : 5;   // rows shown per crew board before "+N more"
 function crewCtaHTML(){
-  return `<button class="crewcta" id="crewcta" type="button"><b>START A CREW FOR YOUR HOUSE</b><span>Who wins the week? Loser cleans the kitchen.</span><i>START</i></button>`;
+  return `<button class="crewcta" id="crewcta" type="button"><b>START A CREW</b><span>A casual scoreboard for any group of friends.</span><i>START</i></button>`;
 }
 async function renderCrews(el, myScore){
   if (!CREWS_API || !el) return;
@@ -2027,7 +2065,7 @@ async function results(){
       <div class="total" id="big">0</div><div class="of">OUT OF ${fmt(DAY_MAX)}</div>
       <div class="squares">${S.results.map((r, k) => `<div class="sq"><i style="background:${sqColor(r.pts)};animation-delay:${600 + k * 120}ms"></i><span>${SQLAB[r.type]}</span><b>${r.pts === null ? 'SAVED' : fmt(r.pts)}</b></div>`).join('')}</div>
       <span class="rankstamp">${esc(stamp)}</span></div>
-    ${GUEST ? '' : '<div id="crewsbox"></div>'}
+    ${GUEST ? '' : '<div id="housebox"></div><div id="crewsbox"></div>'}
     ${!live ? '' : ok
       ? (live ? `<div class="gate ok"><b>${GUEST ? 'DEMO: PRIZE SPIN UNLOCKED' : 'YOU UNLOCKED A PRIZE!'}</b><span>${GUEST ? 'This is where a student would spin. The prizes are samples.' : `You needed ${fmt(UNLOCK)}. You got ${fmt(S.total)}.`}</span></div><button class="btn pulse dock go" id="prize">${GUEST ? 'SEE THE SAMPLE SPIN' : 'SPIN FOR YOUR PRIZE!'}</button>`
               : `<button class="gate ok" id="prize" type="button"><b>YOU'D HAVE UNLOCKED A PRIZE!</b><span>You beat ${fmt(UNLOCK)}. The prize wheel drops soon.</span><i class="gate-go">SEE WHAT'S COMING &rarr;</i></button>`)
@@ -2041,7 +2079,7 @@ async function results(){
   countUp($('#big'), S.total, 1500);
   startCountdown();
   wireShare(S.total, pts, types, stamp);
-  if (!GUEST) postScore({ total:S.total, pts }).then(() => renderCrews($('#crewsbox'), S.total));
+  if (!GUEST) postScore({ total:S.total, pts }).then(() => renderCrews($('#crewsbox'), S.total)).then(() => houseStrip($('#housebox')));
   if (ok && $('#prize')) $('#prize').onclick = () => { SFX.ok(); vibe(20); live ? prize() : prizeTeaser(); };
   if (!GUEST) setTimeout(() => { if (!homeTipSheet(st) && store.get('oc-savelater') !== DAY.no) saveSheet(); }, 2600);
 }
@@ -2057,7 +2095,7 @@ function doneScreen(rec){
       <div class="total">${fmt(rec.total)}</div><div class="of">OUT OF ${fmt(DAY_MAX)}</div>
       <div class="squares">${rec.pts.map((p, k) => `<div class="sq"><i style="background:${sqColor(p)}"></i><span>${SQLAB[rec.types[k]]}</span><b>${p === null ? 'SAVED' : fmt(p)}</b></div>`).join('')}</div>
       <span class="rankstamp" style="animation-delay:0s">${esc(stamp)}</span></div>
-    <div id="crewsbox"></div>
+    <div id="housebox"></div><div id="crewsbox"></div>
     ${statsRow(st)}
     ${PRIZES_LIVE ? `<div class="gate ok" style="box-shadow:inset 0 0 0 2px var(--gold)"><b style="color:var(--gold)">PRIZE WHEEL DROPS SOON</b><span>Score ${fmt(UNLOCK)} and you'll spin for free stuff from Kingston spots.</span></div>` : ''}
     ${tailHTML()}
@@ -2066,7 +2104,7 @@ function doneScreen(rec){
   startCountdown();
   wireShare(rec.total, rec.pts, rec.types, stamp);
   joinCard($('#joinbox'));
-  postScore(rec).then(() => renderCrews($('#crewsbox'), rec.total));
+  postScore(rec).then(() => renderCrews($('#crewsbox'), rec.total)).then(() => houseStrip($('#housebox')));
   if (QS.has('suggest') && !GUEST) setTimeout(suggestSheet, 400);
 }
 

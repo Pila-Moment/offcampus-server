@@ -6,7 +6,7 @@ for f in ['daily.html','party.html','brands.html','thanks.html','link.html','sho
     shutil.copy(SP+'/bundle/'+f, H)
 shutil.copytree(SP+'/bundle/photos', H+'/photos')
 shutil.copy(SP+'/site/stats.html', H)
-for f in ['club.html', 'clubs.html']: shutil.copy(SP+'/site/'+f, H)   # club games (exec builder + member game) and the page for club execs   # Josh's stats page (not linked anywhere, no counter)
+for f in ['club.html', 'clubs.html', 'house.html']: shutil.copy(SP+'/site/'+f, H)   # club games (exec builder + member game) and the page for club execs   # Josh's stats page (not linked anywhere, no counter)
 body=open(SP+'/bundle/index.html').read()
 head='''<!doctype html>
 <html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -45,6 +45,7 @@ shutil.copy(SP+'/site/og.jpg', H)
 OG = {'daily.html':("Off Campus · The Queen's Daily", "How well do you know Queen's? Today's five: 3 minutes, free, same five for everyone at Queen's.", "https://offcampusontario.ca/daily.html"),
       'index.html':("Off Campus", "Know your school? Prove it. Five new rounds about Queen's every day.", "https://offcampusontario.ca/"),
       'club.html':("Your club's game · Off Campus", "How well do you know your club? 5 questions, 2 minutes. See how everyone really answered.", "https://offcampusontario.ca/clubs"),
+      'house.html':("Off Campus · Queen's House League", "Your house vs every house at Queen's. Play the Daily, your house's average counts.", "https://offcampusontario.ca/house.html"),
       'party.html':("Off Campus · Party Games", "Party games made for Queen's. Plug in the laptop and play together.", "https://offcampusontario.ca/party.html")}
 for f in glob.glob(H+'/*.html'):
     n = os.path.basename(f); t = open(f).read()

@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en-CA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>House League | Off Campus</title>
+<meta name="description" content="Your house vs every house at Queen's. Everyone plays the Daily, your house's average counts.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+/* ---------- tokens (same as the Queen's Daily) ---------- */
+:root{--night:#07060F;--night-2:#120F24;--night-3:#1C1836;--text:#F6F1E8;--muted:#A49FC0;--gold:#FFC83D;--gold-deep:#B97F05;--red:#FF3B4A;--mint:#7FE0C4;--blue:#4F72FF;--paper:#F6F3EA;--ink:#111111;--cream:#FFF5DE;--good:#3BD67A;--pin:#FF5A1F;--pink:#FF6FB5;--tile:#2246E6;
+  --display:"Bowlby One","Arial Black",Impact,sans-serif;--tall:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--mono:"IBM Plex Mono",Menlo,Consolas,monospace;--ease-out:cubic-bezier(.16,1,.3,1);--ease-pop:cubic-bezier(.2,1.45,.4,1);--hc:var(--gold)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--night);color:var(--text);font:600 14px/1.4 var(--mono);-webkit-tap-highlight-color:transparent}
+body{min-height:100svh}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(45% 32% at 85% 0%, color-mix(in srgb, var(--hc) 30%, transparent), transparent 70%),radial-gradient(45% 35% at 0% 100%, color-mix(in srgb, var(--tile) 35%, transparent), transparent 70%);transition:background .6s var(--ease-out)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+input{font:inherit}
+a{color:inherit}
+#app{max-width:560px;margin:0 auto;padding:max(12px, env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+.screen{display:flex;flex-direction:column;gap:14px;animation:in .45s var(--ease-out)}
+@keyframes in{from{opacity:0;transform:translateY(12px)}}
+.tabs{display:flex;gap:6px}
+.tabs a{flex:1;display:grid;place-items:center;min-height:44px;padding:0 4px;border-radius:12px;background:var(--night-2);box-shadow:inset 0 0 0 1.5px var(--night-3);color:var(--muted);text-decoration:none;font-family:var(--display);font-size:clamp(11px,3.3vw,14px);letter-spacing:.03em;text-align:center;line-height:1}
+.tabs a.home{flex:0 0 44px;color:var(--gold)}
+.tabs a.on{background:var(--hc);color:var(--ink);box-shadow:none}
+.kick{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--mint)}
+h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(38px,11.5vw,60px);line-height:.9;letter-spacing:-.005em}
+h1 span{color:var(--hc)}
+h2{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1}
+p.sub{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;padding:0 18px;border-radius:16px;background:var(--gold);color:var(--ink);font-family:var(--display);font-size:19px;letter-spacing:.01em;box-shadow:0 6px 0 var(--gold-deep);text-decoration:none;transition:transform .12s var(--ease-out), box-shadow .12s var(--ease-out)}
+.btn:active{transform:translateY(3px);box-shadow:0 3px 0 var(--gold-deep)}
+.btn.go{background:var(--good);box-shadow:0 6px 0 #1E8A4A}
+.btn.ghost{background:var(--night-2);color:var(--text);box-shadow:inset 0 0 0 2px var(--night-3);font-size:15px;min-height:50px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dock{position:fixed;left:16px;right:16px;bottom:max(14px, env(safe-area-inset-bottom));width:auto!important;max-width:528px;margin:0 auto;z-index:20}
+.link{align-self:center;min-height:44px;padding:0 10px;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--mint);text-decoration:underline;text-underline-offset:3px}
+.toast{position:fixed;left:50%;top:18%;z-index:60;transform:translateX(-50%);padding:10px 16px;border-radius:12px;background:var(--cream);color:var(--ink);font-family:var(--display);font-size:15px;white-space:nowrap;animation:toast 1.8s var(--ease-out) forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,8px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+/* ---------- the house crest: a little house shape in the house colour ---------- */
+.crest{position:relative;flex:0 0 auto;width:var(--s,56px);height:calc(var(--s,56px) * 1.08);display:grid;place-items:end center;padding-bottom:calc(var(--s,56px) * .14);color:var(--ink);font-family:var(--display);font-size:calc(var(--s,56px) * .36);line-height:1}
+.crest::before{content:"";position:absolute;inset:0;background:var(--c);clip-path:polygon(50% 0, 100% 38%, 100% 100%, 0 100%, 0 38%);border-radius:4px}
+.crest::after{content:"";position:absolute;inset:0;clip-path:polygon(50% 0, 100% 38%, 100% 100%, 0 100%, 0 38%);background:linear-gradient(160deg, rgba(255,255,255,.35), transparent 45%)}
+.crest b{position:relative;z-index:1;font-weight:400}
+/* ---------- intro ---------- */
+.how{display:grid;gap:8px;margin:2px 0;padding:0;list-style:none;counter-reset:s}
+.how li{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--night-2);font-size:13px;line-height:1.4;counter-increment:s}
+.how li::before{content:counter(s);flex:0 0 34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--hc);color:var(--ink);font-family:var(--display);font-size:18px}
+.how b{color:var(--text)}
+.codebox{display:flex;gap:8px}
+.codebox input{flex:1;min-width:0;height:50px;border:0;border-radius:12px;padding:0 14px;background:var(--cream);color:var(--ink);font-weight:700;font-size:16px;letter-spacing:.2em;text-transform:uppercase}
+.codebox button{min-width:96px;border-radius:12px;background:var(--night-3);font-family:var(--display);font-size:15px}
+/* ---------- create ---------- */
+.field{display:flex;flex-direction:column;gap:6px}
+.field>span{font-size:10.5px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+.field input{width:100%;height:52px;border:0;border-radius:12px;padding:0 14px;background:var(--cream);color:var(--ink);font-weight:700;font-size:16px}
+.field small{font-size:11px;color:var(--muted)}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches button{width:44px;height:44px;border-radius:12px;background:var(--c);box-shadow:inset 0 0 0 3px rgba(0,0,0,.25);transition:transform .2s var(--ease-pop)}
+.swatches button.on{transform:scale(1.12);box-shadow:0 0 0 3px var(--night),0 0 0 6px var(--c)}
+.preview{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;background:var(--night-2);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--hc) 55%, transparent)}
+.preview .nm{font-family:var(--display);font-size:clamp(20px,6vw,26px);line-height:1;overflow-wrap:anywhere}
+.preview .mt{font-size:12px;color:var(--muted);margin-top:4px}
+/* ---------- house HQ ---------- */
+.hero{position:relative;display:flex;gap:14px;align-items:center;padding:16px;border-radius:22px;background:linear-gradient(135deg, color-mix(in srgb, var(--hc) 26%, var(--night-2)), var(--night-2) 70%);box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--hc) 60%, transparent);overflow:hidden}
+.hero .nm{font-family:var(--display);font-size:clamp(24px,7.6vw,34px);line-height:.95;overflow-wrap:anywhere}
+.hero .mt{font-size:12px;color:var(--muted);margin-top:5px}
+.hero .crest{--s:72px;animation:pop .6s var(--ease-pop) both}
+@keyframes pop{from{transform:scale(.4) rotate(-10deg);opacity:0}}
+.status{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--night-2)}
+.status .rk{grid-row:span 2;font-family:var(--display);font-size:clamp(56px,17vw,78px);line-height:.85;color:var(--hc);font-variant-numeric:tabular-nums}
+.status .rk small{font-size:.42em;vertical-align:top;margin-right:2px}
+.status .l1{font-family:var(--display);font-size:18px;line-height:1.05}
+.status .l2{font-size:12px;color:var(--muted)}
+.status .l2 b{color:var(--text)}
+.rival{grid-column:1 / -1;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--night);font-size:12.5px;line-height:1.4}
+.rival b{color:var(--hc)}
+.slots{display:flex;gap:8px;margin:2px 0 4px}
+.slots i{flex:1;height:14px;border-radius:7px;background:var(--night-3);overflow:hidden}
+.slots i.on{background:var(--hc);animation:fill .6s var(--ease-out) both}
+@keyframes fill{from{transform:scaleX(0);transform-origin:left}}
+.need{font-family:var(--display);font-size:20px;line-height:1.05}
+.need span{color:var(--hc)}
+.note{padding:10px 12px;border-radius:12px;background:color-mix(in srgb, var(--gold) 14%, var(--night-2));font-size:12px;line-height:1.45}
+.sect{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:6px}
+.sect b{font-size:11px;letter-spacing:.2em;color:var(--muted)}
+.sect span{font-size:11px;color:var(--muted)}
+.roster{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.roster li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;min-height:48px;padding:8px 12px;border-radius:12px;background:var(--night-2)}
+.roster li.me{box-shadow:inset 0 0 0 2px var(--hc)}
+.roster .nk{font-family:var(--display);font-size:15px;line-height:1.1;overflow-wrap:anywhere}
+.roster .nk em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--hc);margin-left:6px}
+.roster .dd{font-size:11px;color:var(--muted);text-align:right}
+.roster .pc{min-width:58px;text-align:right;font-family:var(--display);font-size:17px;font-variant-numeric:tabular-nums}
+.roster .pc.na{color:var(--muted);font-family:var(--mono);font-size:11px}
+.today{display:block;margin-top:3px;font:700 9.5px var(--mono);letter-spacing:.12em;color:var(--good)}
+/* ---------- the league table ---------- */
+.board{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.board li{display:grid;grid-template-columns:34px auto 1fr auto;gap:10px;align-items:center;min-height:56px;padding:8px 12px;border-radius:14px;background:var(--night-2);animation:in .5s var(--ease-out) both}
+.board li.you{background:color-mix(in srgb, var(--hc) 22%, var(--night-2));box-shadow:inset 0 0 0 2px var(--hc)}
+.board .n{font-family:var(--display);font-size:22px;color:var(--muted);text-align:center}
+.board li:first-child .n{color:var(--gold)}
+.board .crest{--s:34px}
+.board .nm{font-family:var(--display);font-size:15px;line-height:1.05;overflow-wrap:anywhere}
+.board .nm small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:2px;letter-spacing:.04em}
+.board .pc{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.empty{padding:16px;border-radius:16px;background:var(--night-2);font-size:13px;line-height:1.5;color:var(--muted);text-align:center}
+.empty b{display:block;font-family:var(--display);font-size:19px;color:var(--text);margin-bottom:4px}
+.fine{font-size:11px;line-height:1.45;color:var(--muted);text-align:center}
+.how-scored{border-radius:14px;background:var(--night-2)}
+.how-scored summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;padding:0 14px;font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--mint)}
+.how-scored summary::-webkit-details-marker{display:none}
+.how-scored ul{margin:0;padding:0 16px 14px 30px;font-size:12px;line-height:1.5;color:var(--muted)}
+/* ---------- house of the week ---------- */
+.hotw{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 16px 16px;border-radius:22px;background:radial-gradient(90% 80% at 50% 0%, color-mix(in srgb, var(--c) 32%, transparent), transparent 70%), var(--night-2);box-shadow:inset 0 0 0 2px var(--gold);text-align:center}
+.hotw .k{font-size:10.5px;font-weight:700;letter-spacing:.22em;color:var(--gold)}
+.hotw .crest{--s:64px}
+.hotw .nm{font-family:var(--display);font-size:clamp(22px,7vw,30px);line-height:1}
+.hotw .st{font-size:12px;color:var(--muted)}
+.hotw .btn{margin-top:6px;min-height:46px;font-size:15px}
+.mini{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.mini button{min-height:44px;padding:0 12px;font-size:11.5px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.sheetbg{position:fixed;inset:0;z-index:40;background:rgba(5,4,12,.7);display:flex;align-items:flex-end;justify-content:center;animation:fade .25s ease-out}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:560px;display:flex;flex-direction:column;gap:12px;padding:18px 16px calc(18px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0;background:var(--night-2);animation:up .35s var(--ease-out)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.lightbox{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(5,4,12,.88)}
+.lightbox img{max-width:100%;max-height:80vh;border-radius:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"><link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png"><meta name="apple-mobile-web-app-title" content="Off Campus"><meta property="og:title" content="Off Campus · Queen's House League"><meta property="og:description" content="Your house vs every house at Queen's. Play the Daily, your house's average counts."><meta property="og:url" content="https://offcampusontario.ca/house.html"><meta property="og:type" content="website"><meta property="og:image" content="https://offcampusontario.ca/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"></head><body>
+<div id="app"></div>
+<script>
+(() => {
+/* ---------- settings ---------- */
+const MIN_PLAYERS = 3;   // must match MIN_PLAYERS in lib/houses.mjs
+const FIRST_DAY = Date.UTC(2026, 10, 3);   // Daily No. 1 (must match the server)
+const COLORS = ['gold', 'mint', 'red', 'blue', 'pin', 'pink', 'good', 'cream'];
+
+const API = (() => { const t = new URLSearchParams(location.search).get('api'); if (t && /^http:\/\/localhost:\d+$/.test(t)) return t; return /(^|\.)offcampusontario\.ca$|\.netlify\.app$|^localhost$/.test(location.hostname) ? '' : null; })();
+const SITE = /(^|\.)offcampusontario\.ca$/.test(location.hostname) ? 'https://offcampusontario.ca' : location.origin;   // a preview's invite links stay on that preview
+const QS = new URLSearchParams(location.search);
+const KEEP = API ? `&api=${encodeURIComponent(API)}` : '';   // local tests only
+const $ = s => document.querySelector(s), app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c]);
+const store = { get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+const vibe = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const toast = t => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 1900); };
+const track = n => { try { window.goatcounter && window.goatcounter.count({ path:'event-' + n, event:true }); } catch (e) {} };
+const randId = () => Array.from(crypto.getRandomValues(new Uint8Array(20)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('');
+const PLAYER_ID = (() => { let id = store.get('oc-pid'); if (!id || !/^[a-z0-9]{12,40}$/.test(id)) { id = randId(); store.set('oc-pid', id); } return id; })();
+const nick = () => store.get('oc-nick') || '';
+const pct = x => x === null || x === undefined ? '–' : (Math.round(x * 10) / 10).toFixed(1) + '%';
+const cvar = c => `var(--${COLORS.includes(c) ? c : 'gold'})`;
+const crest = (c, mono, s) => `<span class="crest" style="--c:${cvar(c)}${s ? ';--s:' + s + 'px' : ''}"><b>${esc(mono)}</b></span>`;
+const dateOf = d => new Date(FIRST_DAY + (d - 1) * 864e5).toLocaleDateString('en-CA', { month:'short', day:'numeric', timeZone:'UTC' }).toUpperCase().replace('.', '');
+const weekLabel = w => `${dateOf(w.from)} – ${dateOf(w.to)}`;
+const setHC = c => document.documentElement.style.setProperty('--hc', cvar(c));
+async function api(method, p, body){
+  if (API === null) throw new Error('offline');
+  const r = await fetch(API + p, { method, headers:body ? { 'Content-Type':'application/json' } : {}, body:body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'error'); return j;
+}
+const page = p => KEEP ? p + (p.includes('?') ? '&' : '?') + KEEP.slice(1) : p;   // keeps ?api= on local test pages only
+const tabs = () => `<nav class="tabs" aria-label="Off Campus"><a class="home" href="${page('/')}" aria-label="Off Campus home">OC</a><a href="${page('/daily.html')}">DAILY</a><a class="on" href="${page('/house.html')}">HOUSES</a><a href="${page('/party.html')}">PARTY</a></nav>`;
+const inviteUrl = code => `${SITE}/house.html?join=${code}&ref=house`;
+async function share(text, url){
+  try { if (navigator.share) { await navigator.share({ text, url }); return true; } } catch (e) { if (e && e.name === 'AbortError') return false; }
+  try { await navigator.clipboard.writeText(text + ' ' + url); toast('COPIED, PASTE IT IN THE CHAT'); return true; } catch (e) { toast(url); return false; }
+}
+function sheet(html){ const d = document.createElement('div'); d.className = 'sheetbg'; d.innerHTML = `<div class="sheet">${html}</div>`; d.onclick = e => { if (e.target === d) d.remove(); }; document.body.appendChild(d); return d; }
+function countUp(el, to, ms, dec){ if (!el) return; const t0 = performance.now(); const f = now => { const p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = dec ? (to * e).toFixed(1) + '%' : Math.round(to * e); if (p < 1) requestAnimationFrame(f); }; requestAnimationFrame(f); }
+
+/* ================= load ================= */
+let LG = null, ME = null;
+async function load(){
+  if (API === null) { app.innerHTML = `<section class="screen">${tabs()}<div class="empty"><b>OPEN THIS ON OFFCAMPUSONTARIO.CA</b>The House League runs on the Off Campus site.</div></section>`; return; }
+  app.innerHTML = `<section class="screen">${tabs()}<p class="sub" style="text-align:center;margin-top:30vh">LOADING THE LEAGUE…</p></section>`;
+  try { [LG, ME] = await Promise.all([api('GET', '/api/league?playerId=' + PLAYER_ID), api('GET', '/api/me?playerId=' + PLAYER_ID)]); }
+  catch (e) { app.innerHTML = `<section class="screen">${tabs()}<div class="empty"><b>COULDN'T LOAD THE LEAGUE</b>Check your connection and try again.</div><button class="btn" id="re">TRY AGAIN</button></section>`; $('#re').onclick = load; return; }
+  const join = (QS.get('join') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  if (join && !(ME.house && ME.house.code === join)) return joinScreen(join);
+  if (ME.house) return hq(ME.house.code);
+  intro();
+}
+
+/* ================= no house yet ================= */
+function intro(){
+  setHC('gold');
+  app.innerHTML = `<section class="screen">${tabs()}
+    <div class="kick">QUEEN'S HOUSE LEAGUE · ${weekLabel(LG.week)}</div>
+    <h1>YOUR HOUSE <span>VS EVERY HOUSE.</span></h1>
+    <ol class="how">
+      <li><span><b>Start a house</b> and send the link to your roommates.</span></li>
+      <li><span><b>Everyone plays the Daily.</b> Your first score each day counts for your house automatically.</span></li>
+      <li><span><b>${MIN_PLAYERS} players a week</b> puts you in the league. Best average wins the week.</span></li>
+    </ol>
+    <div class="sect"><b>THIS WEEK</b><span>${LG.week.daysLeft ? `${LG.week.daysLeft} ${LG.week.daysLeft === 1 ? 'DAY' : 'DAYS'} LEFT` : 'LAST DAY'}</span></div>
+    ${boardHTML(LG, 5)}
+    ${lastWeekHTML(LG)}
+    <div class="sect"><b>GOT AN INVITE CODE?</b></div>
+    <form class="codebox" id="cf" autocomplete="off"><input id="ci" maxlength="6" placeholder="CODE" aria-label="House code" autocapitalize="characters"><button type="submit">JOIN</button></form>
+    <p class="fine">A house is your official team: one per player per week. Crews are separate, casual and as many as you like.</p>
+    <button class="btn dock" id="mk">START A HOUSE</button>
+  </section>`;
+  $('#mk').onclick = () => { vibe(15); create(); };
+  $('#cf').onsubmit = e => { e.preventDefault(); const c = $('#ci').value.trim().toUpperCase(); if (c.length === 6) joinScreen(c); else toast('CODES ARE 6 CHARACTERS'); };
+  wireBoard();
+}
+
+/* ================= start a house ================= */
+function create(){
+  const S = { name:'', motto:'', color:'gold', nick:nick() };
+  const mono = n => { const w = n.split(/\s+/).filter(x => /[a-z0-9]/i.test(x)); return (w.length > 1 ? w[0][0] + w[1][0] : n.replace(/[^a-z0-9]/gi, '').slice(0, 2)).toUpperCase() || 'H'; };
+  app.innerHTML = `<section class="screen">${tabs()}
+    <div class="kick">START A HOUSE</div><h1>NAME YOUR <span>HOUSE.</span></h1>
+    <div class="preview" id="pv"></div>
+    <label class="field"><span>HOUSE NAME</span><input id="hn" maxlength="24" placeholder="The Earl Street Boys" autocomplete="off"><small>A nickname, not your address.</small></label>
+    <div class="field"><span>HOUSE COLOUR</span><div class="swatches" id="sw">${COLORS.map(c => `<button type="button" data-c="${c}" style="--c:${cvar(c)}" aria-label="${c}"></button>`).join('')}</div></div>
+    <label class="field"><span>HOUSE MOTTO (OPTIONAL)</span><input id="hm" maxlength="40" placeholder="Never home before 2am" autocomplete="off"></label>
+    ${S.nick ? '' : '<label class="field"><span>YOUR NAME ON THE HOUSE BOARD</span><input id="nn" maxlength="16" placeholder="Josh" autocomplete="off"><small>Only your house sees this.</small></label>'}
+    <button class="link" id="bk" type="button">BACK</button>
+    <button class="btn dock" id="go" disabled>CREATE THE HOUSE</button>
+  </section>`;
+  const draw = () => { setHC(S.color); $('#pv').innerHTML = `${crest(S.color, mono(S.name || 'House'), 60)}<div><div class="nm">${esc(S.name || 'Your house')}</div><div class="mt">${esc(S.motto || 'Your motto goes here')}</div></div>`;
+    document.querySelectorAll('#sw button').forEach(b => b.classList.toggle('on', b.dataset.c === S.color));
+    $('#go').disabled = S.name.trim().length < 2 || (!nick() && !(($('#nn') || {}).value || '').trim()); };
+  $('#hn').oninput = e => { S.name = e.target.value; draw(); }; $('#hm').oninput = e => { S.motto = e.target.value; draw(); };
+  if ($('#nn')) $('#nn').oninput = draw;
+  $('#sw').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.color = b.dataset.c; vibe(8); draw(); };
+  $('#bk').onclick = () => intro();
+  $('#go').onclick = async () => {
+    const nn = $('#nn') ? $('#nn').value.trim() : nick(); if (nn) store.set('oc-nick', nn);
+    const b = $('#go'); b.disabled = true; b.textContent = 'CREATING…';
+    try { const h = await api('POST', '/api/houses', { playerId:PLAYER_ID, nick:nn, name:S.name.trim(), motto:S.motto.trim(), color:S.color }); track('house-create'); vibe([20, 40, 60]);
+      ME = await api('GET', '/api/me?playerId=' + PLAYER_ID); LG = await api('GET', '/api/league?playerId=' + PLAYER_ID); hq(h.code, { fresh:true }); }
+    catch (err) { b.disabled = false; b.textContent = 'CREATE THE HOUSE'; toast(String(err.message || 'COULDN\'T CREATE IT').toUpperCase()); }
+  };
+  draw(); setTimeout(() => $('#hn').focus(), 300);
+}
+
+/* ================= join from an invite ================= */
+async function joinScreen(code){
+  let h; try { h = await api('GET', `/api/houses/${code}?playerId=${PLAYER_ID}`); }
+  catch (e) { app.innerHTML = `<section class="screen">${tabs()}<div class="empty"><b>HOUSE NOT FOUND</b>Check the code or ask for a new link.</div><a class="btn" href="${page('/house.html')}">SEE THE LEAGUE</a></section>`; return; }
+  if (h.member) return hq(code);
+  setHC(h.color); track('house-invite-open');
+  const cur = ME.house;
+  app.innerHTML = `<section class="screen">${tabs()}
+    <div class="kick">YOU'RE INVITED</div>
+    <div class="hero">${crest(h.color, h.mono)}<div><div class="nm">${esc(h.name)}</div><div class="mt">${h.motto ? esc(h.motto) + ' · ' : ''}${h.size} ${h.size === 1 ? 'PLAYER' : 'PLAYERS'}</div></div></div>
+    <p class="sub">Join and your Daily scores count for ${esc(h.name)} in the Queen's House League. No account, no sign-up.</p>
+    ${cur ? `<div class="note">You're in <b>${esc(cur.name)}</b> right now. Joining moves you. If you've already played for ${esc(cur.name)} this week, you'll count for ${esc(h.name)} from Monday.</div>` : ''}
+    ${nick() ? '' : '<label class="field"><span>YOUR NAME ON THE HOUSE BOARD</span><input id="nn" maxlength="16" placeholder="Your name" autocomplete="off"><small>Only your house sees this.</small></label>'}
+    <button class="link" id="no" type="button">NOT NOW</button>
+    <button class="btn dock" id="jn">JOIN ${esc(h.name.toUpperCase())}</button>
+  </section>`;
+  $('#no').onclick = () => { history.replaceState(null, '', location.pathname + (KEEP ? '?' + KEEP.slice(1) : '')); cur ? hq(cur.code) : intro(); };
+  $('#jn').onclick = async () => {
+    const nn = $('#nn') ? $('#nn').value.trim() : nick(); if (!nn) { toast('ADD YOUR NAME'); return; } store.set('oc-nick', nn);
+    const b = $('#jn'); b.disabled = true; b.textContent = 'JOINING…';
+    try { const r = await api('POST', `/api/houses/${code}/join`, { playerId:PLAYER_ID, nick:nn }); track('house-join'); vibe([20, 40, 60]);
+      history.replaceState(null, '', location.pathname + (KEEP ? '?' + KEEP.slice(1) : ''));
+      ME = await api('GET', '/api/me?playerId=' + PLAYER_ID); LG = await api('GET', '/api/league?playerId=' + PLAYER_ID); hq(code, { joined:true, later:!r.countsFromNow }); }
+    catch (err) { b.disabled = false; b.textContent = 'JOIN'; toast(String(err.message || 'COULDN\'T JOIN').toUpperCase()); }
+  };
+}
+
+/* ================= your house ================= */
+async function hq(code, opts = {}){
+  let h; try { h = await api('GET', `/api/houses/${code}?playerId=${PLAYER_ID}`); } catch (e) { return intro(); }
+  if (!h.member) return joinScreen(code);
+  setHC(h.color);
+  const mine = LG.mine && LG.mine.code === code ? LG.mine : null;
+  const playedToday = h.members.some(m => m.you && m.today);
+  const ranked = LG.ranked.length;
+  const status = mine && mine.qualified
+    ? `<div class="status"><div class="rk"><small>#</small><span id="rk">${mine.rank}</span></div>
+        <div class="l1">${mine.rank === 1 ? 'TOP OF THE LEAGUE' : `OF ${ranked} RANKED ${ranked === 1 ? 'HOUSE' : 'HOUSES'}`}</div>
+        <div class="l2">House average <b id="hp">${pct(mine.pct)}</b> · ${mine.players} players · ${mine.days} Dailies</div>
+        ${LG.rival ? `<div class="rival">${LG.rival.dir === 'chase' ? `<b>${LG.rival.gap.toFixed(1)} points</b> behind ${esc(LG.rival.name)} (#${LG.rival.rank}). A strong day from anyone in the house closes it.` : `<b>${LG.rival.gap.toFixed(1)} points</b> ahead of ${esc(LG.rival.name)} (#${LG.rival.rank}). Keep playing to hold it.`}</div>` : ''}</div>`
+    : `<div class="status" style="display:block"><div class="need"><span>${mine ? mine.players : 0} OF ${MIN_PLAYERS}</span> PLAYERS THIS WEEK</div>
+        <div class="slots">${Array.from({ length:MIN_PLAYERS }, (_, i) => `<i class="${i < (mine ? mine.players : 0) ? 'on' : ''}" style="animation-delay:${i * 120}ms"></i>`).join('')}</div>
+        <div class="l2">${MIN_PLAYERS - (mine ? mine.players : 0) === 1 ? 'One more player' : `${MIN_PLAYERS - (mine ? mine.players : 0)} more players`} from your house need to play a Daily this week to enter the league.</div></div>`;
+  const you = h.members.find(m => m.you);
+  app.innerHTML = `<section class="screen">${tabs()}
+    ${opts.fresh ? `<div class="kick">HOUSE CREATED · NOW GET YOUR ROOMMATES IN</div>` : opts.joined ? `<div class="kick">YOU'RE IN</div>` : `<div class="kick">QUEEN'S HOUSE LEAGUE · ${weekLabel(LG.week)}</div>`}
+    <div class="hero">${crest(h.color, h.mono)}<div><div class="nm">${esc(h.name)}</div><div class="mt">${h.motto ? esc(h.motto) + ' · ' : ''}${h.size} ${h.size === 1 ? 'PLAYER' : 'PLAYERS'} · CODE ${h.code}</div></div></div>
+    ${h.countsElsewhere || opts.later ? `<div class="note">You already played for another house this week, so your scores count for <b>${esc(h.name)}</b> from Monday.</div>` : ''}
+    ${status}
+    <div class="row2"><button class="btn ghost" id="inv" type="button">INVITE A ROOMMATE</button><button class="btn ghost" id="shr" type="button">SHARE OUR SPOT</button></div>
+    <div class="sect"><b>THE HOUSE · THIS WEEK</b><span>${LG.week.daysLeft ? `${LG.week.daysLeft} ${LG.week.daysLeft === 1 ? 'DAY' : 'DAYS'} LEFT` : 'LAST DAY'}</span></div>
+    <ul class="roster">${h.members.map(m => `<li class="${m.you ? 'me' : ''}"><div><span class="nk">${esc(m.nick)}${m.you ? '<em>YOU</em>' : ''}</span>${m.today ? '<div class="today">PLAYED TODAY</div>' : ''}</div>
+      <span class="dd">${m.countsHere ? (m.days ? `${m.days} ${m.days === 1 ? 'DAY' : 'DAYS'}` : 'NOT YET') : 'FROM MONDAY'}</span><span class="pc ${m.pct === null ? 'na' : ''}">${m.pct === null ? '–' : pct(m.pct)}</span></li>`).join('')}</ul>
+    ${h.size < 2 ? `<div class="empty"><b>JUST YOU SO FAR</b>Send the invite to your roommates. Anyone who lives with you can join with the link, no account needed.</div>` : ''}
+    <div class="sect"><b>THE LEAGUE</b><span>${weekLabel(LG.week)}</span></div>
+    ${boardHTML(LG, 10)}
+    ${lastWeekHTML(LG)}
+    <details class="how-scored"><summary>HOW THE LEAGUE IS SCORED</summary><ul>
+      <li>Each Daily is a % of that day's maximum (today: out of ${(LG.max || 3000).toLocaleString('en-CA')}).</li>
+      <li>Your average is the days you played. Days you miss don't count as zero.</li>
+      <li>The house % is the average of everyone's averages, so one person can't carry the house.</li>
+      <li>${MIN_PLAYERS} different players in a week to be ranked. One house per player per week.</li>
+      <li>Ties: more players, then more Dailies played.</li>
+      <li>Bragging rights only. There are no prizes in the House League.</li></ul></details>
+    <div class="mini"><button id="ed" type="button">EDIT HOUSE</button><button id="lv" type="button">LEAVE HOUSE</button></div>
+    ${playedToday ? `<a class="btn dock" href="${page('/daily.html')}">SEE TODAY'S DAILY</a>` : `<a class="btn go dock" href="${page('/daily.html')}" id="play">PLAY TODAY'S FIVE</a>`}
+  </section>`;
+  if (mine && mine.qualified) { countUp($('#rk'), mine.rank, 700); countUp($('#hp'), mine.pct, 900, true); }
+  const invMsg = `Join ${h.name} in the Queen's House League. Play the Daily and your score counts for the house:`;
+  $('#inv').onclick = async () => { vibe(10); track('house-invite'); await share(invMsg, inviteUrl(h.code)); };
+  $('#shr').onclick = async () => { vibe(10); track('house-share'); await shareCard(h, mine); };
+  $('#ed').onclick = () => editSheet(h);
+  $('#lv').onclick = () => leaveSheet(h);
+  wireBoard();
+  if (opts.fresh || opts.joined) vibe([30, 40, 80]);
+}
+
+/* ================= the league table ================= */
+function boardHTML(L, n){
+  if (!L.ranked.length) return `<div class="empty"><b>${L.forming ? 'NO HOUSE IS RANKED YET' : 'NO HOUSES YET THIS WEEK'}</b>${L.forming ? `${L.forming} ${L.forming === 1 ? 'house is' : 'houses are'} getting ${MIN_PLAYERS} players in. ` : ''}The first house with ${MIN_PLAYERS} players this week takes #1.</div>`;
+  const rows = L.ranked.slice(0, n), mineRow = L.ranked.find(x => x.you), extra = mineRow && !rows.includes(mineRow) ? [mineRow] : [];
+  return `<ol class="board">${rows.concat(extra).map((x, i) => `<li class="${x.you ? 'you' : ''}" style="animation-delay:${i * 60}ms"><span class="n">${x.rank}</span>${crest(x.color, x.mono)}<span class="nm">${esc(x.name)}${x.you ? ' · YOU' : ''}<small>${x.players} players · ${x.days} Dailies</small></span><span class="pc">${pct(x.pct)}</span></li>`).join('')}</ol>
+    ${L.forming ? `<p class="fine">+${L.forming} ${L.forming === 1 ? 'house' : 'houses'} still getting to ${MIN_PLAYERS} players this week.</p>` : ''}`;
+}
+function lastWeekHTML(L){
+  const w = L.lastWeek; if (!w) return '';
+  return `<div class="hotw" style="--c:${cvar(w.winner.color)}"><span class="k">HOUSE OF THE WEEK · ${dateOf(w.from)} – ${dateOf(w.to)}</span>${crest(w.winner.color, w.winner.mono)}<span class="nm">${esc(w.winner.name)}</span>
+    <span class="st">${pct(w.winner.pct)} house average · ${w.winner.players} players · beat ${w.ranked - 1} other ranked ${w.ranked - 1 === 1 ? 'house' : 'houses'}</span>
+    ${w.yours ? `<span class="st">Your house finished <b style="color:var(--text)">#${w.yours.rank}</b>.</span>` : ''}
+    <button class="btn" id="hotw" type="button">SHARE THE HOUSE OF THE WEEK</button></div>`;
+}
+function wireBoard(){ const b = $('#hotw'); if (b) b.onclick = async () => { vibe(10); track('house-hotw-share'); await shareCard(null, null, LG.lastWeek); }; }
+
+/* ================= share card (1080 x 1350) ================= */
+async function shareCard(h, mine, hotw){
+  try { await document.fonts.ready; } catch (e) {}
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1350; const x = c.getContext('2d');
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const who = hotw ? hotw.winner : { name:h.name, color:h.color, mono:h.mono }, col = css('--' + (COLORS.includes(who.color) ? who.color : 'gold'));
+  x.fillStyle = css('--night'); x.fillRect(0, 0, 1080, 1350);
+  const g = x.createRadialGradient(540, 120, 40, 540, 300, 900); g.addColorStop(0, col + '66'); g.addColorStop(1, 'transparent'); x.fillStyle = g; x.fillRect(0, 0, 1080, 1350);
+  x.strokeStyle = hotw ? css('--gold') : col; x.lineWidth = 12; x.strokeRect(40, 40, 1000, 1270);
+  x.textAlign = 'center'; x.fillStyle = css('--mint'); x.font = '700 34px "IBM Plex Mono", monospace';
+  x.fillText(hotw ? `HOUSE OF THE WEEK · ${dateOf(hotw.from)} – ${dateOf(hotw.to)}` : `QUEEN'S HOUSE LEAGUE · ${weekLabel(LG.week)}`, 540, 140);
+  x.save(); x.translate(540, 300); x.fillStyle = col; x.beginPath(); x.moveTo(0, -150); x.lineTo(150, -60); x.lineTo(150, 150); x.lineTo(-150, 150); x.lineTo(-150, -60); x.closePath(); x.fill();
+  x.fillStyle = css('--ink'); x.font = '130px "Bowlby One", Impact, sans-serif'; x.fillText(who.mono, 0, 120); x.restore();
+  x.fillStyle = css('--text'); let fs = 104; x.font = `${fs}px "Bowlby One", Impact, sans-serif`; while (x.measureText(who.name.toUpperCase()).width > 940 && fs > 50) { fs -= 6; x.font = `${fs}px "Bowlby One", Impact, sans-serif`; }
+  x.fillText(who.name.toUpperCase(), 540, 600);
+  let big, line;
+  if (hotw) { big = '#1'; line = `${pct(who.pct)} house average · ${who.players} players`; }
+  else if (mine && mine.qualified) { big = '#' + mine.rank; line = `${pct(mine.pct)} house average · ${mine.players} players`; }
+  else { big = `${mine ? mine.players : 0}/${MIN_PLAYERS}`; line = `players in. ${MIN_PLAYERS} gets us in the league.`; }
+  x.fillStyle = hotw ? css('--gold') : col; x.font = '300px "Bowlby One", Impact, sans-serif'; x.fillText(big, 540, 930);
+  x.fillStyle = css('--text'); x.font = '700 42px "IBM Plex Mono", monospace'; x.fillText(line, 540, 1020);
+  x.fillStyle = css('--muted'); x.font = '700 36px "IBM Plex Mono", monospace'; x.fillText(hotw ? 'Think your house can take it?' : 'Think your house is better?', 540, 1150);
+  x.fillStyle = css('--gold'); x.font = '42px "Bowlby One", Impact, sans-serif'; x.fillText('OFFCAMPUSONTARIO.CA', 540, 1240);
+  const url = h ? inviteUrl(h.code) : `${SITE}/house.html?ref=hotw`, text = hotw ? `${who.name} is the House of the Week in the Queen's House League. Think your house can take it?` : `${who.name} in the Queen's House League. Think your house is better?`;
+  try { const blob = await new Promise(r => c.toBlob(r, 'image/png')), file = new File([blob], 'house-league.png', { type:'image/png' });
+    if (navigator.canShare && navigator.canShare({ files:[file] })) { await navigator.share({ files:[file], text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  const d = document.createElement('div'); d.className = 'lightbox'; d.innerHTML = `<img src="${c.toDataURL('image/png')}" alt="House League card">`; d.onclick = () => d.remove(); document.body.appendChild(d);
+  share(text, url);
+}
+
+/* ================= edit / leave ================= */
+function editSheet(h){
+  const S = { color:h.color };
+  const d = sheet(`<h2>EDIT ${esc(h.name.toUpperCase())}</h2>
+    <label class="field"><span>HOUSE NAME</span><input id="en" maxlength="24" value="${esc(h.name)}"></label>
+    <div class="field"><span>HOUSE COLOUR</span><div class="swatches" id="es">${COLORS.map(c => `<button type="button" data-c="${c}" class="${c === h.color ? 'on' : ''}" style="--c:${cvar(c)}" aria-label="${c}"></button>`).join('')}</div></div>
+    <label class="field"><span>MOTTO</span><input id="em" maxlength="40" value="${esc(h.motto)}"></label>
+    <button class="btn" id="es2" type="button">SAVE</button><button class="link" id="ex" type="button">CANCEL</button>`);
+  d.querySelector('#es').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.color = b.dataset.c; d.querySelectorAll('#es button').forEach(x => x.classList.toggle('on', x === b)); };
+  d.querySelector('#ex').onclick = () => d.remove();
+  d.querySelector('#es2').onclick = async () => { try { await api('POST', `/api/houses/${h.code}/edit`, { playerId:PLAYER_ID, name:d.querySelector('#en').value.trim(), motto:d.querySelector('#em').value.trim(), color:S.color }); d.remove(); toast('SAVED'); LG = await api('GET', '/api/league?playerId=' + PLAYER_ID); hq(h.code); } catch (err) { toast(String(err.message).toUpperCase()); } };
+}
+function leaveSheet(h){
+  const d = sheet(`<h2>LEAVE ${esc(h.name.toUpperCase())}?</h2><p class="sub">Your scores this week still count for ${esc(h.name)}. You can join another house any time.</p>
+    <button class="btn ghost" id="lv2" type="button">LEAVE THE HOUSE</button><button class="link" id="lx" type="button">STAY</button>`);
+  d.querySelector('#lx').onclick = () => d.remove();
+  d.querySelector('#lv2').onclick = async () => { try { await api('POST', `/api/houses/${h.code}/leave`, { playerId:PLAYER_ID }); d.remove(); track('house-leave'); load(); } catch (err) { toast('COULDN\'T LEAVE'); } };
+}
+
+load();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && ME && ME.house && !document.querySelector('.sheetbg, input:focus')) load(); });
+})();
+</script>
+</body></html>
