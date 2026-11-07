@@ -188,9 +188,12 @@ const sl = (await call('GET', '/api/suggestions?k=' + cl.key, null, at(9))).body
 ok(sl.length === 5 && sl.filter(x => x.kind === 'survey').length === 1 && sl.find(x => x.kind === 'survey').credit === 'maya.kscript', 'suggestions: Josh sees them, credit cleaned');
 ok((await call('GET', `/api/clubs/${mk.slug}?k=${cl.key}`, null, at(9))).body.exec === true, 'admin key works on club games');
 // home: yesterday's real result + crew of the week
+// a home cache saved under the old rules (10+ answers, out of 5,000) is never served
+await store.setJSON('cache/home', { day:9, at:at(9) - 60e3, data:{ day:9, yesterday:{ q:'OLD RULES', yes:4, n:12 }, crewOfWeek:{ name:'OLD', avg:4000, players:3 } } });
 // a closed question only shows on the home page once 30+ answered
 for (let i = 0; i < 29; i++) await call('POST', '/api/answer', { playerId:('h' + i).padEnd(14, 'x'), day:8, round:2, yes:i < 8, q:'Have you ever cried in Stauffer?' }, at(8));
-ok((await call('GET', '/api/home', null, at(9) - 6 * 60e3)).body.yesterday === null, 'home: 29 answers is not enough');
+const h29 = (await call('GET', '/api/home', null, at(9) - 6 * 60e3)).body;
+ok(h29.yesterday === null && h29.closed.length === 0 && !JSON.stringify(h29).includes('OLD'), 'home: 29 answers is not enough, and the old-rules cache is ignored');
 await call('POST', '/api/answer', { playerId:'h29'.padEnd(14, 'x'), day:8, round:2, yes:true, q:'Have you ever cried in Stauffer?' }, at(8));
 await call('POST', '/api/crews/' + wc + '/join', { playerId:W[3], nick:'Lee' }, at(9));
 const hm = (await call('GET', '/api/home', null, at(9))).body;

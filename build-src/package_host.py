@@ -24,7 +24,7 @@ for g, cls in [('droppin','sound'), ('showdown','sound'), ('thecall','pill')]:
     f = H + '/' + g + '.html'; s = open(f).read()
     n = s.count('${soundBtn()}'); assert n >= 4, (g, n)
     if g == 'showdown':   # the party Showdown boards are ours, not a survey of 100 students
-        for a, b in [("We asked 100 Queen's students. Can you guess what they said?", "Our board of top answers. Can you guess them?"), ("WE ASKED 100 QUEEN'S STUDENTS", "THE BOARD"), ("'SURVEY SAYS…'", "'THE BOARD SAYS…'")]:
+        for a, b in [("We asked 100 Queen's students. Can you guess what they said?", "Our own board of top answers, made up by Off Campus. Can you guess them?"), ("WE ASKED 100 QUEEN'S STUDENTS", "OFF CAMPUS BOARD · NOT A SURVEY"), ("'SURVEY SAYS…'", "'THE BOARD SAYS…'")]:
             assert s.count(a) == 1, a; s = s.replace(a, b)
     s = s.replace('${soundBtn()}', '<span class="ocr"><a class="' + cls + ' ochome" href="index.html">&larr; HOME</a>${soundBtn()}</span>')
     s = s.replace("location.href='./';return false;", "location.href='party.html';return false;", 1)
